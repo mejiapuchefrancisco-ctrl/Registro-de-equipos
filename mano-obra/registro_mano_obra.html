@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro Mano de Obra · AIRPLAN T1 JMC</title>
+<style>
+  :root {
+    --verde: #1A5632;
+    --verde-oscuro: #0F331D;
+    --verde-claro: #4C8A64;
+    --dorado: #C9A227;
+    --gris-borde: #D8DED9;
+    --gris-texto: #3A3F3C;
+    --fondo: #F5F7F5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--fondo); color: var(--gris-texto); padding-bottom: 90px;
+  }
+  header {
+    background: var(--verde); color: white; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 20;
+  }
+  header img { height: 34px; }
+  header h1 { font-size: 16px; margin: 0; font-weight: 700; }
+  header p { margin: 0; font-size: 11px; opacity: .85; }
+  main { padding: 14px; max-width: 560px; margin: 0 auto; }
+  .card {
+    background: white; border: 1px solid var(--gris-borde); border-radius: 10px;
+    padding: 14px; margin-bottom: 14px;
+  }
+  .card h2 {
+    font-size: 13px; text-transform: none; color: var(--verde-oscuro);
+    margin: 0 0 10px 0; font-weight: 700;
+  }
+  label { display: block; font-size: 12.5px; color: var(--gris-texto); margin: 10px 0 4px; }
+  label:first-child { margin-top: 0; }
+  select, input[type=text], input[type=number], input[type=date] {
+    width: 100%; padding: 10px 10px; border: 1.5px solid var(--gris-borde);
+    border-radius: 8px; font-size: 15px; background: white; color: var(--gris-texto);
+  }
+  select:focus, input:focus { outline: none; border-color: var(--verde); }
+  .fila { display: flex; gap: 8px; }
+  .fila > div { flex: 1; }
+  .persona-chip {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: #EEF3EF; border: 1px solid var(--gris-borde); border-radius: 8px;
+    padding: 8px 10px; margin-top: 8px;
+  }
+  .persona-chip .nombre { font-size: 13.5px; font-weight: 600; flex: 1; }
+  .persona-chip .cargo { font-size: 11px; color: var(--gris-texto); opacity: .7; }
+  .persona-chip input[type=number] { width: 62px; padding: 6px; font-size: 13px; }
+  .persona-chip select { width: auto; padding: 6px; font-size: 12px; }
+  .btn-x {
+    background: none; border: none; color: #B4453A; font-size: 18px; cursor: pointer;
+    padding: 0 4px; line-height: 1;
+  }
+  .buscador-personal { position: relative; margin-top: 10px; }
+  .resultados {
+    position: absolute; z-index: 10; background: white; border: 1px solid var(--gris-borde);
+    border-radius: 8px; width: 100%; max-height: 180px; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  }
+  .resultados div { padding: 9px 10px; font-size: 13.5px; cursor: pointer; border-bottom: 1px solid #F0F0F0; }
+  .resultados div:hover { background: #EEF3EF; }
+  .btn {
+    display: inline-block; border: none; border-radius: 8px; padding: 11px 16px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .btn-primario { background: var(--verde); color: white; width: 100%; }
+  .btn-primario:disabled { background: #A9BBAE; }
+  .btn-secundario { background: white; color: var(--verde); border: 1.5px solid var(--verde); width: 100%; }
+  .btn-agregar-bloque {
+    background: #EEF3EF; color: var(--verde-oscuro); border: 1.5px dashed var(--verde-claro);
+    width: 100%; padding: 12px; margin-top: 6px;
+  }
+  .bloque { border-top: 2px solid var(--dorado); padding-top: 12px; margin-top: 16px; position: relative; }
+  .bloque:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .bloque-num { font-size: 11px; color: var(--dorado); font-weight: 700; margin-bottom: 6px; letter-spacing: .3px; }
+  .quitar-bloque { position: absolute; right: 0; top: 0; }
+  .barra-inferior {
+    position: fixed; bottom: 0; left: 0; right: 0; background: white;
+    border-top: 1px solid var(--gris-borde); padding: 10px 14px; z-index: 20;
+  }
+  .aviso {
+    background: #FBF3D9; border: 1px solid var(--dorado); border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; margin-bottom: 14px; color: var(--verde-oscuro);
+  }
+  .toast {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    background: var(--verde-oscuro); color: white; padding: 12px 20px; border-radius: 8px;
+    font-size: 14px; z-index: 30; display: none; max-width: 90%; text-align: center;
+  }
+  .vacio { text-align: center; color: #8A948E; font-size: 13px; padding: 20px 0; }
+  .campo-libre { font-size: 11px; color: var(--verde); background: none; border: none; cursor: pointer; padding: 4px 0; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="aia.png" alt="AIA" onerror="this.style.display='none'">
+  <div>
+    <h1>Registro de Mano de Obra</h1>
+    <p>AIRPLAN T1 JMC · Diligenciamiento diario</p>
+  </div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<main>
+
+  <div class="card">
+    <h2>1. ¿Quién eres?</h2>
+    <label for="selMaestro">Busca tu nombre</label>
+    <select id="selMaestro" onchange="onMaestroChange()">
+      <option value="">— Selecciona tu nombre —</option>
+    </select>
+
+    <label for="fecha">Fecha</label>
+    <input type="date" id="fecha">
+  </div>
+
+  <div id="zonaBloques"></div>
+
+  <button class="btn btn-agregar-bloque" id="btnAgregarBloque" onclick="agregarBloque()" disabled>
+    + Agregar otro bloque de actividad
+  </button>
+
+  <div style="height: 90px"></div>
+</main>
+
+<div class="barra-inferior">
+  <button class="btn btn-primario" id="btnGuardar" onclick="guardarTodo()" disabled>
+    Guardar el día
+  </button>
+</div>
+
+<script>
+// =================== CONFIGURACIÓN ===================
+// Reemplaza esta URL por la de tu Google Apps Script publicado (ver instrucciones).
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz1CFQcDCcEKTKBl11EBXC_8Lth5vDQX5ZAec3XLw4rB2P5nyUdvtmouv5S2a0Mdsnr/exec";
+// =======================================================
+
+let CATALOGO = null;
+let maestroActual = null;
+let bloques = []; // { id, codFrente, codCapitulo, codSubcap, codActividad, personas: [{nombre, cargo, horas, tipoHora, cantidad}] }
+let contadorBloque = 0;
+
+async function cargarCatalogo() {
+  const resp = await fetch("catalogo.json");
+  CATALOGO = await resp.json();
+  poblarMaestros();
+  document.getElementById("fecha").value = new Date().toISOString().slice(0, 10);
+}
+
+function poblarMaestros() {
+  const sel = document.getElementById("selMaestro");
+  const maestros = CATALOGO.personal
+    .filter(p => (p.cargo || "").toLowerCase().includes("maestro"))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  maestros.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.nombre;
+    opt.textContent = `${p.nombre} (${p.cargo})`;
+    sel.appendChild(opt);
+  });
+}
+
+function onMaestroChange() {
+  const nombre = document.getElementById("selMaestro").value;
+  maestroActual = CATALOGO.personal.find(p => p.nombre === nombre) || null;
+  document.getElementById("btnAgregarBloque").disabled = !maestroActual;
+  actualizarBotonGuardar();
+  if (maestroActual && bloques.length === 0) agregarBloque();
+}
+
+function frentesDelMaestro() {
+  if (!maestroActual) return [];
+  const propios = CATALOGO.residenteFrente.filter(rf => rf.residenteKey === maestroActual.residenteKey);
+  const codsPropios = new Set(propios.map(p => p.codFrente));
+  const listaPropia = CATALOGO.frentes.filter(f => codsPropios.has(f.cod));
+  return listaPropia;
+}
+
+function agregarBloque() {
+  contadorBloque++;
+  bloques.push({
+    id: contadorBloque, codFrente: "", codCapitulo: "", codSubcap: "", codActividad: "",
+    personas: [],
+  });
+  renderBloques();
+}
+
+function quitarBloque(id) {
+  bloques = bloques.filter(b => b.id !== id);
+  renderBloques();
+}
+
+function renderBloques() {
+  const zona = document.getElementById("zonaBloques");
+  zona.innerHTML = "";
+  bloques.forEach((b, idx) => {
+    const div = document.createElement("div");
+    div.className = "card bloque";
+    div.innerHTML = `
+      ${bloques.length > 1 ? `<button class="btn-x quitar-bloque" onclick="quitarBloque(${b.id})">✕</button>` : ""}
+      <div class="bloque-num">BLOQUE ${idx + 1}</div>
+
+      <label>Frente de trabajo</label>
+      <select onchange="cambiarFrente(${b.id}, this.value)">
+        <option value="">— Selecciona el frente —</option>
+        ${frenteOpciones(b)}
+      </select>
+
+      ${b.codFrente ? `
+      <label>Capítulo</label>
+      <select onchange="cambiarCapitulo(${b.id}, this.value)">
+        <option value="">— Selecciona el capítulo —</option>
+        ${capituloOpciones(b)}
+      </select>` : ""}
+
+      ${b.codCapitulo ? `
+      <label>Subcapítulo</label>
+      <select onchange="cambiarSubcap(${b.id}, this.value)">
+        <option value="">— Selecciona el subcapítulo —</option>
+        ${subcapOpciones(b)}
+      </select>` : ""}
+
+      ${b.codSubcap ? `
+      <label>Actividad</label>
+      <select onchange="cambiarActividad(${b.id}, this.value)">
+        <option value="">— Selecciona la actividad —</option>
+        ${actividadOpciones(b)}
+      </select>` : ""}
+
+      ${b.codActividad ? `
+      <label>Personal en esta actividad</label>
+      <div id="personas-${b.id}"></div>
+      <div class="buscador-personal">
+        <input type="text" placeholder="Buscar y agregar a alguien de tu cuadrilla u otra persona…"
+               oninput="buscarPersona(${b.id}, this.value)" id="buscador-${b.id}">
+        <div class="resultados" id="resultados-${b.id}" style="display:none"></div>
+      </div>
+      <button class="campo-libre" onclick="agregarPersonaLibre(${b.id})">
+        ¿No aparece? Escribir el nombre manualmente
+      </button>` : ""}
+    `;
+    zona.appendChild(div);
+    if (b.codActividad) renderPersonas(b);
+  });
+  actualizarBotonGuardar();
+}
+
+function frenteOpciones(b) {
+  const propios = frentesDelMaestro();
+  const codsPropios = new Set(propios.map(f => f.cod));
+  let html = "";
+  if (propios.length) {
+    html += `<optgroup label="Tus frentes habituales">`;
+    propios.forEach(f => {
+      html += `<option value="${f.cod}" ${b.codFrente === f.cod ? "selected" : ""}>${f.nombre}</option>`;
+    });
+    html += `</optgroup><optgroup label="Otros frentes (personal prestado / apoyo)">`;
+  }
+  CATALOGO.frentes.filter(f => !codsPropios.has(f.cod)).forEach(f => {
+    html += `<option value="${f.cod}" ${b.codFrente === f.cod ? "selected" : ""}>${f.nombre}</option>`;
+  });
+  if (propios.length) html += `</optgroup>`;
+  return html;
+}
+
+function capituloOpciones(b) {
+  return CATALOGO.capitulos.filter(c => c.codFrente === b.codFrente)
+    .map(c => `<option value="${c.cod}" ${b.codCapitulo === c.cod ? "selected" : ""}>${c.nombre}</option>`).join("");
+}
+function subcapOpciones(b) {
+  return CATALOGO.subcapitulos.filter(s => s.codCapitulo === b.codCapitulo)
+    .map(s => `<option value="${s.cod}" ${b.codSubcap === s.cod ? "selected" : ""}>${s.nombre}</option>`).join("");
+}
+function actividadOpciones(b) {
+  return CATALOGO.actividades.filter(a => a.codSubcap === b.codSubcap)
+    .map(a => `<option value="${a.cod}" ${b.codActividad === a.cod ? "selected" : ""}>${a.desc.slice(0, 90)}</option>`).join("");
+}
+
+function cambiarFrente(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codFrente = val; b.codCapitulo = ""; b.codSubcap = ""; b.codActividad = "";
+  renderBloques();
+}
+function cambiarCapitulo(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codCapitulo = val; b.codSubcap = ""; b.codActividad = "";
+  renderBloques();
+}
+function cambiarSubcap(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codSubcap = val; b.codActividad = "";
+  renderBloques();
+}
+function cambiarActividad(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codActividad = val;
+  renderBloques();
+}
+
+function buscarPersona(idBloque, texto) {
+  const cont = document.getElementById(`resultados-${idBloque}`);
+  if (!texto || texto.length < 2) { cont.style.display = "none"; return; }
+  const t = texto.toLowerCase();
+  const encontrados = CATALOGO.personal.filter(p => p.nombre.toLowerCase().includes(t)).slice(0, 8);
+  if (!encontrados.length) { cont.style.display = "none"; return; }
+  cont.innerHTML = encontrados.map(p =>
+    `<div onclick='agregarPersona(${idBloque}, ${JSON.stringify(p.nombre)}, ${JSON.stringify(p.cargo)})'>${p.nombre} <span style="color:#999">(${p.cargo})</span></div>`
+  ).join("");
+  cont.style.display = "block";
+}
+
+function agregarPersona(idBloque, nombre, cargo) {
+  const b = bloques.find(x => x.id === idBloque);
+  if (b.personas.some(p => p.nombre === nombre)) return;
+  b.personas.push({ nombre, cargo, horas: 8, tipoHora: "Ordinaria Diurna", cantidad: "" });
+  document.getElementById(`buscador-${idBloque}`).value = "";
+  document.getElementById(`resultados-${idBloque}`).style.display = "none";
+  renderPersonas(b);
+  actualizarBotonGuardar();
+}
+
+function agregarPersonaLibre(idBloque) {
+  const nombre = prompt("Escribe el nombre completo de la persona:");
+  if (!nombre) return;
+  const b = bloques.find(x => x.id === idBloque);
+  b.personas.push({ nombre: nombre.trim(), cargo: "Sin confirmar", horas: 8, tipoHora: "Ordinaria Diurna", cantidad: "" });
+  renderPersonas(b);
+  actualizarBotonGuardar();
+}
+
+function quitarPersona(idBloque, nombre) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.personas = b.personas.filter(p => p.nombre !== nombre);
+  renderPersonas(b);
+  actualizarBotonGuardar();
+}
+
+function renderPersonas(b) {
+  const cont = document.getElementById(`personas-${b.id}`);
+  if (!cont) return;
+  if (!b.personas.length) {
+    cont.innerHTML = `<div class="vacio">Aún no has agregado a nadie en este bloque</div>`;
+    return;
+  }
+  const tiposHora = CATALOGO.recargos.map(r => r.tipo);
+  cont.innerHTML = b.personas.map(p => `
+    <div class="persona-chip">
+      <div>
+        <div class="nombre">${p.nombre}</div>
+        <div class="cargo">${p.cargo}</div>
+      </div>
+      <input type="number" min="0" max="24" step="0.5" value="${p.horas}"
+             onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'horas', this.value)" title="Horas">
+      <select onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'tipoHora', this.value)" title="Tipo de hora">
+        ${tiposHora.map(t => `<option ${t === p.tipoHora ? "selected" : ""}>${t}</option>`).join("")}
+      </select>
+      <button class="btn-x" onclick="quitarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}')">✕</button>
+    </div>
+  `).join("");
+}
+
+function actualizarPersona(idBloque, nombre, campo, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  const p = b.personas.find(x => x.nombre === nombre);
+  p[campo] = valor;
+}
+
+function actualizarBotonGuardar() {
+  const listo = maestroActual && bloques.some(b => b.codActividad && b.personas.length > 0);
+  document.getElementById("btnGuardar").disabled = !listo;
+}
+
+async function guardarTodo() {
+  const fecha = document.getElementById("fecha").value;
+  const filas = [];
+  bloques.forEach(b => {
+    if (!b.codActividad || !b.personas.length) return;
+    const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
+    const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
+    b.personas.forEach(p => {
+      filas.push({
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+        fecha: fecha,
+        nombre: p.nombre,
+        cargo: p.cargo,
+        residente: maestroActual.residente,
+        codfrente: b.codFrente,
+        frenteNombre: frente ? frente.nombre : "",
+        codcap: b.codCapitulo,
+        codsubcap: b.codSubcap,
+        codact: b.codActividad,
+        actDesc: actividad ? actividad.desc : "",
+        actUnidad: actividad ? actividad.unidad : "",
+        horas: parseFloat(p.horas) || 0,
+        tipoHora: p.tipoHora,
+        cantidad: p.cantidad || null,
+        observaciones: p.cargo === "Sin confirmar" ? "Persona registrada manualmente, confirmar cargo y cédula" : "",
+        creado: new Date().toISOString(),
+        registradoPor: maestroActual.nombre,
+      });
+    });
+  });
+
+  if (!filas.length) { mostrarToast("No hay nada para guardar todavía"); return; }
+
+  document.getElementById("btnGuardar").disabled = true;
+  document.getElementById("btnGuardar").textContent = "Guardando…";
+
+  try {
+    await fetch(URL_APPS_SCRIPT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ registros: filas }),
+    });
+    mostrarToast(`✔ Guardado: ${filas.length} registro(s) del día`);
+    bloques = [];
+    contadorBloque = 0;
+    agregarBloque();
+  } catch (e) {
+    mostrarToast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
+  }
+  document.getElementById("btnGuardar").textContent = "Guardar el día";
+  actualizarBotonGuardar();
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 3500);
+}
+
+cargarCatalogo();
+</script>
+
+</body>
+</html>
+
