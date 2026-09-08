@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registro Mano de Obra · AIRPLAN T1 JMC</title>
+<title>Registro de Campo · AIRPLAN T1 JMC</title>
 <style>
   :root {
     --verde: #1A5632;
@@ -47,11 +47,12 @@
   .persona-chip {
     display: flex; align-items: center; justify-content: space-between; gap: 8px;
     background: #EEF3EF; border: 1px solid var(--gris-borde); border-radius: 8px;
-    padding: 8px 10px; margin-top: 8px;
+    padding: 8px 10px; margin-top: 8px; flex-wrap: wrap;
   }
-  .persona-chip .nombre { font-size: 13.5px; font-weight: 600; flex: 1; }
+  .persona-chip .nombre { font-size: 13.5px; font-weight: 600; flex: 1; min-width: 120px; }
   .persona-chip .cargo { font-size: 11px; color: var(--gris-texto); opacity: .7; }
   .persona-chip input[type=number] { width: 62px; padding: 6px; font-size: 13px; }
+  .persona-chip input[type=text] { width: 100px; padding: 6px; font-size: 12px; }
   .persona-chip select { width: auto; padding: 6px; font-size: 12px; }
   .btn-x {
     background: none; border: none; color: #B4453A; font-size: 18px; cursor: pointer;
@@ -94,6 +95,23 @@
   }
   .vacio { text-align: center; color: #8A948E; font-size: 13px; padding: 20px 0; }
   .campo-libre { font-size: 11px; color: var(--verde); background: none; border: none; cursor: pointer; padding: 4px 0; text-decoration: underline; }
+
+  .interruptor {
+    display: flex; background: #EEF3EF; border-radius: 10px; padding: 4px;
+    margin-bottom: 14px; gap: 4px;
+  }
+  .interruptor button {
+    flex: 1; border: none; background: none; padding: 10px; border-radius: 8px;
+    font-size: 14px; font-weight: 700; color: var(--verde-oscuro); cursor: pointer;
+  }
+  .interruptor button.activo { background: var(--verde); color: white; }
+
+  .equipo-fila {
+    background: #EEF3EF; border: 1px solid var(--gris-borde); border-radius: 8px;
+    padding: 10px; margin-top: 8px; position: relative;
+  }
+  .equipo-fila .quitar-equipo { position: absolute; right: 8px; top: 8px; }
+  .equipo-fila .fila { margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -101,7 +119,7 @@
 <header>
   <img src="aia.png" alt="AIA" onerror="this.style.display='none'">
   <div>
-    <h1>Registro de Mano de Obra</h1>
+    <h1 id="tituloApp">Registro de Campo</h1>
     <p>AIRPLAN T1 JMC · Diligenciamiento diario</p>
   </div>
 </header>
@@ -110,9 +128,14 @@
 
 <main>
 
+  <div class="interruptor">
+    <button id="btnModoPersonal" class="activo" onclick="cambiarModo('personal')">👷 Personal</button>
+    <button id="btnModoEquipos" onclick="cambiarModo('equipos')">🚜 Equipos</button>
+  </div>
+
   <div class="card">
-    <h2>1. ¿Quién eres?</h2>
-    <label for="selMaestro">Busca tu nombre</label>
+    <h2 id="tituloPaso1">1. ¿Quién eres?</h2>
+    <label for="selMaestro" id="labelPaso1">Busca tu nombre</label>
     <select id="selMaestro" onchange="onMaestroChange()">
       <option value="">— Selecciona tu nombre —</option>
     </select>
@@ -142,16 +165,38 @@
 const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz1CFQcDCcEKTKBl11EBXC_8Lth5vDQX5ZAec3XLw4rB2P5nyUdvtmouv5S2a0Mdsnr/exec";
 // =======================================================
 
+const PROVEEDORES_SUGERIDOS = ["ALDECCO", "MAS EQUIPOS", "EQUIPOS INMEDIATOS"];
+const UNIDADES_SUGERIDAS = ["Und", "m2", "m3", "Día", "Hora", "Global"];
+
 let CATALOGO = null;
 let maestroActual = null;
-let bloques = []; // { id, codFrente, codCapitulo, codSubcap, codActividad, personas: [{nombre, cargo, horas, tipoHora, cantidad}] }
+let bloques = [];
 let contadorBloque = 0;
+let modo = "personal"; // "personal" | "equipos"
 
 async function cargarCatalogo() {
   const resp = await fetch("catalogo.json");
   CATALOGO = await resp.json();
   poblarMaestros();
   document.getElementById("fecha").value = new Date().toISOString().slice(0, 10);
+}
+
+function cambiarModo(nuevoModo) {
+  if (nuevoModo === modo) return;
+  modo = nuevoModo;
+  document.getElementById("btnModoPersonal").classList.toggle("activo", modo === "personal");
+  document.getElementById("btnModoEquipos").classList.toggle("activo", modo === "equipos");
+  document.getElementById("tituloApp").textContent = modo === "personal" ? "Registro de Mano de Obra" : "Registro de Equipos";
+  document.getElementById("tituloPaso1").textContent = modo === "personal" ? "1. ¿Quién eres?" : "1. ¿Quién solicita el equipo?";
+  document.getElementById("labelPaso1").textContent = modo === "personal" ? "Busca tu nombre" : "Busca tu nombre";
+  document.getElementById("btnAgregarBloque").textContent =
+    modo === "personal" ? "+ Agregar otro bloque de actividad" : "+ Agregar otro bloque de equipos";
+  // Al cambiar de modo reiniciamos los bloques para no mezclar datos
+  bloques = [];
+  contadorBloque = 0;
+  if (maestroActual) agregarBloque();
+  renderBloques();
+  actualizarBotonGuardar();
 }
 
 function poblarMaestros() {
@@ -187,7 +232,7 @@ function agregarBloque() {
   contadorBloque++;
   bloques.push({
     id: contadorBloque, codFrente: "", codCapitulo: "", codSubcap: "", codActividad: "",
-    personas: [],
+    personas: [], equipos: [],
   });
   renderBloques();
 }
@@ -234,7 +279,7 @@ function renderBloques() {
         ${actividadOpciones(b)}
       </select>` : ""}
 
-      ${b.codActividad ? `
+      ${b.codActividad && modo === "personal" ? `
       <label>Personal en esta actividad</label>
       <div id="personas-${b.id}"></div>
       <div class="buscador-personal">
@@ -245,9 +290,17 @@ function renderBloques() {
       <button class="campo-libre" onclick="agregarPersonaLibre(${b.id})">
         ¿No aparece? Escribir el nombre manualmente
       </button>` : ""}
+
+      ${b.codActividad && modo === "equipos" ? `
+      <label>Equipos usados en esta actividad</label>
+      <div id="equipos-${b.id}"></div>
+      <button class="campo-libre" onclick="agregarEquipo(${b.id})" style="margin-top:8px;">
+        + Agregar un equipo a este bloque
+      </button>` : ""}
     `;
     zona.appendChild(div);
-    if (b.codActividad) renderPersonas(b);
+    if (b.codActividad && modo === "personal") renderPersonas(b);
+    if (b.codActividad && modo === "equipos") renderEquipos(b);
   });
   actualizarBotonGuardar();
 }
@@ -261,7 +314,7 @@ function frenteOpciones(b) {
     propios.forEach(f => {
       html += `<option value="${f.cod}" ${b.codFrente === f.cod ? "selected" : ""}>${f.nombre}</option>`;
     });
-    html += `</optgroup><optgroup label="Otros frentes (personal prestado / apoyo)">`;
+    html += `</optgroup><optgroup label="Otros frentes">`;
   }
   CATALOGO.frentes.filter(f => !codsPropios.has(f.cod)).forEach(f => {
     html += `<option value="${f.cod}" ${b.codFrente === f.cod ? "selected" : ""}>${f.nombre}</option>`;
@@ -304,6 +357,7 @@ function cambiarActividad(id, val) {
   renderBloques();
 }
 
+// ============ PERSONAL (Mano de Obra) ============
 function buscarPersona(idBloque, texto) {
   const cont = document.getElementById(`resultados-${idBloque}`);
   if (!texto || texto.length < 2) { cont.style.display = "none"; return; }
@@ -372,41 +426,135 @@ function actualizarPersona(idBloque, nombre, campo, valor) {
   p[campo] = valor;
 }
 
+// ============ EQUIPOS ============
+let contadorEquipo = 0;
+
+function agregarEquipo(idBloque) {
+  const b = bloques.find(x => x.id === idBloque);
+  contadorEquipo++;
+  b.equipos.push({ eid: contadorEquipo, proveedor: "", equipo: "", unidad: "Und", cantidad: 1, valorUnitario: "" });
+  renderEquipos(b);
+  actualizarBotonGuardar();
+}
+
+function quitarEquipo(idBloque, eid) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.equipos = b.equipos.filter(eq => eq.eid !== eid);
+  renderEquipos(b);
+  actualizarBotonGuardar();
+}
+
+function actualizarEquipo(idBloque, eid, campo, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  const eq = b.equipos.find(x => x.eid === eid);
+  eq[campo] = valor;
+}
+
+function renderEquipos(b) {
+  const cont = document.getElementById(`equipos-${b.id}`);
+  if (!cont) return;
+  if (!b.equipos.length) {
+    cont.innerHTML = `<div class="vacio">Aún no has agregado ningún equipo en este bloque</div>`;
+    return;
+  }
+  cont.innerHTML = b.equipos.map(eq => `
+    <div class="equipo-fila">
+      <button class="btn-x quitar-equipo" onclick="quitarEquipo(${b.id}, ${eq.eid})">✕</button>
+      <label>Proveedor</label>
+      <input type="text" list="listaProveedores" value="${eq.proveedor}"
+             placeholder="Ej. ALDECCO"
+             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'proveedor', this.value)">
+      <label>Equipo</label>
+      <input type="text" value="${eq.equipo}" placeholder="Ej. Andamio tubular 2m"
+             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'equipo', this.value)">
+      <div class="fila">
+        <div>
+          <label>Cantidad</label>
+          <input type="number" min="0" step="1" value="${eq.cantidad}"
+                 onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'cantidad', this.value)">
+        </div>
+        <div>
+          <label>Unidad</label>
+          <input type="text" list="listaUnidades" value="${eq.unidad}"
+                 onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'unidad', this.value)">
+        </div>
+      </div>
+      <label>Valor unitario (opcional)</label>
+      <input type="number" min="0" step="1" value="${eq.valorUnitario}" placeholder="$"
+             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'valorUnitario', this.value)">
+    </div>
+  `).join("");
+}
+
 function actualizarBotonGuardar() {
-  const listo = maestroActual && bloques.some(b => b.codActividad && b.personas.length > 0);
+  let listo;
+  if (modo === "personal") {
+    listo = maestroActual && bloques.some(b => b.codActividad && b.personas.length > 0);
+  } else {
+    listo = maestroActual && bloques.some(b => b.codActividad && b.equipos.length > 0);
+  }
   document.getElementById("btnGuardar").disabled = !listo;
 }
 
 async function guardarTodo() {
   const fecha = document.getElementById("fecha").value;
   const filas = [];
-  bloques.forEach(b => {
-    if (!b.codActividad || !b.personas.length) return;
-    const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
-    const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
-    b.personas.forEach(p => {
-      filas.push({
-        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-        fecha: fecha,
-        nombre: p.nombre,
-        cargo: p.cargo,
-        residente: maestroActual.residente,
-        codfrente: b.codFrente,
-        frenteNombre: frente ? frente.nombre : "",
-        codcap: b.codCapitulo,
-        codsubcap: b.codSubcap,
-        codact: b.codActividad,
-        actDesc: actividad ? actividad.desc : "",
-        actUnidad: actividad ? actividad.unidad : "",
-        horas: parseFloat(p.horas) || 0,
-        tipoHora: p.tipoHora,
-        cantidad: p.cantidad || null,
-        observaciones: p.cargo === "Sin confirmar" ? "Persona registrada manualmente, confirmar cargo y cédula" : "",
-        creado: new Date().toISOString(),
-        registradoPor: maestroActual.nombre,
+
+  if (modo === "personal") {
+    bloques.forEach(b => {
+      if (!b.codActividad || !b.personas.length) return;
+      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
+      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
+      b.personas.forEach(p => {
+        filas.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          fecha: fecha,
+          nombre: p.nombre,
+          cargo: p.cargo,
+          residente: maestroActual.residente,
+          codfrente: b.codFrente,
+          frenteNombre: frente ? frente.nombre : "",
+          codcap: b.codCapitulo,
+          codsubcap: b.codSubcap,
+          codact: b.codActividad,
+          actDesc: actividad ? actividad.desc : "",
+          actUnidad: actividad ? actividad.unidad : "",
+          horas: parseFloat(p.horas) || 0,
+          tipoHora: p.tipoHora,
+          cantidad: p.cantidad || null,
+          observaciones: p.cargo === "Sin confirmar" ? "Persona registrada manualmente, confirmar cargo y cédula" : "",
+          creado: new Date().toISOString(),
+          registradoPor: maestroActual.nombre,
+        });
       });
     });
-  });
+  } else {
+    bloques.forEach(b => {
+      if (!b.codActividad || !b.equipos.length) return;
+      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
+      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
+      b.equipos.forEach(eq => {
+        filas.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          fecha: fecha,
+          solicitante: maestroActual.nombre,
+          codfrente: b.codFrente,
+          frenteNombre: frente ? frente.nombre : "",
+          codcap: b.codCapitulo,
+          codsubcap: b.codSubcap,
+          codact: b.codActividad,
+          actDesc: actividad ? actividad.desc : "",
+          proveedor: eq.proveedor,
+          equipo: eq.equipo,
+          unidad: eq.unidad,
+          cantidad: parseFloat(eq.cantidad) || 0,
+          valorUnitario: eq.valorUnitario ? parseFloat(eq.valorUnitario) : null,
+          observaciones: "",
+          creado: new Date().toISOString(),
+        });
+      });
+    });
+  }
 
   if (!filas.length) { mostrarToast("No hay nada para guardar todavía"); return; }
 
@@ -418,7 +566,7 @@ async function guardarTodo() {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ registros: filas }),
+      body: JSON.stringify({ registros: filas, hoja: modo === "equipos" ? "Equipos" : "Registros" }),
     });
     mostrarToast(`✔ Guardado: ${filas.length} registro(s) del día`);
     bloques = [];
@@ -441,6 +589,16 @@ function mostrarToast(msg) {
 cargarCatalogo();
 </script>
 
+<datalist id="listaProveedores">
+</datalist>
+<datalist id="listaUnidades">
+</datalist>
+<script>
+  document.getElementById("listaProveedores").innerHTML =
+    PROVEEDORES_SUGERIDOS.map(p => `<option value="${p}">`).join("");
+  document.getElementById("listaUnidades").innerHTML =
+    UNIDADES_SUGERIDAS.map(u => `<option value="${u}">`).join("");
+</script>
+
 </body>
 </html>
-
