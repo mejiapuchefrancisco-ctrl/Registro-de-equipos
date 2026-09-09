@@ -228,11 +228,22 @@ function frentesDelMaestro() {
   return listaPropia;
 }
 
+function unidadActividad(b) {
+  const a = CATALOGO.actividades.find(x => x.cod === b.codActividad);
+  return a ? a.unidad : "";
+}
+
+function actualizarCantidadBloque(idBloque, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.cantidadEjecutada = valor;
+}
+
 function agregarBloque() {
   contadorBloque++;
   bloques.push({
     id: contadorBloque, codFrente: "", codCapitulo: "", codSubcap: "", codActividad: "",
-    personas: [], equipos: [],
+    personas: [], equipos: [], cantidadEjecutada: "",
+    loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
   });
   renderBloques();
 }
@@ -280,7 +291,11 @@ function renderBloques() {
       </select>` : ""}
 
       ${b.codActividad && modo === "personal" ? `
-      <label>Personal en esta actividad</label>
+      <label>Cantidad ejecutada hoy en esta actividad ${unidadActividad(b) ? '(' + unidadActividad(b) + ')' : ''}</label>
+      <input type="number" min="0" step="0.01" value="${b.cantidadEjecutada || ''}"
+             placeholder="Ej. 2.5" oninput="actualizarCantidadBloque(${b.id}, this.value)">
+
+      <label style="margin-top:14px;">Personal en esta actividad</label>
       <div id="personas-${b.id}"></div>
       <div class="buscador-personal">
         <input type="text" placeholder="Buscar y agregar a alguien de tu cuadrilla u otra persona…"
@@ -521,7 +536,8 @@ async function guardarTodo() {
           actUnidad: actividad ? actividad.unidad : "",
           horas: parseFloat(p.horas) || 0,
           tipoHora: p.tipoHora,
-          cantidad: p.cantidad || null,
+          cantidad: b.cantidadEjecutada || null,
+          loteId: b.loteId,
           observaciones: p.cargo === "Sin confirmar" ? "Persona registrada manualmente, confirmar cargo y cédula" : "",
           creado: new Date().toISOString(),
           registradoPor: maestroActual.nombre,
