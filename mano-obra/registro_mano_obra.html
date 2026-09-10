@@ -112,6 +112,14 @@
   }
   .equipo-fila .quitar-equipo { position: absolute; right: 8px; top: 8px; }
   .equipo-fila .fila { margin-top: 8px; }
+
+  .caja-codigos {
+    background: #FBF3D9; border: 1.5px solid var(--dorado); border-radius: 8px;
+    padding: 12px; margin-top: 10px; font-size: 15px; color: var(--verde-oscuro);
+  }
+  .caja-codigos b { color: var(--verde-oscuro); }
+  .caja-codigos div { margin-bottom: 4px; }
+  .nota-caja-codigos { font-size: 11px; color: var(--gris-texto); margin-top: 6px !important; font-weight: normal; }
 </style>
 </head>
 <body>
@@ -131,6 +139,7 @@
   <div class="interruptor">
     <button id="btnModoPersonal" class="activo" onclick="cambiarModo('personal')">👷 Personal</button>
     <button id="btnModoEquipos" onclick="cambiarModo('equipos')">🚜 Equipos</button>
+    <button id="btnModoMateriales" onclick="cambiarModo('materiales')">📦 Materiales</button>
   </div>
 
   <div class="card">
@@ -186,11 +195,14 @@ function cambiarModo(nuevoModo) {
   modo = nuevoModo;
   document.getElementById("btnModoPersonal").classList.toggle("activo", modo === "personal");
   document.getElementById("btnModoEquipos").classList.toggle("activo", modo === "equipos");
-  document.getElementById("tituloApp").textContent = modo === "personal" ? "Registro de Mano de Obra" : "Registro de Equipos";
-  document.getElementById("tituloPaso1").textContent = modo === "personal" ? "1. ¿Quién eres?" : "1. ¿Quién solicita el equipo?";
-  document.getElementById("labelPaso1").textContent = modo === "personal" ? "Busca tu nombre" : "Busca tu nombre";
-  document.getElementById("btnAgregarBloque").textContent =
-    modo === "personal" ? "+ Agregar otro bloque de actividad" : "+ Agregar otro bloque de equipos";
+  document.getElementById("btnModoMateriales").classList.toggle("activo", modo === "materiales");
+  const titulos = { personal: "Registro de Mano de Obra", equipos: "Registro de Equipos", materiales: "Pedido de Materiales" };
+  const paso1 = { personal: "1. ¿Quién eres?", equipos: "1. ¿Quién solicita el equipo?", materiales: "1. ¿Quién solicita el material?" };
+  const btnTexto = { personal: "+ Agregar otro bloque de actividad", equipos: "+ Agregar otro bloque de equipos", materiales: "+ Agregar otro bloque de materiales" };
+  document.getElementById("tituloApp").textContent = titulos[modo];
+  document.getElementById("tituloPaso1").textContent = paso1[modo];
+  document.getElementById("labelPaso1").textContent = "Busca tu nombre";
+  document.getElementById("btnAgregarBloque").textContent = btnTexto[modo];
   // Al cambiar de modo reiniciamos los bloques para no mezclar datos
   bloques = [];
   contadorBloque = 0;
@@ -242,7 +254,7 @@ function agregarBloque() {
   contadorBloque++;
   bloques.push({
     id: contadorBloque, codFrente: "", codCapitulo: "", codSubcap: "", codActividad: "",
-    personas: [], equipos: [], cantidadEjecutada: "",
+    personas: [], equipos: [], materiales: [], cantidadEjecutada: "",
     loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
   });
   renderBloques();
@@ -312,10 +324,23 @@ function renderBloques() {
       <button class="campo-libre" onclick="agregarEquipo(${b.id})" style="margin-top:8px;">
         + Agregar un equipo a este bloque
       </button>` : ""}
+
+      ${b.codActividad && modo === "materiales" ? `
+      <div class="caja-codigos">
+        <div><b>Código de Frente:</b> ${b.codFrente}</div>
+        <div><b>Código de Actividad:</b> ${b.codActividad}</div>
+        <div class="nota-caja-codigos">Copia estos códigos en tu remisión / solicitud física.</div>
+      </div>
+      <label>Materiales pedidos en esta actividad</label>
+      <div id="materiales-${b.id}"></div>
+      <button class="campo-libre" onclick="agregarMaterial(${b.id})" style="margin-top:8px;">
+        + Agregar un material a este bloque
+      </button>` : ""}
     `;
     zona.appendChild(div);
     if (b.codActividad && modo === "personal") renderPersonas(b);
     if (b.codActividad && modo === "equipos") renderEquipos(b);
+    if (b.codActividad && modo === "materiales") renderMateriales(b);
   });
   actualizarBotonGuardar();
 }
@@ -501,12 +526,67 @@ function renderEquipos(b) {
   `).join("");
 }
 
+// ============ MATERIALES ============
+let contadorMaterial = 0;
+
+function agregarMaterial(idBloque) {
+  const b = bloques.find(x => x.id === idBloque);
+  contadorMaterial++;
+  b.materiales.push({ mid: contadorMaterial, material: "", cantidad: 1, unidad: "Und" });
+  renderMateriales(b);
+  actualizarBotonGuardar();
+}
+
+function quitarMaterial(idBloque, mid) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.materiales = b.materiales.filter(m => m.mid !== mid);
+  renderMateriales(b);
+  actualizarBotonGuardar();
+}
+
+function actualizarMaterial(idBloque, mid, campo, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  const m = b.materiales.find(x => x.mid === mid);
+  m[campo] = valor;
+}
+
+function renderMateriales(b) {
+  const cont = document.getElementById(`materiales-${b.id}`);
+  if (!cont) return;
+  if (!b.materiales.length) {
+    cont.innerHTML = `<div class="vacio">Aún no has agregado ningún material en este bloque</div>`;
+    return;
+  }
+  cont.innerHTML = b.materiales.map(m => `
+    <div class="equipo-fila">
+      <button class="btn-x quitar-equipo" onclick="quitarMaterial(${b.id}, ${m.mid})">✕</button>
+      <label>Material</label>
+      <input type="text" value="${m.material}" placeholder="Ej. Cemento gris tipo I"
+             onchange="actualizarMaterial(${b.id}, ${m.mid}, 'material', this.value)">
+      <div class="fila">
+        <div>
+          <label>Cantidad</label>
+          <input type="number" min="0" step="0.01" value="${m.cantidad}"
+                 onchange="actualizarMaterial(${b.id}, ${m.mid}, 'cantidad', this.value)">
+        </div>
+        <div>
+          <label>Unidad</label>
+          <input type="text" list="listaUnidades" value="${m.unidad}"
+                 onchange="actualizarMaterial(${b.id}, ${m.mid}, 'unidad', this.value)">
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
 function actualizarBotonGuardar() {
   let listo;
   if (modo === "personal") {
     listo = maestroActual && bloques.some(b => b.codActividad && b.personas.length > 0);
-  } else {
+  } else if (modo === "equipos") {
     listo = maestroActual && bloques.some(b => b.codActividad && b.equipos.length > 0);
+  } else {
+    listo = maestroActual && bloques.some(b => b.codActividad && b.materiales.length > 0);
   }
   document.getElementById("btnGuardar").disabled = !listo;
 }
@@ -544,7 +624,7 @@ async function guardarTodo() {
         });
       });
     });
-  } else {
+  } else if (modo === "equipos") {
     bloques.forEach(b => {
       if (!b.codActividad || !b.equipos.length) return;
       const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
@@ -570,6 +650,29 @@ async function guardarTodo() {
         });
       });
     });
+  } else {
+    bloques.forEach(b => {
+      if (!b.codActividad || !b.materiales.length) return;
+      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
+      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
+      b.materiales.forEach(m => {
+        filas.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          fecha: fecha,
+          solicitante: maestroActual.nombre,
+          codfrente: b.codFrente,
+          frenteNombre: frente ? frente.nombre : "",
+          codcap: b.codCapitulo,
+          codsubcap: b.codSubcap,
+          codact: b.codActividad,
+          actDesc: actividad ? actividad.desc : "",
+          material: m.material,
+          cantidad: parseFloat(m.cantidad) || 0,
+          unidad: m.unidad,
+          creado: new Date().toISOString(),
+        });
+      });
+    });
   }
 
   if (!filas.length) { mostrarToast("No hay nada para guardar todavía"); return; }
@@ -582,7 +685,7 @@ async function guardarTodo() {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ registros: filas, hoja: modo === "equipos" ? "Equipos" : "Registros" }),
+      body: JSON.stringify({ registros: filas, hoja: modo === "equipos" ? "Equipos" : (modo === "materiales" ? "Materiales" : "Registros") }),
     });
     mostrarToast(`✔ Guardado: ${filas.length} registro(s) del día`);
     bloques = [];
