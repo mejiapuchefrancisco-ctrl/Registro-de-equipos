@@ -54,6 +54,26 @@
   .persona-chip input[type=number] { width: 62px; padding: 6px; font-size: 13px; }
   .persona-chip input[type=text] { width: 100px; padding: 6px; font-size: 12px; }
   .persona-chip select { width: auto; padding: 6px; font-size: 12px; }
+  .hora-fin-auto {
+    display: flex; flex-direction: column; gap: 3px; width: 100%;
+    background: #FFFFFF; border: 1px solid var(--gris-borde); border-radius: 6px;
+    padding: 8px; margin-top: 4px;
+  }
+  .hora-fin-auto label { font-size: 10.5px; color: var(--gris-texto); }
+  .hora-fin-auto input[type=time] { padding: 6px; font-size: 13px; }
+  .fila-horas { display: flex; align-items: center; gap: 6px; }
+  .fila-horas input[type=time] { flex: 1; min-width: 0; }
+  .fila-horas span { font-size: 11px; color: var(--gris-texto); }
+  .resumen-auto {
+    font-size: 12px; font-weight: 600; color: var(--verde-oscuro);
+    background: #FBF3D9; border-radius: 5px; padding: 4px 7px; margin-top: 2px;
+  }
+  .resumen-auto.aviso { color: #8a6d00; background: #FFF3CD; font-weight: 500; }
+  .manual-toggle {
+    width: 100%; font-size: 11.5px; color: var(--gris-texto); margin-top: 2px;
+  }
+  .manual-toggle summary { cursor: pointer; padding: 4px 0; }
+  .manual-toggle input, .manual-toggle select { margin-top: 6px; }
   .btn-x {
     background: none; border: none; color: #B4453A; font-size: 18px; cursor: pointer;
     padding: 0 4px; line-height: 1;
@@ -150,7 +170,7 @@
     </select>
 
     <label for="fecha">Fecha</label>
-    <input type="date" id="fecha">
+    <input type="date" id="fecha" onchange="renderBloques()">
   </div>
 
   <div id="zonaBloques"></div>
@@ -379,345 +399,4 @@ function actividadOpciones(b) {
 function cambiarFrente(id, val) {
   const b = bloques.find(x => x.id === id);
   b.codFrente = val; b.codCapitulo = ""; b.codSubcap = ""; b.codActividad = "";
-  renderBloques();
-}
-function cambiarCapitulo(id, val) {
-  const b = bloques.find(x => x.id === id);
-  b.codCapitulo = val; b.codSubcap = ""; b.codActividad = "";
-  renderBloques();
-}
-function cambiarSubcap(id, val) {
-  const b = bloques.find(x => x.id === id);
-  b.codSubcap = val; b.codActividad = "";
-  renderBloques();
-}
-function cambiarActividad(id, val) {
-  const b = bloques.find(x => x.id === id);
-  b.codActividad = val;
-  renderBloques();
-}
-
-// ============ PERSONAL (Mano de Obra) ============
-function buscarPersona(idBloque, texto) {
-  const cont = document.getElementById(`resultados-${idBloque}`);
-  if (!texto || texto.length < 2) { cont.style.display = "none"; return; }
-  const t = texto.toLowerCase();
-  const encontrados = CATALOGO.personal.filter(p => p.nombre.toLowerCase().includes(t)).slice(0, 8);
-  if (!encontrados.length) { cont.style.display = "none"; return; }
-  cont.innerHTML = encontrados.map(p =>
-    `<div onclick='agregarPersona(${idBloque}, ${JSON.stringify(p.nombre)}, ${JSON.stringify(p.cargo)})'>${p.nombre} <span style="color:#999">(${p.cargo})</span></div>`
-  ).join("");
-  cont.style.display = "block";
-}
-
-function agregarPersona(idBloque, nombre, cargo) {
-  const b = bloques.find(x => x.id === idBloque);
-  if (b.personas.some(p => p.nombre === nombre)) return;
-  b.personas.push({ nombre, cargo, horas: 8, tipoHora: "Ordinaria Diurna", cantidad: "" });
-  document.getElementById(`buscador-${idBloque}`).value = "";
-  document.getElementById(`resultados-${idBloque}`).style.display = "none";
-  renderPersonas(b);
-  actualizarBotonGuardar();
-}
-
-function agregarPersonaLibre(idBloque) {
-  const nombre = prompt("Escribe el nombre completo de la persona:");
-  if (!nombre) return;
-  const b = bloques.find(x => x.id === idBloque);
-  b.personas.push({ nombre: nombre.trim(), cargo: "Sin confirmar", horas: 8, tipoHora: "Ordinaria Diurna", cantidad: "" });
-  renderPersonas(b);
-  actualizarBotonGuardar();
-}
-
-function quitarPersona(idBloque, nombre) {
-  const b = bloques.find(x => x.id === idBloque);
-  b.personas = b.personas.filter(p => p.nombre !== nombre);
-  renderPersonas(b);
-  actualizarBotonGuardar();
-}
-
-function renderPersonas(b) {
-  const cont = document.getElementById(`personas-${b.id}`);
-  if (!cont) return;
-  if (!b.personas.length) {
-    cont.innerHTML = `<div class="vacio">Aún no has agregado a nadie en este bloque</div>`;
-    return;
-  }
-  const tiposHora = CATALOGO.recargos.map(r => r.tipo);
-  cont.innerHTML = b.personas.map(p => `
-    <div class="persona-chip">
-      <div>
-        <div class="nombre">${p.nombre}</div>
-        <div class="cargo">${p.cargo}</div>
-      </div>
-      <input type="number" min="0" max="24" step="0.5" value="${p.horas}"
-             onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'horas', this.value)" title="Horas">
-      <select onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'tipoHora', this.value)" title="Tipo de hora">
-        ${tiposHora.map(t => `<option ${t === p.tipoHora ? "selected" : ""}>${t}</option>`).join("")}
-      </select>
-      <button class="btn-x" onclick="quitarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}')">✕</button>
-    </div>
-  `).join("");
-}
-
-function actualizarPersona(idBloque, nombre, campo, valor) {
-  const b = bloques.find(x => x.id === idBloque);
-  const p = b.personas.find(x => x.nombre === nombre);
-  p[campo] = valor;
-}
-
-// ============ EQUIPOS ============
-let contadorEquipo = 0;
-
-function agregarEquipo(idBloque) {
-  const b = bloques.find(x => x.id === idBloque);
-  contadorEquipo++;
-  b.equipos.push({ eid: contadorEquipo, proveedor: "", equipo: "", unidad: "Und", cantidad: 1, valorUnitario: "" });
-  renderEquipos(b);
-  actualizarBotonGuardar();
-}
-
-function quitarEquipo(idBloque, eid) {
-  const b = bloques.find(x => x.id === idBloque);
-  b.equipos = b.equipos.filter(eq => eq.eid !== eid);
-  renderEquipos(b);
-  actualizarBotonGuardar();
-}
-
-function actualizarEquipo(idBloque, eid, campo, valor) {
-  const b = bloques.find(x => x.id === idBloque);
-  const eq = b.equipos.find(x => x.eid === eid);
-  eq[campo] = valor;
-}
-
-function renderEquipos(b) {
-  const cont = document.getElementById(`equipos-${b.id}`);
-  if (!cont) return;
-  if (!b.equipos.length) {
-    cont.innerHTML = `<div class="vacio">Aún no has agregado ningún equipo en este bloque</div>`;
-    return;
-  }
-  cont.innerHTML = b.equipos.map(eq => `
-    <div class="equipo-fila">
-      <button class="btn-x quitar-equipo" onclick="quitarEquipo(${b.id}, ${eq.eid})">✕</button>
-      <label>Proveedor</label>
-      <input type="text" list="listaProveedores" value="${eq.proveedor}"
-             placeholder="Ej. ALDECCO"
-             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'proveedor', this.value)">
-      <label>Equipo</label>
-      <input type="text" value="${eq.equipo}" placeholder="Ej. Andamio tubular 2m"
-             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'equipo', this.value)">
-      <div class="fila">
-        <div>
-          <label>Cantidad</label>
-          <input type="number" min="0" step="1" value="${eq.cantidad}"
-                 onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'cantidad', this.value)">
-        </div>
-        <div>
-          <label>Unidad</label>
-          <input type="text" list="listaUnidades" value="${eq.unidad}"
-                 onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'unidad', this.value)">
-        </div>
-      </div>
-      <label>Valor unitario (opcional)</label>
-      <input type="number" min="0" step="1" value="${eq.valorUnitario}" placeholder="$"
-             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'valorUnitario', this.value)">
-    </div>
-  `).join("");
-}
-
-// ============ MATERIALES ============
-let contadorMaterial = 0;
-
-function agregarMaterial(idBloque) {
-  const b = bloques.find(x => x.id === idBloque);
-  contadorMaterial++;
-  b.materiales.push({ mid: contadorMaterial, material: "", cantidad: 1, unidad: "Und" });
-  renderMateriales(b);
-  actualizarBotonGuardar();
-}
-
-function quitarMaterial(idBloque, mid) {
-  const b = bloques.find(x => x.id === idBloque);
-  b.materiales = b.materiales.filter(m => m.mid !== mid);
-  renderMateriales(b);
-  actualizarBotonGuardar();
-}
-
-function actualizarMaterial(idBloque, mid, campo, valor) {
-  const b = bloques.find(x => x.id === idBloque);
-  const m = b.materiales.find(x => x.mid === mid);
-  m[campo] = valor;
-}
-
-function renderMateriales(b) {
-  const cont = document.getElementById(`materiales-${b.id}`);
-  if (!cont) return;
-  if (!b.materiales.length) {
-    cont.innerHTML = `<div class="vacio">Aún no has agregado ningún material en este bloque</div>`;
-    return;
-  }
-  cont.innerHTML = b.materiales.map(m => `
-    <div class="equipo-fila">
-      <button class="btn-x quitar-equipo" onclick="quitarMaterial(${b.id}, ${m.mid})">✕</button>
-      <label>Material</label>
-      <input type="text" value="${m.material}" placeholder="Ej. Cemento gris tipo I"
-             onchange="actualizarMaterial(${b.id}, ${m.mid}, 'material', this.value)">
-      <div class="fila">
-        <div>
-          <label>Cantidad</label>
-          <input type="number" min="0" step="0.01" value="${m.cantidad}"
-                 onchange="actualizarMaterial(${b.id}, ${m.mid}, 'cantidad', this.value)">
-        </div>
-        <div>
-          <label>Unidad</label>
-          <input type="text" list="listaUnidades" value="${m.unidad}"
-                 onchange="actualizarMaterial(${b.id}, ${m.mid}, 'unidad', this.value)">
-        </div>
-      </div>
-    </div>
-  `).join("");
-}
-
-function actualizarBotonGuardar() {
-  let listo;
-  if (modo === "personal") {
-    listo = maestroActual && bloques.some(b => b.codActividad && b.personas.length > 0);
-  } else if (modo === "equipos") {
-    listo = maestroActual && bloques.some(b => b.codActividad && b.equipos.length > 0);
-  } else {
-    listo = maestroActual && bloques.some(b => b.codActividad && b.materiales.length > 0);
-  }
-  document.getElementById("btnGuardar").disabled = !listo;
-}
-
-async function guardarTodo() {
-  const fecha = document.getElementById("fecha").value;
-  const filas = [];
-
-  if (modo === "personal") {
-    bloques.forEach(b => {
-      if (!b.codActividad || !b.personas.length) return;
-      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
-      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
-      b.personas.forEach(p => {
-        filas.push({
-          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          fecha: fecha,
-          nombre: p.nombre,
-          cargo: p.cargo,
-          residente: maestroActual.residente,
-          codfrente: b.codFrente,
-          frenteNombre: frente ? frente.nombre : "",
-          codcap: b.codCapitulo,
-          codsubcap: b.codSubcap,
-          codact: b.codActividad,
-          actDesc: actividad ? actividad.desc : "",
-          actUnidad: actividad ? actividad.unidad : "",
-          horas: parseFloat(p.horas) || 0,
-          tipoHora: p.tipoHora,
-          cantidad: b.cantidadEjecutada || null,
-          loteId: b.loteId,
-          observaciones: p.cargo === "Sin confirmar" ? "Persona registrada manualmente, confirmar cargo y cédula" : "",
-          creado: new Date().toISOString(),
-          registradoPor: maestroActual.nombre,
-        });
-      });
-    });
-  } else if (modo === "equipos") {
-    bloques.forEach(b => {
-      if (!b.codActividad || !b.equipos.length) return;
-      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
-      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
-      b.equipos.forEach(eq => {
-        filas.push({
-          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          fecha: fecha,
-          solicitante: maestroActual.nombre,
-          codfrente: b.codFrente,
-          frenteNombre: frente ? frente.nombre : "",
-          codcap: b.codCapitulo,
-          codsubcap: b.codSubcap,
-          codact: b.codActividad,
-          actDesc: actividad ? actividad.desc : "",
-          proveedor: eq.proveedor,
-          equipo: eq.equipo,
-          unidad: eq.unidad,
-          cantidad: parseFloat(eq.cantidad) || 0,
-          valorUnitario: eq.valorUnitario ? parseFloat(eq.valorUnitario) : null,
-          observaciones: "",
-          creado: new Date().toISOString(),
-        });
-      });
-    });
-  } else {
-    bloques.forEach(b => {
-      if (!b.codActividad || !b.materiales.length) return;
-      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
-      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
-      b.materiales.forEach(m => {
-        filas.push({
-          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-          fecha: fecha,
-          solicitante: maestroActual.nombre,
-          codfrente: b.codFrente,
-          frenteNombre: frente ? frente.nombre : "",
-          codcap: b.codCapitulo,
-          codsubcap: b.codSubcap,
-          codact: b.codActividad,
-          actDesc: actividad ? actividad.desc : "",
-          material: m.material,
-          cantidad: parseFloat(m.cantidad) || 0,
-          unidad: m.unidad,
-          creado: new Date().toISOString(),
-        });
-      });
-    });
-  }
-
-  if (!filas.length) { mostrarToast("No hay nada para guardar todavía"); return; }
-
-  document.getElementById("btnGuardar").disabled = true;
-  document.getElementById("btnGuardar").textContent = "Guardando…";
-
-  try {
-    await fetch(URL_APPS_SCRIPT, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ registros: filas, hoja: modo === "equipos" ? "Equipos" : (modo === "materiales" ? "Materiales" : "Registros") }),
-    });
-    mostrarToast(`✔ Guardado: ${filas.length} registro(s) del día`);
-    bloques = [];
-    contadorBloque = 0;
-    agregarBloque();
-  } catch (e) {
-    mostrarToast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
-  }
-  document.getElementById("btnGuardar").textContent = "Guardar el día";
-  actualizarBotonGuardar();
-}
-
-function mostrarToast(msg) {
-  const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.style.display = "block";
-  setTimeout(() => { t.style.display = "none"; }, 3500);
-}
-
-cargarCatalogo();
-</script>
-
-<datalist id="listaProveedores">
-</datalist>
-<datalist id="listaUnidades">
-</datalist>
-<script>
-  document.getElementById("listaProveedores").innerHTML =
-    PROVEEDORES_SUGERIDOS.map(p => `<option value="${p}">`).join("");
-  document.getElementById("listaUnidades").innerHTML =
-    UNIDADES_SUGERIDAS.map(u => `<option value="${u}">`).join("");
-</script>
-
-</body>
-</html>
+  render
