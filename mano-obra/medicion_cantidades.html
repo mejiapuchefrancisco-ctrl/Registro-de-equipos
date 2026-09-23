@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medición de Cantidades · PILOTO</title>
+<style>
+  :root {
+    --verde: #1A5632;
+    --verde-oscuro: #0F331D;
+    --verde-claro: #4C8A64;
+    --dorado: #C9A227;
+    --gris-borde: #D8DED9;
+    --gris-texto: #3A3F3C;
+    --fondo: #F5F7F5;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+  body {
+    margin: 0; height: 100%;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--fondo); color: var(--gris-texto);
+  }
+  header {
+    background: var(--verde); color: #fff;
+    padding: 18px 20px 16px;
+    padding-top: calc(18px + env(safe-area-inset-top, 0px));
+  }
+  header h1 { margin: 0; font-size: 20px; font-weight: 700; }
+  header p { margin: 4px 0 0; font-size: 13px; color: #cfe3d6; }
+  .demo-badge {
+    display: inline-block; margin-top: 8px;
+    background: var(--dorado); color: var(--verde-oscuro);
+    font-size: 11px; font-weight: 700; letter-spacing: .04em;
+    padding: 3px 10px; border-radius: 20px;
+  }
+  main { max-width: 520px; margin: 0 auto; padding: 18px 16px 40px; }
+  .card {
+    background: #fff; border: 1px solid var(--gris-borde); border-radius: 12px;
+    padding: 18px; margin-bottom: 16px;
+  }
+  .card h2 { font-size: 15px; margin: 0 0 14px; color: var(--verde); }
+  label {
+    display: block; font-size: 13px; font-weight: 600; margin: 12px 0 5px;
+    color: var(--gris-texto);
+  }
+  label:first-of-type { margin-top: 0; }
+  select, input[type=date], input[type=number], input[type=text] {
+    width: 100%; padding: 11px 12px; font-size: 15px;
+    border: 1px solid var(--gris-borde); border-radius: 8px;
+    background: #fff; color: var(--gris-texto);
+    -webkit-appearance: none; appearance: none;
+  }
+  .row2 { display: flex; gap: 10px; align-items: flex-end; }
+  .row2 > div { flex: 1; }
+  .unidad-chip {
+    display: inline-flex; align-items: center; justify-content: center;
+    background: var(--verde-claro); color: #fff; font-weight: 700; font-size: 14px;
+    border-radius: 8px; padding: 0 14px; height: 44px; min-width: 56px;
+    white-space: nowrap;
+  }
+  button.submit {
+    width: 100%; margin-top: 18px; padding: 14px; font-size: 16px; font-weight: 700;
+    background: var(--verde); color: #fff; border: none; border-radius: 10px;
+    cursor: pointer;
+  }
+  button.submit:active { background: var(--verde-oscuro); }
+  .ok-msg {
+    display: none; margin-top: 14px; padding: 12px 14px; border-radius: 8px;
+    background: #E8F0EA; color: var(--verde-oscuro); font-size: 14px; font-weight: 600;
+  }
+  .log h2 { font-size: 15px; margin: 0 0 10px; color: var(--verde); }
+  .log-empty { font-size: 13px; color: #8a938d; padding: 10px 0; }
+  .log-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 0; border-bottom: 1px solid #EDF1EE; font-size: 13.5px;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-item .desc { flex: 1; padding-right: 10px; }
+  .log-item .desc b { display: block; color: var(--verde-oscuro); font-size: 14px; }
+  .log-item .desc span { color: #7a8b82; font-size: 12px; }
+  .log-item .cant { font-weight: 700; color: var(--verde); white-space: nowrap; }
+  .footnote {
+    font-size: 11.5px; color: #8a938d; text-align: center; margin-top: 22px; line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Medición Diaria de Cantidades</h1>
+  <p>AIRPLAN T1 JMC · Constructora AIA S.A.S</p>
+  <span class="demo-badge">PILOTO</span>
+</header>
+
+<main>
+  <div class="card">
+    <h2>Nueva medición</h2>
+
+    <label for="fecha">Fecha</label>
+    <input type="date" id="fecha">
+
+    <label for="oficial">Oficial responsable</label>
+    <select id="oficial">
+      <option value="">Selecciona...</option>
+    </select>
+
+    <label for="frente">Frente</label>
+    <select id="frente">
+      <option value="">Selecciona...</option>
+    </select>
+
+    <label for="actividad">Actividad</label>
+    <select id="actividad">
+      <option value="">Selecciona...</option>
+    </select>
+
+    <div class="row2">
+      <div>
+        <label for="cantidad">Cantidad ejecutada</label>
+        <input type="number" id="cantidad" inputmode="decimal" placeholder="0" min="0" step="0.01">
+      </div>
+      <div>
+        <label>&nbsp;</label>
+        <div class="unidad-chip" id="unidadChip">—</div>
+      </div>
+    </div>
+
+    <button class="submit" id="btnSubmit">Registrar medición</button>
+    <div class="ok-msg" id="okMsg">✓ Medición enviada</div>
+  </div>
+
+  <div class="card log">
+    <h2>Mediciones enviadas desde este celular (hoy)</h2>
+    <div id="logList"><div class="log-empty">Todavía no has registrado ninguna medición.</div></div>
+  </div>
+
+  <p class="footnote">
+    Registra solo lo ejecutado hoy. Si te equivocas, avísale a tu residente.
+  </p>
+</main>
+
+<script>
+  // Pega aqui la URL de la implementacion del Apps Script (MedicionCantidades_Backend.gs)
+  // una vez este desplegado. Mientras este vacio, el formulario funciona en modo demo local.
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygQ9lgDfHZulIjanGB_WwC9-5y3JyJ9gSmQIKJ2ccOlbkWhZOTs3ipXFqKaHK_B5oz/exec";
+
+  const OFICIALES = [
+    "Gabriel Angel Lopez Castañeda", "Julian David Gomez Castro", "Evelio de Jesus Rodriguez Rua",
+    "Luis Eduardo Sanchez Castrillon", "Edio Omedis Quintero Padierna", "Jaime Antonio Salas Higuita",
+    "Nilson Espitia Fuentes", "Ronaldo Toscano Barrera", "Yimer Javier Vides Misas",
+    "Eduer Enrique Gallego", "Nelson Gutierrez",
+  ];
+
+  const FRENTES = [
+    "01 - 3 - Check In Nacional - Internacional",
+    "02 - 3A - Alternativa Sistema de Equipaje Saliendo BHS Sur y Norte",
+    "03 - 3B - Filtro Seguridad Internacional",
+    "04 - 4 - Filtro Seguridad Nacional",
+    "05 - 5 - Sala de Embarque Remoto Nacional",
+    "06 - 5A - Alternativa Equipaje Llegando",
+    "07 - 5B - Adecuacion Sala de Espera Actual",
+    "08 - 6 - Plataforma",
+    "09 - 7 - Alternativa Nuevo Centro de Conexiones (Fase 1)",
+    "10 - 8 - Alternativa Inmigracion",
+    "11 - 9 - Alternativa Emigracion",
+    "12 - 10 - Plataforma",
+    "13 - 11 y 12 - Segundo Filtro de Empleados y Equipaje Sobredimensionado",
+    "14 - 13 - Dobles Lectoras",
+    "18 - Campamento (instalaciones provisionales / administrativo)",
+  ];
+
+  // Actividades del piloto: las 11 categorias confirmadas (con su letra, igual que el formato fisico)
+  const ACTIVIDADES = [
+    { letra: "A", nombre: "Vaciado de concreto",                              unidad: "m³" },
+    { letra: "B", nombre: "Mamposteria (muro en bloque + dovelas)",           unidad: "m²" },
+    { letra: "C", nombre: "Revoque",                                          unidad: "m²" },
+    { letra: "D", nombre: "Pintura",                                          unidad: "m²" },
+    { letra: "E", nombre: "Enchape / Revestimiento ceramico",                 unidad: "m²" },
+    { letra: "F", nombre: "Instalacion de piso (baldosa/granito/porcelanato)", unidad: "m²" },
+    { letra: "G", nombre: "Instalacion de cielo raso",                        unidad: "m²" },
+    { letra: "H", nombre: "Muro en drywall / Superboard",                     unidad: "m²" },
+    { letra: "I", nombre: "Demolicion (muros y pisos)",                       unidad: "m²" },
+    { letra: "J", nombre: "Excavacion",                                       unidad: "m³" },
+    { letra: "K", nombre: "Retiro de escombros / Trasiego",                    unidad: "m³" },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+
+  function poblarSelect(select, items, getLabel, getValue) {
+    items.forEach((item) => {
+      const opt = document.createElement("option");
+      opt.value = getValue ? getValue(item) : item;
+      opt.textContent = getLabel ? getLabel(item) : item;
+      select.appendChild(opt);
+    });
+  }
+
+  poblarSelect($("oficial"), OFICIALES);
+  poblarSelect($("frente"), FRENTES);
+  poblarSelect($("actividad"), ACTIVIDADES, (a) => a.nombre, (a) => a.nombre);
+
+  $("fecha").value = new Date().toISOString().slice(0, 10);
+
+  $("actividad").addEventListener("change", () => {
+    const act = ACTIVIDADES.find((a) => a.nombre === $("actividad").value);
+    $("unidadChip").textContent = act ? act.unidad : "—";
+  });
+
+  let registros = [];
+
+  function renderLog() {
+    const cont = $("logList");
+    if (registros.length === 0) {
+      cont.innerHTML = '<div class="log-empty">Todavía no has registrado ninguna medición.</div>';
+      return;
+    }
+    cont.innerHTML = registros.map((r) => `
+      <div class="log-item">
+        <div class="desc">
+          <b>${r.actividad}</b>
+          <span>${r.frente.split(" - ").slice(1).join(" - ")} · ${r.oficial}</span>
+        </div>
+        <div class="cant">${r.cantidad} ${r.unidad}</div>
+      </div>
+    `).reverse().join("");
+  }
+
+  $("btnSubmit").addEventListener("click", async () => {
+    const oficial = $("oficial").value;
+    const frenteFull = $("frente").value;
+    const act = ACTIVIDADES.find((a) => a.nombre === $("actividad").value);
+    const cantidad = $("cantidad").value;
+
+    if (!oficial || !frenteFull || !act || !cantidad || parseFloat(cantidad) <= 0) {
+      alert("Completa todos los campos antes de registrar.");
+      return;
+    }
+
+    const frenteCod = frenteFull.split(" - ")[0];
+    const frenteNombre = frenteFull.split(" - ").slice(1).join(" - ");
+    const payload = {
+      fecha: $("fecha").value, oficial, frenteCod, frenteNombre,
+      categoria: act.nombre, categoriaLetra: act.letra, unidad: act.unidad, cantidad: parseFloat(cantidad),
+    };
+
+    const btn = $("btnSubmit");
+    btn.disabled = true; btn.textContent = "Registrando...";
+
+    if (SCRIPT_URL) {
+      try {
+        await fetch(SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify(payload),
+        });
+      } catch (err) {
+        alert("No se pudo conectar al Sheet. Se guardo local por ahora.");
+      }
+    }
+
+    registros.push({ oficial, frente: frenteFull, actividad: act.nombre, cantidad, unidad: act.unidad });
+    renderLog();
+
+    const ok = $("okMsg");
+    ok.textContent = SCRIPT_URL ? "✓ Medición enviada al Sheet" : "✓ Medición registrada (modo demo, aún no conectado)";
+    ok.style.display = "block";
+    setTimeout(() => { ok.style.display = "none"; }, 2200);
+
+    $("cantidad").value = "";
+    btn.disabled = false; btn.textContent = "Registrar medición";
+  });
+</script>
+
+</body>
+</html>
