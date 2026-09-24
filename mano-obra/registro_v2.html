@@ -186,6 +186,15 @@
   table.resumen tr.error td { color: #B4453A; font-weight: 600; }
   .extra { color: #7A5E00; font-weight: 600; }
   button:disabled { opacity: .55; }
+  .interruptor button { font-size: 13.5px; }
+  .bus-resultado { background: #FBF3D9; border: 1.5px solid var(--dorado); border-radius: 10px; padding: 14px; margin-top: 12px; }
+  .bus-codigos { display: flex; gap: 10px; }
+  .bus-codigos > div { flex: 1; background: white; border-radius: 8px; padding: 10px; text-align: center; }
+  .bus-codigos small { display: block; font-size: 10.5px; color: #6B756F; font-weight: 600; letter-spacing: .3px; }
+  .bus-codigos b { display: block; font-size: 22px; color: var(--verde-oscuro); margin-top: 2px; }
+  .bus-desc { font-size: 13px; color: var(--verde-oscuro); margin-top: 10px; line-height: 1.4; }
+  .bus-ruta { font-size: 11.5px; color: #6B756F; margin-top: 8px; line-height: 1.4; }
+  .btn-copiar { margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -204,11 +213,12 @@
 
   <div class="interruptor">
     <button id="btnModoPersonal" class="activo" onclick="cambiarModo('personal')">👷 Jornada</button>
-    <button id="btnModoEquipos" onclick="cambiarModo('equipos')">🚜 Equipos</button>
-    <button id="btnModoMateriales" onclick="cambiarModo('materiales')">📦 Materiales</button>
+    <button id="btnModoBuscador" onclick="cambiarModo('buscador')">🔎 Buscar códigos</button>
+    <button id="btnModoEquipos" onclick="cambiarModo('equipos')" style="display:none">🚜 Equipos</button>
+    <button id="btnModoMateriales" onclick="cambiarModo('materiales')" style="display:none">📦 Materiales</button>
   </div>
 
-  <div class="card">
+  <div class="card" id="cardQuien">
     <h2 id="tituloPaso1">1. ¿Quién eres?</h2>
     <label for="selMaestro" id="labelPaso1">Busca tu nombre</label>
     <select id="selMaestro" onchange="onMaestroChange()">
@@ -220,6 +230,7 @@
   </div>
 
   <div id="zonaJornada"></div>
+  <div id="zonaBuscador" style="display:none"></div>
   <div id="zonaBloques" style="display:none"></div>
 
   <button class="btn btn-agregar-bloque" id="btnAgregarBloque" onclick="agregarBloque()" disabled style="display:none">
@@ -229,7 +240,7 @@
   <div style="height: 90px"></div>
 </main>
 
-<div class="barra-inferior">
+<div class="barra-inferior" id="barraGuardar">
   <button class="btn btn-primario" id="btnGuardar" onclick="guardarTodo()" disabled>
     Guardar el día
   </button>
@@ -265,9 +276,10 @@ function cambiarModo(nuevoModo) {
   document.getElementById("btnModoPersonal").classList.toggle("activo", modo === "personal");
   document.getElementById("btnModoEquipos").classList.toggle("activo", modo === "equipos");
   document.getElementById("btnModoMateriales").classList.toggle("activo", modo === "materiales");
-  const titulos = { personal: "Jornada: horas y cantidades", equipos: "Registro de Equipos", materiales: "Pedido de Materiales" };
-  const paso1 = { personal: "1. ¿Quién eres?", equipos: "1. ¿Quién solicita el equipo?", materiales: "1. ¿Quién solicita el material?" };
-  const btnTexto = { personal: "+ Agregar otro bloque de actividad", equipos: "+ Agregar otro bloque de equipos", materiales: "+ Agregar otro bloque de materiales" };
+  document.getElementById("btnModoBuscador").classList.toggle("activo", modo === "buscador");
+  const titulos = { buscador: "Buscador de códigos", personal: "Jornada: horas y cantidades", equipos: "Registro de Equipos", materiales: "Pedido de Materiales" };
+  const paso1 = { buscador: "", personal: "1. ¿Quién eres?", equipos: "1. ¿Quién solicita el equipo?", materiales: "1. ¿Quién solicita el material?" };
+  const btnTexto = { buscador: "", personal: "+ Agregar otro bloque de actividad", equipos: "+ Agregar otro bloque de equipos", materiales: "+ Agregar otro bloque de materiales" };
   document.getElementById("tituloApp").textContent = titulos[modo];
   document.getElementById("tituloPaso1").textContent = paso1[modo];
   document.getElementById("labelPaso1").textContent = "Busca tu nombre";
@@ -275,11 +287,15 @@ function cambiarModo(nuevoModo) {
   // Al cambiar de modo reiniciamos los bloques para no mezclar datos
   bloques = [];
   contadorBloque = 0;
-  const esJornada = modo === "personal";
+  const esJornada = modo === "personal", esBuscador = modo === "buscador";
   document.getElementById("zonaJornada").style.display = esJornada ? "" : "none";
-  document.getElementById("zonaBloques").style.display = esJornada ? "none" : "";
-  document.getElementById("btnAgregarBloque").style.display = esJornada ? "none" : "";
-  if (esJornada) { renderJornada(); } else { if (maestroActual) agregarBloque(); renderBloques(); }
+  document.getElementById("zonaBuscador").style.display = esBuscador ? "" : "none";
+  document.getElementById("zonaBloques").style.display = (esJornada || esBuscador) ? "none" : "";
+  document.getElementById("btnAgregarBloque").style.display = (esJornada || esBuscador) ? "none" : "";
+  document.getElementById("cardQuien").style.display = esBuscador ? "none" : "";
+  document.getElementById("barraGuardar").style.display = esBuscador ? "none" : "";
+  if (esBuscador) { renderBuscador(); }
+  else if (esJornada) { renderJornada(); } else { if (maestroActual) agregarBloque(); renderBloques(); }
   actualizarBotonGuardar();
 }
 
@@ -784,6 +800,7 @@ function renderMateriales(b) {
 }
 
 function actualizarBotonGuardar() {
+  if (modo === "buscador") return;
   let listo;
   if (modo === "personal") {
     listo = maestroActual && jornada.lineas.length > 0;
@@ -1371,6 +1388,86 @@ async function guardarJornada() {
   }
   btn.textContent = "Guardar el día";
   actualizarBotonGuardar();
+}
+
+// =====================================================================
+// ============ BUSCADOR DE CÓDIGOS (solo consulta, no guarda) =========
+// =====================================================================
+let bus = { frente: "", cap: "", sub: "", act: "", texto: "" };
+function renderBuscador() {
+  const z = document.getElementById("zonaBuscador");
+  const caps = CATALOGO.capitulos.filter(c => c.codFrente === bus.frente);
+  const subs = CATALOGO.subcapitulos.filter(x => x.codCapitulo === bus.cap);
+  const acts = CATALOGO.actividades.filter(a => a.codSubcap === bus.sub);
+  const op = (lista, sel, txt) => lista.map(x => `<option value="${x.cod}" ${sel === x.cod ? "selected" : ""}>${esc(txt(x))}</option>`).join("");
+  const frentes = CATALOGO.frentes.map(f => `<option value="${f.cod}" ${bus.frente === f.cod ? "selected" : ""}>${f.cod} — ${esc(f.nombre)}</option>`).join("");
+  z.innerHTML = `
+    <div class="aviso">Solo consulta: aquí no se guarda nada. Úsalo para encontrar el código de frente y de actividad al pedir materiales o equipos.</div>
+    <div class="card">
+      <h2>1. Frente de trabajo</h2>
+      <select onchange="bus={frente:this.value,cap:'',sub:'',act:'',texto:''}; renderBuscador()">
+        <option value="">— Selecciona el frente —</option>${frentes}
+      </select>
+    </div>
+    ${bus.frente ? `
+    <div class="card">
+      <h2>2. Busca por palabras</h2>
+      <input type="text" id="busTexto" placeholder="Ej. luminaria led, pintura muro, andamio" value="${esc(bus.texto)}"
+             oninput="bus.texto=this.value; buscarEnCatalogo()" autocomplete="off">
+      <div class="lista-act" id="busResultados"></div>
+      <h2 style="margin-top:16px">o navega por capítulos</h2>
+      <label>Capítulo</label>
+      <select onchange="bus.cap=this.value; bus.sub=''; bus.act=''; renderBuscador()">
+        <option value="">— Capítulo —</option>${op(caps, bus.cap, c => c.nombre.split("(")[0].trim())}
+      </select>
+      ${bus.cap ? `<label>Subcapítulo</label>
+      <select onchange="bus.sub=this.value; bus.act=''; renderBuscador()">
+        <option value="">— Subcapítulo —</option>${op(subs, bus.sub, x => x.cod + " — " + x.nombre.split("(")[0].trim().slice(0, 70))}
+      </select>` : ""}
+      ${bus.sub ? `<label>Actividad</label>
+      <select onchange="bus.act=this.value; renderBuscador()">
+        <option value="">— Actividad —</option>${op(acts, bus.act, a => a.cod + " — " + a.desc.split("(")[0].trim().slice(0, 70))}
+      </select>` : ""}
+    </div>` : ""}
+    ${renderResultadoBuscador()}
+  `;
+  if (bus.texto) buscarEnCatalogo();
+}
+function buscarEnCatalogo() {
+  const cont = document.getElementById("busResultados"); if (!cont) return;
+  const palabras = normTxt(bus.texto).split(/\s+/).filter(w => w.length >= 3);
+  if (!palabras.length) { cont.innerHTML = ""; return; }
+  const enc = CATALOGO.actividades.filter(a => a.cod.startsWith(bus.frente + ".") &&
+    palabras.every(w => normTxt(a.desc).includes(w) || a.cod.includes(w))).slice(0, 15);
+  cont.innerHTML = enc.length ? enc.map(a => `
+    <div onclick="elegirEnBuscador('${a.cod}')">
+      <b>${esc(a.desc.split("(")[0].trim().slice(0, 90))}</b><span>${a.cod} · ${a.unidad}</span>
+    </div>`).join("") : `<p class="nota">Sin resultados en este frente. Prueba otra palabra o navega por capítulos.</p>`;
+}
+function elegirEnBuscador(cod) {
+  const a = CATALOGO.actividades.find(x => x.cod === cod); if (!a) return;
+  bus.act = cod; bus.sub = a.codSubcap; bus.cap = cod.split(".").slice(0, 2).join("."); bus.texto = "";
+  renderBuscador();
+  const r = document.getElementById("busResultado"); if (r) r.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+function renderResultadoBuscador() {
+  const a = CATALOGO.actividades.find(x => x.cod === bus.act); if (!a) return "";
+  const cap = CATALOGO.capitulos.find(c => c.cod === bus.cap), sub = CATALOGO.subcapitulos.find(x => x.cod === a.codSubcap);
+  return `
+    <div class="bus-resultado" id="busResultado">
+      <div class="bus-codigos">
+        <div><small>CÓDIGO DE FRENTE</small><b>${bus.frente}</b></div>
+        <div><small>CÓDIGO DE ACTIVIDAD</small><b>${a.cod}</b></div>
+      </div>
+      <div class="bus-desc">${esc(a.desc)}</div>
+      <div class="bus-ruta">Unidad: <b>${esc(a.unidad)}</b><br>Capítulo: ${esc(cap ? cap.nombre.split("(")[0].trim() : "")}<br>Subcapítulo: ${esc(sub ? sub.nombre.split("(")[0].trim().slice(0, 90) : "")}</div>
+      <button class="btn btn-secundario btn-copiar" onclick="copiarCodigo('${a.cod}')">Copiar código ${a.cod}</button>
+    </div>`;
+}
+function copiarCodigo(cod) {
+  const ok = () => mostrarToast(`Código ${cod} copiado`);
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(cod).then(ok, () => prompt("Copia el código:", cod));
+  else prompt("Copia el código:", cod);
 }
 
 cargarCatalogo();
