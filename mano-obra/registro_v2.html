@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Campo v2 · AIRPLAN T1 JMC</title>
+<style>
+  :root {
+    --verde: #1A5632;
+    --verde-oscuro: #0F331D;
+    --verde-claro: #4C8A64;
+    --dorado: #C9A227;
+    --gris-borde: #D8DED9;
+    --gris-texto: #3A3F3C;
+    --fondo: #F5F7F5;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--fondo); color: var(--gris-texto); padding-bottom: 90px;
+  }
+  header {
+    background: var(--verde); color: white; padding: 14px 16px;
+    display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 20;
+  }
+  header img { height: 34px; }
+  header h1 { font-size: 16px; margin: 0; font-weight: 700; }
+  header p { margin: 0; font-size: 11px; opacity: .85; }
+  main { padding: 14px; max-width: 560px; margin: 0 auto; }
+  .card {
+    background: white; border: 1px solid var(--gris-borde); border-radius: 10px;
+    padding: 14px; margin-bottom: 14px;
+  }
+  .card h2 {
+    font-size: 13px; text-transform: none; color: var(--verde-oscuro);
+    margin: 0 0 10px 0; font-weight: 700;
+  }
+  label { display: block; font-size: 12.5px; color: var(--gris-texto); margin: 10px 0 4px; }
+  label:first-child { margin-top: 0; }
+  select, input[type=text], input[type=number], input[type=date] {
+    width: 100%; padding: 10px 10px; border: 1.5px solid var(--gris-borde);
+    border-radius: 8px; font-size: 15px; background: white; color: var(--gris-texto);
+  }
+  select:focus, input:focus { outline: none; border-color: var(--verde); }
+  .fila { display: flex; gap: 8px; }
+  .fila > div { flex: 1; }
+  .persona-chip {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: #EEF3EF; border: 1px solid var(--gris-borde); border-radius: 8px;
+    padding: 8px 10px; margin-top: 8px; flex-wrap: wrap;
+  }
+  .persona-chip .nombre { font-size: 13.5px; font-weight: 600; flex: 1; min-width: 120px; }
+  .persona-chip .cargo { font-size: 11px; color: var(--gris-texto); opacity: .7; }
+  .persona-chip input[type=number] { width: 62px; padding: 6px; font-size: 13px; }
+  .persona-chip input[type=text] { width: 100px; padding: 6px; font-size: 12px; }
+  .persona-chip select { width: auto; padding: 6px; font-size: 12px; }
+  .hora-fin-auto {
+    display: flex; flex-direction: column; gap: 3px; width: 100%;
+    background: #FFFFFF; border: 1px solid var(--gris-borde); border-radius: 6px;
+    padding: 8px; margin-top: 4px;
+  }
+  .hora-fin-auto label { font-size: 10.5px; color: var(--gris-texto); }
+  .hora-fin-auto input[type=time] { padding: 6px; font-size: 13px; }
+  .fila-horas { display: flex; align-items: center; gap: 6px; }
+  .fila-horas input[type=time] { flex: 1; min-width: 0; }
+  .fila-horas span { font-size: 11px; color: var(--gris-texto); }
+  .resumen-auto {
+    font-size: 12px; font-weight: 600; color: var(--verde-oscuro);
+    background: #FBF3D9; border-radius: 5px; padding: 4px 7px; margin-top: 2px;
+  }
+  .resumen-auto.aviso { color: #8a6d00; background: #FFF3CD; font-weight: 500; }
+  .manual-toggle {
+    width: 100%; font-size: 11.5px; color: var(--gris-texto); margin-top: 2px;
+  }
+  .manual-toggle summary { cursor: pointer; padding: 4px 0; }
+  .manual-toggle input, .manual-toggle select { margin-top: 6px; }
+  .btn-x {
+    background: none; border: none; color: #B4453A; font-size: 18px; cursor: pointer;
+    padding: 0 4px; line-height: 1;
+  }
+  .buscador-personal { position: relative; margin-top: 10px; }
+  .resultados {
+    position: absolute; z-index: 10; background: white; border: 1px solid var(--gris-borde);
+    border-radius: 8px; width: 100%; max-height: 180px; overflow-y: auto; box-shadow: 0 4px 10px rgba(0,0,0,.08);
+  }
+  .resultados div { padding: 9px 10px; font-size: 13.5px; cursor: pointer; border-bottom: 1px solid #F0F0F0; }
+  .resultados div:hover { background: #EEF3EF; }
+  .btn {
+    display: inline-block; border: none; border-radius: 8px; padding: 11px 16px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .btn-primario { background: var(--verde); color: white; width: 100%; }
+  .btn-primario:disabled { background: #A9BBAE; }
+  .btn-secundario { background: white; color: var(--verde); border: 1.5px solid var(--verde); width: 100%; }
+  .btn-agregar-bloque {
+    background: #EEF3EF; color: var(--verde-oscuro); border: 1.5px dashed var(--verde-claro);
+    width: 100%; padding: 12px; margin-top: 6px;
+  }
+  .bloque { border-top: 2px solid var(--dorado); padding-top: 12px; margin-top: 16px; position: relative; }
+  .bloque:first-of-type { border-top: none; padding-top: 0; margin-top: 0; }
+  .bloque-num { font-size: 11px; color: var(--dorado); font-weight: 700; margin-bottom: 6px; letter-spacing: .3px; }
+  .quitar-bloque { position: absolute; right: 0; top: 0; }
+  .barra-inferior {
+    position: fixed; bottom: 0; left: 0; right: 0; background: white;
+    border-top: 1px solid var(--gris-borde); padding: 10px 14px; z-index: 20;
+  }
+  .aviso {
+    background: #FBF3D9; border: 1px solid var(--dorado); border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; margin-bottom: 14px; color: var(--verde-oscuro);
+  }
+  .toast {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    background: var(--verde-oscuro); color: white; padding: 12px 20px; border-radius: 8px;
+    font-size: 14px; z-index: 30; display: none; max-width: 90%; text-align: center;
+  }
+  .vacio { text-align: center; color: #8A948E; font-size: 13px; padding: 20px 0; }
+  .campo-libre { font-size: 11px; color: var(--verde); background: none; border: none; cursor: pointer; padding: 4px 0; text-decoration: underline; }
+
+  .interruptor {
+    display: flex; background: #EEF3EF; border-radius: 10px; padding: 4px;
+    margin-bottom: 14px; gap: 4px;
+  }
+  .interruptor button {
+    flex: 1; border: none; background: none; padding: 10px; border-radius: 8px;
+    font-size: 14px; font-weight: 700; color: var(--verde-oscuro); cursor: pointer;
+  }
+  .interruptor button.activo { background: var(--verde); color: white; }
+
+  .equipo-fila {
+    background: #EEF3EF; border: 1px solid var(--gris-borde); border-radius: 8px;
+    padding: 10px; margin-top: 8px; position: relative;
+  }
+  .equipo-fila .quitar-equipo { position: absolute; right: 8px; top: 8px; }
+  .equipo-fila .fila { margin-top: 8px; }
+
+  .caja-codigos {
+    background: #FBF3D9; border: 1.5px solid var(--dorado); border-radius: 8px;
+    padding: 12px; margin-top: 10px; font-size: 15px; color: var(--verde-oscuro);
+  }
+  .caja-codigos b { color: var(--verde-oscuro); }
+  .caja-codigos div { margin-bottom: 4px; }
+  .nota-caja-codigos { font-size: 11px; color: var(--gris-texto); margin-top: 6px !important; font-weight: normal; }
+
+  /* ---------- v2: jornada ---------- */
+  .contador { background: var(--verde); color: white; border-radius: 10px; padding: 1px 8px; font-size: 11px; margin-left: 4px; }
+  .nota-h { font-weight: 400; color: #6B756F; font-size: 11.5px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 16px; padding: 7px 12px; font-size: 13px;
+          border: 1.5px solid var(--gris-borde); background: white; color: var(--gris-texto); cursor: pointer; font-family: inherit; }
+  .chip.on { background: #E3EEE6; border-color: var(--verde-claro); color: var(--verde-oscuro); font-weight: 600; }
+  .chip.off { background: #F3F4F3; color: #9AA39D; text-decoration: line-through; }
+  .chip.rec { background: #FBF3D9; border-color: var(--dorado); color: var(--verde-oscuro); text-align: left; }
+  .chip button { background: none; border: none; color: #B4453A; font-size: 14px; cursor: pointer; padding: 0 0 0 2px; }
+  .vacio-inline { color: #8A948E; font-size: 13px; }
+  .btn-suave { background: #EEF3EF; color: var(--verde-oscuro); border: 1.5px solid var(--verde-claro); width: 100%; margin-top: 8px; }
+  .nota { font-size: 11.5px; color: #6B756F; margin: 6px 0 0; }
+  .linea { border: 1.5px solid var(--gris-borde); border-left: 4px solid var(--verde); border-radius: 8px; padding: 10px; margin-bottom: 10px; background: white; }
+  .linea.incompleta { border-left-color: var(--dorado); }
+  .linea-top { display: flex; align-items: center; gap: 6px; }
+  .linea-top input[type=time] { width: auto; flex: 1; min-width: 0; padding: 8px 6px; font-size: 15px; border: 1.5px solid var(--gris-borde); border-radius: 8px; }
+  .linea-top span { font-size: 12px; }
+  .linea-top .dur { font-weight: 700; color: var(--verde-oscuro); min-width: 42px; text-align: right; }
+  .act-elegida { margin-top: 8px; cursor: pointer; }
+  .act-titulo { font-size: 14px; font-weight: 600; color: var(--verde-oscuro); }
+  .act-sub { font-size: 11.5px; color: #6B756F; }
+  .tag-np { background: #FBF3D9; color: #7A5E00; border-radius: 6px; padding: 1px 6px; font-size: 10.5px; font-weight: 600; }
+  .picker { background: #F7F9F7; border: 1px dashed var(--verde-claro); border-radius: 8px; padding: 10px; margin-top: 8px; }
+  .lista-act div { background: white; border: 1px solid var(--gris-borde); border-radius: 8px; padding: 8px 10px; margin-top: 6px; cursor: pointer; }
+  .lista-act div:active { background: #E3EEE6; }
+  .lista-act b { display: block; font-size: 13px; color: var(--verde-oscuro); }
+  .lista-act span { font-size: 11px; color: #6B756F; }
+  details.np { margin-top: 10px; font-size: 13px; }
+  details.np summary { cursor: pointer; color: #7A5E00; font-weight: 600; padding: 4px 0; }
+  .chips-linea { margin-top: 10px; }
+  .chips-linea .chip { padding: 5px 10px; font-size: 12px; }
+  .cant-fila { border-top: 1px solid #EEF1EE; padding: 8px 0; }
+  .cant-fila:first-of-type { border-top: none; }
+  .cant-nombre { font-size: 13.5px; font-weight: 600; color: var(--verde-oscuro); margin-bottom: 6px; }
+  .cant-inputs { display: flex; gap: 6px; align-items: center; }
+  .cant-inputs input { width: 90px !important; flex: none; }
+  .cant-inputs .unidad { font-size: 13px; font-weight: 600; min-width: 24px; }
+  .cant-inputs select { flex: 1; min-width: 0; font-size: 13px; padding: 9px 6px; }
+  table.resumen { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.resumen th { text-align: left; font-size: 11.5px; color: #6B756F; font-weight: 600; padding: 4px 0; border-bottom: 1px solid var(--gris-borde); }
+  table.resumen td { padding: 6px 0; border-bottom: 1px solid #F0F2F0; }
+  table.resumen tr.error td { color: #B4453A; font-weight: 600; }
+  .extra { color: #7A5E00; font-weight: 600; }
+  button:disabled { opacity: .55; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="aia.png" alt="AIA" onerror="this.style.display='none'">
+  <div>
+    <h1 id="tituloApp">Registro de Campo</h1>
+    <p>AIRPLAN T1 JMC · Diligenciamiento diario</p>
+  </div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<main>
+
+  <div class="interruptor">
+    <button id="btnModoPersonal" class="activo" onclick="cambiarModo('personal')">👷 Jornada</button>
+    <button id="btnModoEquipos" onclick="cambiarModo('equipos')">🚜 Equipos</button>
+    <button id="btnModoMateriales" onclick="cambiarModo('materiales')">📦 Materiales</button>
+  </div>
+
+  <div class="card">
+    <h2 id="tituloPaso1">1. ¿Quién eres?</h2>
+    <label for="selMaestro" id="labelPaso1">Busca tu nombre</label>
+    <select id="selMaestro" onchange="onMaestroChange()">
+      <option value="">— Selecciona tu nombre —</option>
+    </select>
+
+    <label for="fecha">Fecha</label>
+    <input type="date" id="fecha" onchange="modo === 'personal' ? renderJornada() : renderBloques()">
+  </div>
+
+  <div id="zonaJornada"></div>
+  <div id="zonaBloques" style="display:none"></div>
+
+  <button class="btn btn-agregar-bloque" id="btnAgregarBloque" onclick="agregarBloque()" disabled style="display:none">
+    + Agregar otro bloque de actividad
+  </button>
+
+  <div style="height: 90px"></div>
+</main>
+
+<div class="barra-inferior">
+  <button class="btn btn-primario" id="btnGuardar" onclick="guardarTodo()" disabled>
+    Guardar el día
+  </button>
+</div>
+
+<script>
+// =================== CONFIGURACIÓN ===================
+// Reemplaza esta URL por la de tu Google Apps Script publicado (ver instrucciones).
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbygQ9lgDfHZulIjanGB_WwC9-5y3JyJ9gSmQIKJ2ccOlbkWhZOTs3ipXFqKaHK_B5oz/exec";
+// =======================================================
+
+const PROVEEDORES_SUGERIDOS = ["ALDECCO", "MAS EQUIPOS", "EQUIPOS INMEDIATOS"];
+const UNIDADES_SUGERIDAS = ["Und", "m2", "m3", "Día", "Hora", "Global"];
+
+let CATALOGO = null;
+let maestroActual = null;
+let bloques = [];
+let contadorBloque = 0;
+let modo = "personal"; // "personal" | "equipos"
+
+async function cargarCatalogo() {
+  const resp = await fetch("catalogo.json");
+  CATALOGO = await resp.json();
+  poblarMaestros();
+  const hoy = new Date(); hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+  document.getElementById("fecha").value = hoy.toISOString().slice(0, 10);
+  renderJornada();
+}
+
+function cambiarModo(nuevoModo) {
+  if (nuevoModo === modo) return;
+  modo = nuevoModo;
+  document.getElementById("btnModoPersonal").classList.toggle("activo", modo === "personal");
+  document.getElementById("btnModoEquipos").classList.toggle("activo", modo === "equipos");
+  document.getElementById("btnModoMateriales").classList.toggle("activo", modo === "materiales");
+  const titulos = { personal: "Jornada: horas y cantidades", equipos: "Registro de Equipos", materiales: "Pedido de Materiales" };
+  const paso1 = { personal: "1. ¿Quién eres?", equipos: "1. ¿Quién solicita el equipo?", materiales: "1. ¿Quién solicita el material?" };
+  const btnTexto = { personal: "+ Agregar otro bloque de actividad", equipos: "+ Agregar otro bloque de equipos", materiales: "+ Agregar otro bloque de materiales" };
+  document.getElementById("tituloApp").textContent = titulos[modo];
+  document.getElementById("tituloPaso1").textContent = paso1[modo];
+  document.getElementById("labelPaso1").textContent = "Busca tu nombre";
+  document.getElementById("btnAgregarBloque").textContent = btnTexto[modo];
+  // Al cambiar de modo reiniciamos los bloques para no mezclar datos
+  bloques = [];
+  contadorBloque = 0;
+  const esJornada = modo === "personal";
+  document.getElementById("zonaJornada").style.display = esJornada ? "" : "none";
+  document.getElementById("zonaBloques").style.display = esJornada ? "none" : "";
+  document.getElementById("btnAgregarBloque").style.display = esJornada ? "none" : "";
+  if (esJornada) { renderJornada(); } else { if (maestroActual) agregarBloque(); renderBloques(); }
+  actualizarBotonGuardar();
+}
+
+function poblarMaestros() {
+  const sel = document.getElementById("selMaestro");
+  const maestros = CATALOGO.personal
+    .filter(p => (p.cargo || "").toLowerCase().includes("maestro"))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+  maestros.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.nombre;
+    opt.textContent = `${p.nombre} (${p.cargo})`;
+    sel.appendChild(opt);
+  });
+}
+
+function onMaestroChange() {
+  const nombre = document.getElementById("selMaestro").value;
+  maestroActual = CATALOGO.personal.find(p => p.nombre === nombre) || null;
+  document.getElementById("btnAgregarBloque").disabled = !maestroActual;
+  actualizarBotonGuardar();
+  if (modo === "personal") { iniciarJornada(); return; }
+  if (maestroActual && bloques.length === 0) agregarBloque();
+}
+
+function frentesDelMaestro() {
+  if (!maestroActual) return [];
+  const propios = CATALOGO.residenteFrente.filter(rf => rf.residenteKey === maestroActual.residenteKey);
+  const codsPropios = new Set(propios.map(p => p.codFrente));
+  const listaPropia = CATALOGO.frentes.filter(f => codsPropios.has(f.cod));
+  return listaPropia;
+}
+
+function unidadActividad(b) {
+  const a = CATALOGO.actividades.find(x => x.cod === b.codActividad);
+  return a ? a.unidad : "";
+}
+
+function actualizarCantidadBloque(idBloque, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.cantidadEjecutada = valor;
+}
+
+function agregarBloque() {
+  contadorBloque++;
+  bloques.push({
+    id: contadorBloque, codFrente: "", codCapitulo: "", codSubcap: "", codActividad: "",
+    personas: [], equipos: [], materiales: [], cantidadEjecutada: "",
+    loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  });
+  renderBloques();
+}
+
+function quitarBloque(id) {
+  bloques = bloques.filter(b => b.id !== id);
+  renderBloques();
+}
+
+function renderBloques() {
+  const zona = document.getElementById("zonaBloques");
+  zona.innerHTML = "";
+  bloques.forEach((b, idx) => {
+    const div = document.createElement("div");
+    div.className = "card bloque";
+    div.innerHTML = `
+      ${bloques.length > 1 ? `<button class="btn-x quitar-bloque" onclick="quitarBloque(${b.id})">✕</button>` : ""}
+      <div class="bloque-num">BLOQUE ${idx + 1}</div>
+
+      <label>Frente de trabajo</label>
+      <select onchange="cambiarFrente(${b.id}, this.value)">
+        <option value="">— Selecciona el frente —</option>
+        ${frenteOpciones(b)}
+      </select>
+
+      ${b.codFrente ? `
+      <label>Capítulo</label>
+      <select onchange="cambiarCapitulo(${b.id}, this.value)">
+        <option value="">— Selecciona el capítulo —</option>
+        ${capituloOpciones(b)}
+      </select>` : ""}
+
+      ${b.codCapitulo ? `
+      <label>Subcapítulo</label>
+      <select onchange="cambiarSubcap(${b.id}, this.value)">
+        <option value="">— Selecciona el subcapítulo —</option>
+        ${subcapOpciones(b)}
+      </select>` : ""}
+
+      ${b.codSubcap ? `
+      <label>Actividad</label>
+      <select onchange="cambiarActividad(${b.id}, this.value)">
+        <option value="">— Selecciona la actividad —</option>
+        ${actividadOpciones(b)}
+      </select>` : ""}
+
+      ${b.codActividad && modo === "personal" ? `
+      <label>Cantidad ejecutada hoy en esta actividad ${unidadActividad(b) ? '(' + unidadActividad(b) + ')' : ''}</label>
+      <input type="number" min="0" step="0.01" value="${b.cantidadEjecutada || ''}"
+             placeholder="Ej. 2.5" oninput="actualizarCantidadBloque(${b.id}, this.value)">
+
+      <label style="margin-top:14px;">Personal en esta actividad</label>
+      <div id="personas-${b.id}"></div>
+      <div class="buscador-personal">
+        <input type="text" placeholder="Buscar y agregar a alguien de tu cuadrilla u otra persona…"
+               oninput="buscarPersona(${b.id}, this.value)" id="buscador-${b.id}">
+        <div class="resultados" id="resultados-${b.id}" style="display:none"></div>
+      </div>
+      <button class="campo-libre" onclick="agregarPersonaLibre(${b.id})">
+        ¿No aparece? Escribir el nombre manualmente
+      </button>` : ""}
+
+      ${b.codActividad && modo === "equipos" ? `
+      <label>Equipos usados en esta actividad</label>
+      <div id="equipos-${b.id}"></div>
+      <button class="campo-libre" onclick="agregarEquipo(${b.id})" style="margin-top:8px;">
+        + Agregar un equipo a este bloque
+      </button>` : ""}
+
+      ${b.codActividad && modo === "materiales" ? `
+      <div class="caja-codigos">
+        <div><b>Código de Frente:</b> ${b.codFrente}</div>
+        <div><b>Código de Actividad:</b> ${b.codActividad}</div>
+        <div class="nota-caja-codigos">Copia estos códigos en tu remisión / solicitud física.</div>
+      </div>
+      <label>Materiales pedidos en esta actividad</label>
+      <div id="materiales-${b.id}"></div>
+      <button class="campo-libre" onclick="agregarMaterial(${b.id})" style="margin-top:8px;">
+        + Agregar un material a este bloque
+      </button>` : ""}
+    `;
+    zona.appendChild(div);
+    if (b.codActividad && modo === "personal") renderPersonas(b);
+    if (b.codActividad && modo === "equipos") renderEquipos(b);
+    if (b.codActividad && modo === "materiales") renderMateriales(b);
+  });
+  actualizarBotonGuardar();
+}
+
+function frenteOpciones(b) {
+  const propios = frentesDelMaestro();
+  const codsPropios = new Set(propios.map(f => f.cod));
+  let html = "";
+  if (propios.length) {
+    html += `<optgroup label="Tus frentes habituales">`;
+    propios.forEach(f => {
+      html += `<option value="${f.cod}" ${b.codFrente === f.cod ? "selected" : ""}>${f.nombre}</option>`;
+    });
+    html += `</optgroup><optgroup label="Otros frentes">`;
+  }
+  CATALOGO.frentes.filter(f => !codsPropios.has(f.cod)).forEach(f => {
+    html += `<option value="${f.cod}" ${b.codFrente === f.cod ? "selected" : ""}>${f.nombre}</option>`;
+  });
+  if (propios.length) html += `</optgroup>`;
+  return html;
+}
+
+function capituloOpciones(b) {
+  return CATALOGO.capitulos.filter(c => c.codFrente === b.codFrente)
+    .map(c => `<option value="${c.cod}" ${b.codCapitulo === c.cod ? "selected" : ""}>${c.nombre}</option>`).join("");
+}
+function subcapOpciones(b) {
+  return CATALOGO.subcapitulos.filter(s => s.codCapitulo === b.codCapitulo)
+    .map(s => `<option value="${s.cod}" ${b.codSubcap === s.cod ? "selected" : ""}>${s.nombre}</option>`).join("");
+}
+function actividadOpciones(b) {
+  return CATALOGO.actividades.filter(a => a.codSubcap === b.codSubcap)
+    .map(a => `<option value="${a.cod}" ${b.codActividad === a.cod ? "selected" : ""}>${a.desc.slice(0, 90)}</option>`).join("");
+}
+
+function cambiarFrente(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codFrente = val; b.codCapitulo = ""; b.codSubcap = ""; b.codActividad = "";
+  renderBloques();
+}
+function cambiarCapitulo(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codCapitulo = val; b.codSubcap = ""; b.codActividad = "";
+  renderBloques();
+}
+function cambiarSubcap(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codSubcap = val; b.codActividad = "";
+  renderBloques();
+}
+function cambiarActividad(id, val) {
+  const b = bloques.find(x => x.id === id);
+  b.codActividad = val;
+  renderBloques();
+}
+
+// ============ PERSONAL (Mano de Obra) ============
+function buscarPersona(idBloque, texto) {
+  const cont = document.getElementById(`resultados-${idBloque}`);
+  if (!texto || texto.length < 2) { cont.style.display = "none"; return; }
+  const t = texto.toLowerCase();
+  const encontrados = CATALOGO.personal.filter(p => p.nombre.toLowerCase().includes(t)).slice(0, 8);
+  if (!encontrados.length) { cont.style.display = "none"; return; }
+  cont.innerHTML = encontrados.map(p =>
+    `<div onclick='agregarPersona(${idBloque}, ${JSON.stringify(p.nombre)}, ${JSON.stringify(p.cargo)})'>${p.nombre} <span style="color:#999">(${p.cargo})</span></div>`
+  ).join("");
+  cont.style.display = "block";
+}
+
+function agregarPersona(idBloque, nombre, cargo) {
+  const b = bloques.find(x => x.id === idBloque);
+  if (b.personas.some(p => p.nombre === nombre)) return;
+  b.personas.push({ nombre, cargo, horas: 8, tipoHora: "Ordinaria Diurna", cantidad: "", horaIni: "", horaFin: "" });
+  document.getElementById(`buscador-${idBloque}`).value = "";
+  document.getElementById(`resultados-${idBloque}`).style.display = "none";
+  renderPersonas(b);
+  actualizarBotonGuardar();
+}
+
+function agregarPersonaLibre(idBloque) {
+  const nombre = prompt("Escribe el nombre completo de la persona:");
+  if (!nombre) return;
+  const b = bloques.find(x => x.id === idBloque);
+  b.personas.push({ nombre: nombre.trim(), cargo: "Sin confirmar", horas: 8, tipoHora: "Ordinaria Diurna", cantidad: "", horaIni: "", horaFin: "" });
+  renderPersonas(b);
+  actualizarBotonGuardar();
+}
+
+function quitarPersona(idBloque, nombre) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.personas = b.personas.filter(p => p.nombre !== nombre);
+  renderPersonas(b);
+  actualizarBotonGuardar();
+}
+
+function renderPersonas(b) {
+  const cont = document.getElementById(`personas-${b.id}`);
+  if (!cont) return;
+  if (!b.personas.length) {
+    cont.innerHTML = `<div class="vacio">Aún no has agregado a nadie en este bloque</div>`;
+    return;
+  }
+  const tiposHora = CATALOGO.recargos.map(r => r.tipo);
+  const fechaGlobal = document.getElementById("fecha").value;
+  cont.innerHTML = b.personas.map(p => {
+    const segmentos = calcularSegmentosHora(fechaGlobal, p.horaIni, p.horaFin);
+    const resumenAuto = segmentos
+      ? `<div class="resumen-auto">${segmentos.map(s => `${s.horas}h ${s.tipoHora}`).join(" + ")}</div>`
+      : "";
+    return `
+    <div class="persona-chip">
+      <div>
+        <div class="nombre">${p.nombre}</div>
+        <div class="cargo">${p.cargo}</div>
+      </div>
+      <div class="hora-fin-auto">
+        <label>Hora de inicio y de finalización (calcula solo el tipo de hora)</label>
+        <div class="fila-horas">
+          <input type="time" value="${p.horaIni || ""}" placeholder="Inicio"
+                 onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'horaIni', this.value)">
+          <span>a</span>
+          <input type="time" value="${p.horaFin || ""}" placeholder="Fin"
+                 onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'horaFin', this.value)">
+        </div>
+        ${resumenAuto}
+      </div>
+      <details class="manual-toggle">
+        <summary>Ingresar horas manualmente</summary>
+        <input type="number" min="0" max="24" step="0.5" value="${p.horas}"
+               onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'horas', this.value)" title="Horas">
+        <select onchange="actualizarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}', 'tipoHora', this.value)" title="Tipo de hora">
+          ${tiposHora.map(t => `<option ${t === p.tipoHora ? "selected" : ""}>${t}</option>`).join("")}
+        </select>
+      </details>
+      <button class="btn-x" onclick="quitarPersona(${b.id}, '${p.nombre.replace(/'/g, "\\'")}')">✕</button>
+    </div>
+  `;
+  }).join("");
+}
+
+function actualizarPersona(idBloque, nombre, campo, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  const p = b.personas.find(x => x.nombre === nombre);
+  p[campo] = valor;
+  if (campo === "horaFin" || campo === "horaIni") renderPersonas(b); // para refrescar el resumen calculado
+}
+
+// ============ CÁLCULO AUTOMÁTICO DE HORAS (hora inicio + hora fin) ============
+// Cuota de horas ORDINARIAS según el día de la semana (a partir de la hora
+// en que la persona inició su turno — no se asume que todos entran a las 7am,
+// para poder registrar bien los turnos nocturnos):
+//   Lunes a Jueves: 8h ordinarias (ej. 7am-3pm), luego extra
+//   Viernes:        7.5h ordinarias (ej. 7am-2:30pm), luego extra
+//   Sábado:         5h ordinarias (ej. 7am-12m), luego extra —
+//                   salvo que esa semana tenga un festivo, en cuyo caso
+//                   el sábado completo es extra (0h ordinarias).
+//   Domingo:        0h ordinarias — TODO lo trabajado es extra.
+//
+// Recargo nocturno: 19:00 a 06:00 (Ley 2466 de 2025, vigente desde dic-2025)
+// Domingo Y festivos: usa las tarifas "Dominical/Festivo ..." automáticamente.
+const FESTIVOS_COLOMBIA_2026 = [
+  "2026-01-01", "2026-01-12", "2026-03-23", "2026-04-02", "2026-04-03",
+  "2026-05-01", "2026-05-18", "2026-06-08", "2026-06-15", "2026-06-29",
+  "2026-07-20", "2026-08-07", "2026-08-17", "2026-10-12", "2026-11-02",
+  "2026-11-16", "2026-12-08", "2026-12-25",
+];
+
+function esFestivoColombia(fechaStr) {
+  return FESTIVOS_COLOMBIA_2026.includes(fechaStr);
+}
+
+function semanaTieneFestivo(fechaStr) {
+  // ¿Algún día de lunes a sábado de la semana de 'fechaStr' es festivo?
+  // (para decidir si el sábado de esa semana cuenta como todo extra o no)
+  const fecha = new Date(fechaStr + "T00:00:00");
+  const diasDesdeElLunes = (fecha.getDay() + 6) % 7; // lunes=0 ... domingo=6
+  const lunes = new Date(fecha);
+  lunes.setDate(fecha.getDate() - diasDesdeElLunes);
+  for (let i = 0; i < 6; i++) { // lunes(0) a sábado(5)
+    const d = new Date(lunes);
+    d.setDate(lunes.getDate() + i);
+    const dStr = d.toISOString().slice(0, 10);
+    if (esFestivoColombia(dStr)) return true;
+  }
+  return false;
+}
+
+function esHoraNocturna(horaAbsoluta) {
+  const h = ((horaAbsoluta % 24) + 24) % 24;
+  return h >= 19 || h < 6;
+}
+
+function nombreTipoHora(esOrdinaria, esNocturna, esDominicalFestivo) {
+  if (esDominicalFestivo) {
+    if (esOrdinaria) return esNocturna ? "Dominical/Festivo Ordinaria Nocturna" : "Dominical/Festivo Ordinaria Diurna";
+    return esNocturna ? "Dominical/Festivo Extra Nocturna" : "Dominical/Festivo Extra Diurna";
+  }
+  if (esOrdinaria) return esNocturna ? "Recargo Nocturno (Ordinaria)" : "Ordinaria Diurna";
+  return esNocturna ? "Extra Nocturna" : "Extra Diurna";
+}
+
+function calcularSegmentosHora(fechaStr, horaInicioStr, horaFinStr) {
+  if (!fechaStr || !horaInicioStr || !horaFinStr) return null;
+  const fecha = new Date(fechaStr + "T00:00:00");
+  const diaSemana = fecha.getDay(); // 0=domingo,1=lunes,...,6=sábado
+
+  const [hIni, mIni] = horaInicioStr.split(":").map(Number);
+  const [hFin, mFin] = horaFinStr.split(":").map(Number);
+  const inicio = hIni + (mIni || 0) / 60;
+  let fin = hFin + (mFin || 0) / 60;
+  if (fin <= inicio) fin += 24; // el turno cruza la medianoche (trabajo nocturno)
+  if (fin - inicio > 24) return null; // dato improbable / error de digitación
+
+  const esDominicalFestivo = (diaSemana === 0) || esFestivoColombia(fechaStr);
+
+  // Cuota de horas ORDINARIAS del día (a partir de la hora en que inició el turno):
+  //   Lunes a Jueves: 8h ordinarias (ej. 7am-3pm), luego extra
+  //   Viernes:        7.5h ordinarias (ej. 7am-2:30pm), luego extra
+  //   Sábado:         5h ordinarias (ej. 7am-12m), luego extra —
+  //                   PERO si esa semana (lunes a sábado) tiene un festivo,
+  //                   el sábado completo cuenta como extra (0h ordinarias).
+  //   Domingo:        0h ordinarias — todo lo trabajado es extra.
+  let cuotaOrdinaria;
+  if (diaSemana >= 1 && diaSemana <= 4) cuotaOrdinaria = 8;         // lunes a jueves
+  else if (diaSemana === 5) cuotaOrdinaria = 7.5;                    // viernes
+  else if (diaSemana === 6) cuotaOrdinaria = semanaTieneFestivo(fechaStr) ? 0 : 5; // sábado
+  else cuotaOrdinaria = 0;                                           // domingo
+
+  const finOrdinaria = inicio + cuotaOrdinaria;
+
+  // Puntos de quiebre: inicio/fin del turno, fin de la cuota ordinaria, y
+  // cada transición 19:00/06:00 (nocturno) que caiga dentro del turno.
+  const puntos = new Set([inicio, fin, finOrdinaria]);
+  for (let k = -1; k * 24 <= fin + 24; k++) {
+    const t19 = k * 24 + 19, t6 = k * 24 + 6;
+    if (t19 > inicio && t19 < fin) puntos.add(t19);
+    if (t6 > inicio && t6 < fin) puntos.add(t6);
+  }
+  const cortes = [...puntos].filter(p => p >= inicio - 1e-9 && p <= fin + 1e-9).sort((a, b) => a - b);
+
+  const totales = {};
+  for (let i = 0; i < cortes.length - 1; i++) {
+    const ini = cortes[i], finTramo = cortes[i + 1];
+    const dur = finTramo - ini;
+    if (dur <= 1e-9) continue;
+    const medio = (ini + finTramo) / 2;
+    const esOrdinaria = ini < finOrdinaria - 1e-9;
+    const esNocturna = esHoraNocturna(medio);
+    const tipo = nombreTipoHora(esOrdinaria, esNocturna, esDominicalFestivo);
+    totales[tipo] = (totales[tipo] || 0) + dur;
+  }
+  return Object.entries(totales)
+    .filter(([, h]) => h > 0.001)
+    .map(([tipoHora, horas]) => ({ tipoHora, horas: Math.round(horas * 100) / 100 }));
+}
+
+// ============ EQUIPOS ============
+let contadorEquipo = 0;
+
+function agregarEquipo(idBloque) {
+  const b = bloques.find(x => x.id === idBloque);
+  contadorEquipo++;
+  b.equipos.push({ eid: contadorEquipo, proveedor: "", equipo: "", unidad: "Und", cantidad: 1, valorUnitario: "" });
+  renderEquipos(b);
+  actualizarBotonGuardar();
+}
+
+function quitarEquipo(idBloque, eid) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.equipos = b.equipos.filter(eq => eq.eid !== eid);
+  renderEquipos(b);
+  actualizarBotonGuardar();
+}
+
+function actualizarEquipo(idBloque, eid, campo, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  const eq = b.equipos.find(x => x.eid === eid);
+  eq[campo] = valor;
+}
+
+function renderEquipos(b) {
+  const cont = document.getElementById(`equipos-${b.id}`);
+  if (!cont) return;
+  if (!b.equipos.length) {
+    cont.innerHTML = `<div class="vacio">Aún no has agregado ningún equipo en este bloque</div>`;
+    return;
+  }
+  cont.innerHTML = b.equipos.map(eq => `
+    <div class="equipo-fila">
+      <button class="btn-x quitar-equipo" onclick="quitarEquipo(${b.id}, ${eq.eid})">✕</button>
+      <label>Proveedor</label>
+      <input type="text" list="listaProveedores" value="${eq.proveedor}"
+             placeholder="Ej. ALDECCO"
+             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'proveedor', this.value)">
+      <label>Equipo</label>
+      <input type="text" value="${eq.equipo}" placeholder="Ej. Andamio tubular 2m"
+             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'equipo', this.value)">
+      <div class="fila">
+        <div>
+          <label>Cantidad</label>
+          <input type="number" min="0" step="1" value="${eq.cantidad}"
+                 onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'cantidad', this.value)">
+        </div>
+        <div>
+          <label>Unidad</label>
+          <input type="text" list="listaUnidades" value="${eq.unidad}"
+                 onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'unidad', this.value)">
+        </div>
+      </div>
+      <label>Valor unitario (opcional)</label>
+      <input type="number" min="0" step="1" value="${eq.valorUnitario}" placeholder="$"
+             onchange="actualizarEquipo(${b.id}, ${eq.eid}, 'valorUnitario', this.value)">
+    </div>
+  `).join("");
+}
+
+// ============ MATERIALES ============
+let contadorMaterial = 0;
+
+function agregarMaterial(idBloque) {
+  const b = bloques.find(x => x.id === idBloque);
+  contadorMaterial++;
+  b.materiales.push({ mid: contadorMaterial, material: "", cantidad: 1, unidad: "Und" });
+  renderMateriales(b);
+  actualizarBotonGuardar();
+}
+
+function quitarMaterial(idBloque, mid) {
+  const b = bloques.find(x => x.id === idBloque);
+  b.materiales = b.materiales.filter(m => m.mid !== mid);
+  renderMateriales(b);
+  actualizarBotonGuardar();
+}
+
+function actualizarMaterial(idBloque, mid, campo, valor) {
+  const b = bloques.find(x => x.id === idBloque);
+  const m = b.materiales.find(x => x.mid === mid);
+  m[campo] = valor;
+}
+
+function renderMateriales(b) {
+  const cont = document.getElementById(`materiales-${b.id}`);
+  if (!cont) return;
+  if (!b.materiales.length) {
+    cont.innerHTML = `<div class="vacio">Aún no has agregado ningún material en este bloque</div>`;
+    return;
+  }
+  cont.innerHTML = b.materiales.map(m => `
+    <div class="equipo-fila">
+      <button class="btn-x quitar-equipo" onclick="quitarMaterial(${b.id}, ${m.mid})">✕</button>
+      <label>Material</label>
+      <input type="text" value="${m.material}" placeholder="Ej. Cemento gris tipo I"
+             onchange="actualizarMaterial(${b.id}, ${m.mid}, 'material', this.value)">
+      <div class="fila">
+        <div>
+          <label>Cantidad</label>
+          <input type="number" min="0" step="0.01" value="${m.cantidad}"
+                 onchange="actualizarMaterial(${b.id}, ${m.mid}, 'cantidad', this.value)">
+        </div>
+        <div>
+          <label>Unidad</label>
+          <input type="text" list="listaUnidades" value="${m.unidad}"
+                 onchange="actualizarMaterial(${b.id}, ${m.mid}, 'unidad', this.value)">
+        </div>
+      </div>
+    </div>
+  `).join("");
+}
+
+function actualizarBotonGuardar() {
+  let listo;
+  if (modo === "personal") {
+    listo = maestroActual && jornada.lineas.length > 0;
+    const n = listo ? construirFilasJornada().length : 0;
+    document.getElementById("btnGuardar").textContent = n ? `Guardar el día · ${n} registros` : "Guardar el día";
+  } else if (modo === "equipos") {
+    listo = maestroActual && bloques.some(b => b.codActividad && b.equipos.length > 0);
+  } else {
+    listo = maestroActual && bloques.some(b => b.codActividad && b.materiales.length > 0);
+  }
+  document.getElementById("btnGuardar").disabled = !listo;
+}
+
+async function guardarTodo() {
+  if (modo === "personal") { return guardarJornada(); }
+  const fecha = document.getElementById("fecha").value;
+  const filas = [];
+
+  if (modo === "personal") {
+    bloques.forEach(b => {
+      if (!b.codActividad || !b.personas.length) return;
+      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
+      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
+      b.personas.forEach(p => {
+        const base = {
+          fecha: fecha,
+          nombre: p.nombre,
+          cargo: p.cargo,
+          residente: maestroActual.residente,
+          codfrente: b.codFrente,
+          frenteNombre: frente ? frente.nombre : "",
+          codcap: b.codCapitulo,
+          codsubcap: b.codSubcap,
+          codact: b.codActividad,
+          actDesc: actividad ? actividad.desc : "",
+          actUnidad: actividad ? actividad.unidad : "",
+          cantidad: b.cantidadEjecutada || null,
+          loteId: b.loteId,
+          observaciones: p.cargo === "Sin confirmar" ? "Persona registrada manualmente, confirmar cargo y cédula" : "",
+          creado: new Date().toISOString(),
+          registradoPor: maestroActual.nombre,
+        };
+        // Si tiene "hora de finalización" (lunes a sábado), se parte en varias
+        // filas automáticamente (Ordinaria/Extra/Nocturna según corresponda).
+        // Si no (o es domingo), se guarda tal cual quedó en horas/tipoHora manual.
+        const segmentos = calcularSegmentosHora(fecha, p.horaIni, p.horaFin);
+        if (segmentos) {
+          segmentos.forEach((seg, i) => {
+            filas.push({
+              id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${i}`,
+              ...base,
+              horas: seg.horas,
+              tipoHora: seg.tipoHora,
+            });
+          });
+        } else {
+          filas.push({
+            id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            ...base,
+            horas: parseFloat(p.horas) || 0,
+            tipoHora: p.tipoHora,
+          });
+        }
+      });
+    });
+  } else if (modo === "equipos") {
+    bloques.forEach(b => {
+      if (!b.codActividad || !b.equipos.length) return;
+      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
+      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
+      b.equipos.forEach(eq => {
+        filas.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          fecha: fecha,
+          solicitante: maestroActual.nombre,
+          codfrente: b.codFrente,
+          frenteNombre: frente ? frente.nombre : "",
+          codcap: b.codCapitulo,
+          codsubcap: b.codSubcap,
+          codact: b.codActividad,
+          actDesc: actividad ? actividad.desc : "",
+          proveedor: eq.proveedor,
+          equipo: eq.equipo,
+          unidad: eq.unidad,
+          cantidad: parseFloat(eq.cantidad) || 0,
+          valorUnitario: eq.valorUnitario ? parseFloat(eq.valorUnitario) : null,
+          observaciones: "",
+          creado: new Date().toISOString(),
+        });
+      });
+    });
+  } else {
+    bloques.forEach(b => {
+      if (!b.codActividad || !b.materiales.length) return;
+      const frente = CATALOGO.frentes.find(f => f.cod === b.codFrente);
+      const actividad = CATALOGO.actividades.find(a => a.cod === b.codActividad);
+      b.materiales.forEach(m => {
+        filas.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          fecha: fecha,
+          solicitante: maestroActual.nombre,
+          codfrente: b.codFrente,
+          frenteNombre: frente ? frente.nombre : "",
+          codcap: b.codCapitulo,
+          codsubcap: b.codSubcap,
+          codact: b.codActividad,
+          actDesc: actividad ? actividad.desc : "",
+          material: m.material,
+          cantidad: parseFloat(m.cantidad) || 0,
+          unidad: m.unidad,
+          creado: new Date().toISOString(),
+        });
+      });
+    });
+  }
+
+  if (!filas.length) { mostrarToast("No hay nada para guardar todavía"); return; }
+
+  document.getElementById("btnGuardar").disabled = true;
+  document.getElementById("btnGuardar").textContent = "Guardando…";
+
+  try {
+    await fetch(URL_APPS_SCRIPT, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ registros: filas, hoja: modo === "equipos" ? "Equipos" : (modo === "materiales" ? "Materiales" : "Registros") }),
+    });
+    mostrarToast(`✔ Guardado: ${filas.length} registro(s) del día`);
+    bloques = [];
+    contadorBloque = 0;
+    agregarBloque();
+  } catch (e) {
+    mostrarToast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
+  }
+  document.getElementById("btnGuardar").textContent = "Guardar el día";
+  actualizarBotonGuardar();
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 3500);
+}
+
+// =====================================================================
+// ============ JORNADA (Mano de Obra + Cantidades) — v2 ===============
+// =====================================================================
+// Un solo registro diario por maestro: cuadrilla -> actividades del día
+// (línea de tiempo) -> cantidades medidas. Las horas se clasifican a nivel
+// de DÍA por persona (la cuota ordinaria se consume en orden cronológico
+// sumando todas sus actividades), no actividad por actividad.
+
+const CATEGORIAS = {
+  A: { nombre: "Vaciado de concreto", unidad: "m³", medible: true },
+  B: { nombre: "Mamposteria (muro en bloque + dovelas)", unidad: "m²", medible: true },
+  C: { nombre: "Revoque", unidad: "m²", medible: true },
+  D: { nombre: "Pintura", unidad: "m²", medible: true },
+  E: { nombre: "Enchape / Revestimiento ceramico", unidad: "m²", medible: true },
+  F: { nombre: "Instalacion de piso (baldosa/granito/porcelanato)", unidad: "m²", medible: true },
+  G: { nombre: "Instalacion de cielo raso", unidad: "m²", medible: true },
+  H: { nombre: "Muro en drywall / Superboard", unidad: "m²", medible: true },
+  I: { nombre: "Demolicion (muros y pisos)", unidad: "m²", medible: true },
+  J: { nombre: "Excavacion", unidad: "m³", medible: true },
+  K: { nombre: "Retiro de escombros / Trasiego", unidad: "m³", medible: true },
+  L: { nombre: "Aseo y orden", unidad: "Glb", medible: false },
+  M: { nombre: "Apoyo y logistica (cargue, acarreo)", unidad: "Glb", medible: false },
+  N: { nombre: "Desmonte y retiro", unidad: "Glb", medible: false },
+  O: { nombre: "Instalaciones provisionales", unidad: "Glb", medible: false },
+  P: { nombre: "Otra (describir)", unidad: "Glb", medible: false },
+};
+// Código SINCO -> categoría medible (A-K), de categorias_sinco.csv validado por Control de Costos
+const CAT_SINCO = {"01.01.01.01":"H","01.01.02.06":"I","01.01.02.08":"I","01.01.02.09":"K","01.01.02.10":"K","01.02.01.01":"H","01.02.02.02":"D","01.02.02.03":"D","01.02.03.01":"G","01.02.03.02":"G","01.02.03.03":"G","01.02.03.06":"G","02.01.01.01":"H","02.01.02.01":"I","02.01.02.02":"I","02.01.02.03":"I","02.01.02.11":"I","02.01.02.16":"K","02.01.02.17":"K","02.02.01.01":"K","02.02.01.02":"J","02.02.01.03":"J","02.02.02.01":"A","02.02.02.02":"A","02.02.02.03":"A","02.03.01.01":"B","02.03.01.02":"B","02.03.01.03":"B","02.03.01.04":"B","02.03.02.01":"C","02.03.02.02":"C","02.03.02.03":"D","02.03.02.04":"D","02.05.01.01":"F","02.05.01.02":"F","02.05.01.04":"D","02.05.01.05":"G","02.05.01.06":"H","02.05.01.07":"I","02.05.01.09":"I","02.05.02.01":"F","02.05.02.02":"F","02.05.02.04":"D","02.05.02.05":"G","02.05.02.06":"H","02.05.02.07":"I","02.05.02.09":"I","02.05.03.01":"F","02.05.03.02":"F","02.05.03.04":"D","02.05.03.05":"G","02.05.03.06":"G","02.05.03.07":"H","02.05.03.10":"I","02.05.03.11":"I","02.05.04.01":"A","02.05.04.04":"D","02.05.04.05":"H","02.05.04.07":"D","02.08.01.01":"G","02.08.01.02":"F","02.08.01.03":"D","02.08.01.04":"F","02.09.01.01":"G","02.09.01.02":"F","02.09.01.03":"D","02.09.01.04":"F","02.11.01.01":"G","02.11.01.02":"F","02.11.01.03":"D","02.11.01.04":"F","02.12.01.01":"G","02.12.01.02":"F","02.12.01.03":"D","02.12.01.04":"F","03.01.01.01":"H","03.01.02.01":"I","03.01.02.04":"K","03.01.02.05":"K","03.03.01.01":"H","03.03.01.02":"H","03.03.02.01":"C","03.03.02.02":"D","03.03.03.01":"G","03.03.03.02":"G","03.03.03.03":"G","03.03.03.04":"G","03.03.04.01":"F","03.03.04.02":"F","03.03.04.03":"F","04.01.01.01":"H","04.01.02.01.01":"I","04.01.02.02.01":"A","04.01.02.02.04":"K","04.01.02.02.06":"I","04.01.02.02.07":"I","04.01.02.02.08":"I","04.01.02.03.06":"I","04.01.02.03.07":"I","04.01.02.03.09":"K","04.01.02.03.10":"K","04.02.01.01":"J","04.02.01.02":"K","04.02.01.03":"K","04.02.01.04":"A","04.02.01.05":"A","04.02.01.06":"J","04.02.01.07":"A","04.02.02.01":"A","04.02.02.02":"A","04.02.02.03":"A","04.02.02.04":"A","04.02.02.05":"A","04.02.02.06":"B","04.02.02.07":"A","04.02.02.08":"A","04.02.03.02":"A","04.02.03.03":"A","04.02.04.01":"G","04.03.01.01":"B","04.03.01.02":"B","04.03.01.03":"B","04.03.01.04":"B","04.03.02.01":"C","04.03.02.02":"C","04.03.02.03":"D","04.03.02.04":"D","04.03.03.01":"G","04.03.04.01":"F","04.03.04.02":"F","04.03.04.03":"F","04.03.04.04":"F","04.03.04.05":"F","04.03.04.06":"A","04.03.04.07":"F","04.03.05.07":"E","05.01.01.01":"H","05.01.02.01":"I","05.01.02.12":"I","05.01.02.15":"I","05.01.03.08":"I","05.01.03.12":"I","05.01.04.01.01":"I","05.01.04.01.02":"I","05.01.04.01.12":"I","05.01.04.01.15":"I","05.01.04.01.16":"I","05.01.04.02.01":"A","05.01.04.02.02":"I","05.01.04.02.03":"K","05.01.04.02.05":"K","05.01.05.09":"I","05.01.06.05":"I","05.01.06.07":"I","05.01.07.09":"I","05.01.08.02":"I","05.01.09.02":"I","05.01.09.03":"I","05.01.09.04":"I","05.01.10.03":"I","05.01.11.02":"I","05.01.12.02":"I","05.01.13.09":"I","05.01.13.10":"I","05.01.13.15":"K","05.01.13.16":"K","05.02.01.01":"A","05.02.01.02":"A","05.02.03.01":"E","05.03.01.01":"H","05.03.01.02":"H","05.03.02.01":"C","05.03.02.02":"C","05.03.02.03":"E","05.03.02.05":"D","05.03.02.06":"D","05.03.02.07":"D","05.03.02.08":"A","05.03.04.01":"G","05.03.04.02":"G","05.03.04.03":"G","05.03.04.04":"G","05.03.04.05":"G","05.03.04.06":"G","05.03.04.07":"G","05.03.05.01":"F","05.03.05.02":"F","05.03.05.03":"F","05.03.05.04":"F","05.03.05.05":"F","05.03.05.06":"F","05.03.05.07":"F","05.07.01.01":"F","05.07.01.05":"D","05.07.02.01":"F","05.07.02.05":"D","05.07.02.06":"D","05.07.03.01":"F","05.07.03.05":"D","05.07.04.02":"F","05.07.04.03":"F","05.07.04.05":"D","06.01.01.01":"H","06.01.02.03":"I","06.02.01.01":"K","06.02.01.02":"C","06.02.01.03":"J","06.02.01.04":"J","06.02.01.05":"J","06.02.01.06":"J","06.02.01.07":"J","06.02.02.01":"A","06.02.02.02":"A","06.02.02.03":"A","06.02.02.04":"A","06.02.02.05":"A","06.02.02.06":"A","06.02.02.08":"A","06.02.02.09":"A","06.02.02.10":"A","06.02.02.11":"A","06.02.03.01":"A","06.02.03.02":"A","06.02.03.03":"A","06.02.03.04":"A","06.02.03.05":"A","06.02.03.06":"B","06.02.03.07":"A","06.02.03.08":"A","06.02.03.09":"A","06.02.05.01":"G","06.02.05.02":"G","06.03.01.02":"B","06.03.01.03":"B","06.03.01.04":"B","06.03.01.05":"B","06.03.01.06":"B","06.03.01.07":"B","06.03.01.08":"H","06.03.01.09":"H","06.03.02.01":"C","06.03.02.02":"C","06.03.02.03":"E","06.03.02.05":"D","06.03.02.06":"D","06.03.02.07":"D","06.03.02.09":"E","06.03.02.10":"E","06.03.03.02":"A","06.03.04.01":"G","06.03.04.02":"G","06.03.04.03":"G","06.03.04.04":"G","06.03.04.05":"G","06.03.05.01":"F","06.03.05.02":"F","06.03.05.03":"F","06.03.05.04":"F","06.03.05.05":"F","06.04.01.05":"F","06.07.01.06.14":"A","06.09.01.05.09":"A","07.01.01.01":"H","07.01.02.08":"I","07.01.02.10":"I","07.01.02.13":"I","07.01.02.17":"I","07.01.03.08":"I","07.01.03.10":"I","07.01.03.13":"I","07.01.03.17":"I","07.01.04.08":"I","07.01.04.10":"I","07.01.04.13":"I","07.01.05.08":"I","07.01.05.12":"I","07.01.05.13":"I","07.01.06.08":"I","07.01.06.12":"I","07.01.06.13":"I","07.01.07.09":"I","07.01.07.10":"I","07.01.07.15":"I","07.01.07.17":"K","07.01.07.18":"K","07.02.01.01":"J","07.02.01.02":"J","07.02.01.03":"J","07.02.01.04":"K","07.02.01.05":"K","07.02.02.01":"A","07.02.02.02":"A","07.03.01.01":"B","07.03.01.02":"B","07.03.01.03":"B","07.03.01.04":"B","07.03.01.05":"B","07.03.02.01":"C","07.03.02.02":"C","07.03.02.03":"E","07.03.02.06":"D","07.03.02.07":"D","07.03.04.01":"G","07.03.04.02":"G","07.03.04.03":"G","07.03.04.04":"G","07.03.04.05":"G","07.03.04.06":"G","07.03.05.01":"F","07.03.05.02":"F","07.03.05.03":"F","07.03.05.04":"F","07.03.05.05":"F","08.01.01.02":"I","08.02.01.01":"J","08.02.03.02":"J","08.02.03.03":"J","08.02.03.04":"J","08.02.03.05":"J","08.02.03.06":"J","08.02.03.07":"J","08.03.01.19":"A","08.04.02.03.06":"A","09.01.01.01":"H","09.01.02.13":"K","09.01.02.14":"K","09.02.01.01":"A","09.02.01.02":"A","09.02.02.02":"A","09.02.02.04":"D","09.02.03.01":"G","09.03.02.01":"C","09.03.02.02":"C","09.03.02.03":"D","09.03.02.05":"D","09.03.03.03":"G","09.03.03.05":"G","09.03.04.01":"F","11.02.01.01":"D","11.02.03.01":"G","11.02.03.02":"I","12.01.01.02":"I","12.02.01.01":"J","12.02.03.01":"J","12.02.03.02":"J","12.02.03.03":"J","12.02.03.04":"J","12.02.03.05":"J","12.03.01.18":"D","12.04.02.01.04":"A","13.01.01.01":"H","13.01.02.01":"I","13.01.02.03":"K","13.01.02.04":"K","13.03.01.01":"H","13.03.01.02":"H","13.03.02.01":"D","13.03.02.02":"D","13.03.03.01":"G","13.03.03.02":"G","13.03.03.03":"G"};
+
+let jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {} };
+let contLinea = 0;
+let lineaEnPicker = null; // id de la línea cuyo selector de actividad está abierto
+
+const normTxt = s => (s || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const esc = s => (s || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+const claveLS = sufijo => `jmc_${sufijo}_${maestroActual ? maestroActual.nombre : "x"}`;
+function lsGet(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch (e) { return def; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+function iniciarJornada() {
+  jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {} };
+  contLinea = 0;
+  const propios = frentesDelMaestro();
+  jornada.frenteDia = lsGet(claveLS("frente"), "") || (propios[0] ? propios[0].cod : "");
+  renderJornada();
+}
+
+function renderJornada() {
+  const z = document.getElementById("zonaJornada");
+  if (!maestroActual) { z.innerHTML = `<div class="vacio">Selecciona tu nombre para empezar</div>`; actualizarBotonGuardar(); return; }
+  const previa = lsGet(claveLS("cuadrilla"), []);
+  z.innerHTML = `
+    <div class="card">
+      <h2>2. Frente principal del día</h2>
+      <select onchange="jornada.frenteDia=this.value; lsSet(claveLS('frente'), this.value); renderJornada()">
+        ${frenteOpciones({ codFrente: jornada.frenteDia })}
+      </select>
+    </div>
+
+    <div class="card">
+      <h2>3. Cuadrilla de hoy <span class="contador">${jornada.cuadrilla.length}</span></h2>
+      <div class="chips">${jornada.cuadrilla.map(p => `
+        <span class="chip on">${esc(nombreCorto(p.nombre))}
+          <button aria-label="Quitar" onclick='quitarDeCuadrilla(${JSON.stringify(p.nombre)})'>✕</button></span>`).join("") || `<span class="vacio-inline">Nadie todavía</span>`}
+      </div>
+      ${previa.length && !jornada.cuadrilla.length ? `<button class="btn btn-suave" onclick="usarCuadrillaPrevia()">Usar la cuadrilla de la última vez (${previa.length})</button>` : ""}
+      <div class="buscador-personal">
+        <input type="text" id="buscaCuadrilla" placeholder="Agregar persona: escribe 2 letras del nombre"
+               oninput="buscarParaCuadrilla(this.value)" autocomplete="off">
+        <div class="resultados" id="resCuadrilla" style="display:none"></div>
+      </div>
+      <button class="campo-libre" onclick="agregarLibreCuadrilla()">¿No aparece? Agregar nombre manualmente</button>
+    </div>
+
+    <div class="card">
+      <h2>4. Actividades del día</h2>
+      <div id="lineas">${jornada.lineas.map(renderLinea).join("") || `<div class="vacio">Agrega la primera actividad</div>`}</div>
+      <button class="btn btn-agregar-bloque" onclick="agregarLinea()" ${jornada.cuadrilla.length ? "" : "disabled"}>
+        + ${jornada.lineas.length ? "Siguiente actividad" : "Agregar actividad"}${ultimaHoraFin() ? " desde las " + ultimaHoraFin() : ""}
+      </button>
+      ${!jornada.cuadrilla.length ? `<p class="nota">Primero arma la cuadrilla</p>` : ""}
+    </div>
+
+    ${renderCantidades()}
+    ${renderResumenDia()}
+  `;
+  actualizarBotonGuardar();
+}
+
+function nombreCorto(n) { const p = n.split(" ").filter(Boolean); return p.length > 2 ? `${p[0]} ${p[p.length >= 4 ? 2 : 1]}` : n; }
+
+// ---------- Cuadrilla ----------
+function buscarParaCuadrilla(txt) {
+  const cont = document.getElementById("resCuadrilla");
+  if (!txt || txt.length < 2) { cont.style.display = "none"; return; }
+  const t = normTxt(txt);
+  const ya = new Set(jornada.cuadrilla.map(p => p.nombre));
+  const enc = CATALOGO.personal.filter(p => normTxt(p.nombre).includes(t) && !ya.has(p.nombre)).slice(0, 8);
+  if (!enc.length) { cont.style.display = "none"; return; }
+  cont.innerHTML = enc.map(p => `<div onclick='agregarACuadrilla(${JSON.stringify(p.nombre)}, ${JSON.stringify(p.cargo)})'>${esc(p.nombre)} <span style="color:#999">(${esc(p.cargo)})</span></div>`).join("");
+  cont.style.display = "block";
+}
+function agregarACuadrilla(nombre, cargo) {
+  if (jornada.cuadrilla.some(p => p.nombre === nombre)) return;
+  jornada.cuadrilla.push({ nombre, cargo });
+  jornada.lineas.forEach(l => { if (l.todos) l.personas.push(nombre); });
+  renderJornada();
+  setTimeout(() => { const i = document.getElementById("buscaCuadrilla"); if (i) i.focus(); }, 0);
+}
+function agregarLibreCuadrilla() {
+  const nombre = prompt("Escribe el nombre completo de la persona:");
+  if (nombre && nombre.trim()) agregarACuadrilla(nombre.trim().toUpperCase(), "Sin confirmar");
+}
+function quitarDeCuadrilla(nombre) {
+  jornada.cuadrilla = jornada.cuadrilla.filter(p => p.nombre !== nombre);
+  jornada.lineas.forEach(l => { l.personas = l.personas.filter(n => n !== nombre); });
+  renderJornada();
+}
+function usarCuadrillaPrevia() {
+  const previa = lsGet(claveLS("cuadrilla"), []);
+  previa.forEach(p => { if (!jornada.cuadrilla.some(x => x.nombre === p.nombre)) jornada.cuadrilla.push(p); });
+  renderJornada();
+}
+
+// ---------- Líneas de actividad ----------
+function ultimaHoraFin() {
+  const conFin = jornada.lineas.filter(l => l.horaFin);
+  return conFin.length ? conFin[conFin.length - 1].horaFin : "";
+}
+function agregarLinea() {
+  contLinea++;
+  const ini = ultimaHoraFin() || "07:00";
+  jornada.lineas.push({
+    id: contLinea, horaIni: ini, horaFin: "", codFrente: jornada.frenteDia,
+    codAct: "", np: null, // np = { cat, desc } si es no presupuestada
+    personas: jornada.cuadrilla.map(p => p.nombre), todos: true,
+    loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  });
+  lineaEnPicker = contLinea;
+  renderJornada();
+}
+function quitarLinea(id) { jornada.lineas = jornada.lineas.filter(l => l.id !== id); if (lineaEnPicker === id) lineaEnPicker = null; renderJornada(); }
+function setLinea(id, campo, valor) {
+  const l = jornada.lineas.find(x => x.id === id); l[campo] = valor;
+  if (campo === "horaIni" || campo === "horaFin" || campo === "codFrente") renderJornada();
+}
+function togglePersonaLinea(id, nombre) {
+  const l = jornada.lineas.find(x => x.id === id);
+  l.personas = l.personas.includes(nombre) ? l.personas.filter(n => n !== nombre) : [...l.personas, nombre];
+  l.todos = l.personas.length === jornada.cuadrilla.length;
+  renderJornada();
+}
+function catDeLinea(l) { return l.np ? l.np.cat : (CAT_SINCO[l.codAct] || null); }
+function textoActividad(l) {
+  if (l.np) return { titulo: l.np.desc || "(sin descripción)", sub: `No presupuestada · ${l.np.cat} ${CATEGORIAS[l.np.cat].nombre}`, np: true };
+  const a = CATALOGO.actividades.find(x => x.cod === l.codAct);
+  if (!a) return null;
+  const c = CAT_SINCO[a.cod];
+  return { titulo: a.desc.split("(")[0].trim().slice(0, 90), sub: `${a.cod}${c ? " · categoría " + c : ""}`, np: false };
+}
+
+function renderLinea(l) {
+  const act = textoActividad(l);
+  const horasTxt = duracionTxt(l.horaIni, l.horaFin);
+  const frenteNom = (CATALOGO.frentes.find(f => f.cod === l.codFrente) || {}).nombre || "";
+  const otroFrente = l.codFrente !== jornada.frenteDia;
+  return `
+  <div class="linea ${act ? "" : "incompleta"}">
+    <div class="linea-top">
+      <input type="time" value="${l.horaIni}" onchange="setLinea(${l.id}, 'horaIni', this.value)" aria-label="Hora inicio">
+      <span>a</span>
+      <input type="time" value="${l.horaFin}" onchange="setLinea(${l.id}, 'horaFin', this.value)" aria-label="Hora fin">
+      <span class="dur">${horasTxt}</span>
+      <button class="btn-x" onclick="quitarLinea(${l.id})" aria-label="Quitar actividad">✕</button>
+    </div>
+    ${act ? `
+      <div class="act-elegida" onclick="abrirPicker(${l.id})">
+        <div class="act-titulo">${esc(act.titulo)} ${act.np ? `<span class="tag-np">no presupuestada</span>` : ""}</div>
+        <div class="act-sub">${esc(act.sub)}${otroFrente ? " · frente " + l.codFrente : ""} · <u>cambiar</u></div>
+      </div>` : ""}
+    ${lineaEnPicker === l.id || !act ? renderPicker(l) : ""}
+    <div class="chips chips-linea">
+      ${jornada.cuadrilla.map(p => `<button class="chip ${l.personas.includes(p.nombre) ? "on" : "off"}" onclick='togglePersonaLinea(${l.id}, ${JSON.stringify(p.nombre)})'>${esc(nombreCorto(p.nombre))}</button>`).join("")}
+    </div>
+  </div>`;
+}
+
+function abrirPicker(id) { lineaEnPicker = id; renderJornada(); }
+
+function recientes(codFrente) {
+  return lsGet(claveLS("recientes"), []).filter(c => c.startsWith(codFrente + ".")).slice(0, 6);
+}
+function renderPicker(l) {
+  const rec = recientes(l.codFrente);
+  return `
+  <div class="picker">
+    <div class="fila">
+      <div><label>Frente</label>
+        <select onchange="setLinea(${l.id}, 'codFrente', this.value)">${frenteOpciones({ codFrente: l.codFrente })}</select></div>
+    </div>
+    ${rec.length ? `<label>Recientes</label><div class="chips">${rec.map(c => {
+      const a = CATALOGO.actividades.find(x => x.cod === c);
+      return a ? `<button class="chip rec" onclick="elegirActividad(${l.id}, '${c}')">${esc(a.desc.split("(")[0].trim().slice(0, 42))}</button>` : "";
+    }).join("")}</div>` : ""}
+    <label>Buscar actividad del presupuesto</label>
+    <input type="text" placeholder="Ej. demolicion muro, pintura, escombros" oninput="buscarActividad(${l.id}, this.value)" autocomplete="off">
+    <div class="lista-act" id="resAct-${l.id}"></div>
+    <details class="np" ${l.np ? "open" : ""}>
+      <summary>No está en el presupuesto</summary>
+      <label>Categoría</label>
+      <select id="npCat-${l.id}">
+        <option value="">— Elige la categoría —</option>
+        <optgroup label="Medibles">${Object.entries(CATEGORIAS).filter(([, c]) => c.medible).map(([k, c]) => `<option value="${k}" ${l.np && l.np.cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
+        <optgroup label="No medibles">${Object.entries(CATEGORIAS).filter(([, c]) => !c.medible).map(([k, c]) => `<option value="${k}" ${l.np && l.np.cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
+      </select>
+      <label>Descripción corta</label>
+      <input type="text" id="npDesc-${l.id}" maxlength="120" placeholder="Ej. Resane de muros zona bandas" value="${l.np ? esc(l.np.desc) : ""}">
+      <button class="btn btn-suave" onclick="elegirNoPresupuestada(${l.id})">Usar esta actividad</button>
+    </details>
+  </div>`;
+}
+function buscarActividad(id, txt) {
+  const l = jornada.lineas.find(x => x.id === id);
+  const cont = document.getElementById(`resAct-${id}`);
+  const palabras = normTxt(txt).split(/\s+/).filter(w => w.length >= 3);
+  if (!palabras.length) { cont.innerHTML = ""; return; }
+  const enc = CATALOGO.actividades
+    .filter(a => a.cod.startsWith(l.codFrente + ".") && palabras.every(w => normTxt(a.desc).includes(w) || a.cod.includes(w)))
+    .slice(0, 12);
+  cont.innerHTML = enc.length ? enc.map(a => `
+    <div onclick="elegirActividad(${id}, '${a.cod}')">
+      <b>${esc(a.desc.split("(")[0].trim().slice(0, 80))}</b>
+      <span>${a.cod} · ${a.unidad}${CAT_SINCO[a.cod] ? " · categoría " + CAT_SINCO[a.cod] : ""}</span>
+    </div>`).join("") : `<p class="nota">Sin resultados en el frente ${l.codFrente}. Prueba otra palabra o usa "No está en el presupuesto".</p>`;
+}
+function elegirActividad(id, cod) {
+  const l = jornada.lineas.find(x => x.id === id);
+  l.codAct = cod; l.np = null; lineaEnPicker = null;
+  const rec = lsGet(claveLS("recientes"), []).filter(c => c !== cod);
+  lsSet(claveLS("recientes"), [cod, ...rec].slice(0, 30));
+  renderJornada();
+}
+function elegirNoPresupuestada(id) {
+  const cat = document.getElementById(`npCat-${id}`).value;
+  const desc = document.getElementById(`npDesc-${id}`).value.trim();
+  if (!cat) { mostrarToast("Elige la categoría"); return; }
+  if (desc.length < 4) { mostrarToast("Escribe una descripción corta de la actividad"); return; }
+  const l = jornada.lineas.find(x => x.id === id);
+  l.np = { cat, desc }; l.codAct = ""; lineaEnPicker = null;
+  renderJornada();
+}
+
+// ---------- Cantidades ----------
+function categoriasMediblesHoy() {
+  const set = new Map(); // clave frente|cat
+  jornada.lineas.forEach(l => {
+    const c = catDeLinea(l);
+    if (c && CATEGORIAS[c] && CATEGORIAS[c].medible) set.set(`${l.codFrente}|${c}`, { frente: l.codFrente, cat: c });
+  });
+  return [...set.values()];
+}
+function renderCantidades() {
+  const cats = categoriasMediblesHoy();
+  if (!cats.length) return "";
+  const oficiales = CATALOGO.personal.filter(p => normTxt(p.cargo).includes("oficial")).map(p => p.nombre).sort();
+  return `
+  <div class="card">
+    <h2>5. Cantidades del día <span class="nota-h">según el formato del oficial</span></h2>
+    ${cats.map(({ frente, cat }) => {
+      const k = `${frente}|${cat}`; const v = jornada.cantidades[k] || {};
+      return `
+      <div class="cant-fila">
+        <div class="cant-nombre">${cat} · ${esc(CATEGORIAS[cat].nombre)}${frente !== jornada.frenteDia ? ` <span class="act-sub">(frente ${frente})</span>` : ""}</div>
+        <div class="cant-inputs">
+          <input type="text" inputmode="decimal" placeholder="0" value="${esc(v.cantidad ?? "")}"
+                 onchange="setCantidad('${k}', 'cantidad', this.value)">
+          <span class="unidad">${CATEGORIAS[cat].unidad}</span>
+          <select onchange="setCantidad('${k}', 'oficial', this.value)" aria-label="Oficial que midió">
+            <option value="">¿Quién midió?</option>
+            ${oficiales.map(o => `<option ${v.oficial === o ? "selected" : ""}>${esc(o)}</option>`).join("")}
+          </select>
+        </div>
+      </div>`;
+    }).join("")}
+    <p class="nota">Solo lo terminado hoy, en área neta. Deja vacío lo que no se midió.</p>
+  </div>`;
+}
+function setCantidad(k, campo, valor) { jornada.cantidades[k] = { ...(jornada.cantidades[k] || {}), [campo]: valor }; }
+
+// ---------- Cálculo de horas a nivel de DÍA ----------
+function aHoras(str) { if (!str) return null; const [h, m] = str.split(":").map(Number); return h + (m || 0) / 60; }
+function duracionTxt(ini, fin) {
+  const a = aHoras(ini), b0 = aHoras(fin); if (a === null || b0 === null) return "";
+  let b = b0; if (b <= a) b += 24; const d = Math.round((b - a) * 100) / 100; return `${d} h`;
+}
+function cuotaOrdinariaDia(fechaStr) {
+  const d = new Date(fechaStr + "T00:00:00").getDay();
+  if (d >= 1 && d <= 4) return 8;
+  if (d === 5) return 7.5;
+  if (d === 6) return semanaTieneFestivo(fechaStr) ? 0 : 5;
+  return 0;
+}
+// intervalos: [{ini, fin, ref}] -> [{ref, tipoHora, horas}]
+function clasificarDia(fechaStr, intervalos) {
+  const dom = new Date(fechaStr + "T00:00:00").getDay() === 0 || esFestivoColombia(fechaStr);
+  let restante = cuotaOrdinariaDia(fechaStr);
+  const salida = [];
+  const orden = intervalos.map(iv => {
+    const a = aHoras(iv.ini); let b = aHoras(iv.fin); if (b <= a) b += 24;
+    return { ...iv, a, b };
+  }).sort((x, y) => x.a - y.a);
+  orden.forEach(iv => {
+    const puntos = new Set([iv.a, iv.b]);
+    if (restante > 0 && iv.a + restante < iv.b) puntos.add(iv.a + restante);
+    for (let k = -1; k <= 2; k++) { [k * 24 + 19, k * 24 + 6].forEach(t => { if (t > iv.a && t < iv.b) puntos.add(t); }); }
+    const cortes = [...puntos].sort((x, y) => x - y);
+    const tot = {};
+    for (let i = 0; i < cortes.length - 1; i++) {
+      const dur = cortes[i + 1] - cortes[i]; if (dur <= 1e-9) continue;
+      const esOrd = restante > 1e-9;
+      const tipo = nombreTipoHora(esOrd, esHoraNocturna((cortes[i] + cortes[i + 1]) / 2), dom);
+      tot[tipo] = (tot[tipo] || 0) + dur;
+      if (esOrd) restante = Math.max(0, restante - dur);
+    }
+    Object.entries(tot).forEach(([tipoHora, h]) => { if (h > 0.001) salida.push({ ref: iv.ref, tipoHora, horas: Math.round(h * 100) / 100 }); });
+  });
+  return salida;
+}
+function traslapes(intervalos) {
+  const o = intervalos.map(iv => { const a = aHoras(iv.ini); let b = aHoras(iv.fin); if (b <= a) b += 24; return [a, b]; }).sort((x, y) => x[0] - y[0]);
+  for (let i = 1; i < o.length; i++) if (o[i][0] < o[i - 1][1] - 1e-9) return true;
+  return false;
+}
+function porPersona() {
+  const mapa = {};
+  jornada.lineas.forEach(l => {
+    if (!l.horaIni || !l.horaFin || !(l.codAct || l.np)) return;
+    l.personas.forEach(n => { (mapa[n] = mapa[n] || []).push({ ini: l.horaIni, fin: l.horaFin, ref: l.id }); });
+  });
+  return mapa;
+}
+function renderResumenDia() {
+  const fecha = document.getElementById("fecha").value;
+  const mapa = porPersona(); const nombres = Object.keys(mapa);
+  if (!nombres.length) return "";
+  const filas = nombres.map(n => {
+    if (traslapes(mapa[n])) return `<tr class="error"><td>${esc(nombreCorto(n))}</td><td colspan="2">Horarios cruzados: revisa sus actividades</td></tr>`;
+    const seg = clasificarDia(fecha, mapa[n]);
+    const total = seg.reduce((s, x) => s + x.horas, 0);
+    const extra = seg.filter(x => x.tipoHora.includes("Extra")).reduce((s, x) => s + x.horas, 0);
+    return `<tr><td>${esc(nombreCorto(n))}</td><td>${Math.round(total * 100) / 100} h</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
+  }).join("");
+  return `
+  <div class="card">
+    <h2>Resumen del día por persona</h2>
+    <table class="resumen"><tr><th>Persona</th><th>Total</th><th>Extra</th></tr>${filas}</table>
+    <p class="nota">Las horas extra se calculan con toda la jornada de la persona (Ley 2101).</p>
+  </div>`;
+}
+
+// ---------- Validación y guardado ----------
+function problemasJornada() {
+  const p = [];
+  if (!jornada.lineas.length) p.push("No hay actividades");
+  jornada.lineas.forEach((l, i) => {
+    if (!l.horaIni || !l.horaFin) p.push(`Actividad ${i + 1}: falta la hora de inicio o de fin`);
+    if (!(l.codAct || l.np)) p.push(`Actividad ${i + 1}: falta elegir la actividad`);
+    if (!l.personas.length) p.push(`Actividad ${i + 1}: no tiene personas`);
+  });
+  const mapa = porPersona();
+  Object.entries(mapa).forEach(([n, ivs]) => { if (traslapes(ivs)) p.push(`${nombreCorto(n)} tiene horarios cruzados`); });
+  return p;
+}
+function construirFilasJornada() {
+  const fecha = document.getElementById("fecha").value;
+  const filas = []; const mapa = porPersona();
+  const creado = new Date().toISOString();
+  Object.entries(mapa).forEach(([nombre, ivs]) => {
+    const persona = jornada.cuadrilla.find(p => p.nombre === nombre) || { cargo: "Sin confirmar" };
+    clasificarDia(fecha, ivs).forEach((seg, i) => {
+      const l = jornada.lineas.find(x => x.id === seg.ref);
+      const frente = CATALOGO.frentes.find(f => f.cod === l.codFrente);
+      const a = l.np ? null : CATALOGO.actividades.find(x => x.cod === l.codAct);
+      filas.push({
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${i}`,
+        fecha, nombre, cargo: persona.cargo, residente: maestroActual.residente,
+        codfrente: l.codFrente, frenteNombre: frente ? frente.nombre : "",
+        codcap: a ? a.cod.split(".").slice(0, 2).join(".") : "", codsubcap: a ? a.codSubcap : "",
+        codact: l.np ? `NP-${l.codFrente}-${l.np.cat}` : l.codAct,
+        actDesc: l.np ? `[NO PRESUPUESTADA] ${l.np.desc}` : (a ? a.desc : ""),
+        actUnidad: l.np ? CATEGORIAS[l.np.cat].unidad : (a ? a.unidad : ""),
+        horas: seg.horas, tipoHora: seg.tipoHora, cantidad: null,
+        observaciones: `${l.horaIni}-${l.horaFin}${persona.cargo === "Sin confirmar" ? " · Persona registrada manualmente, confirmar cargo y cédula" : ""}`,
+        creado, registradoPor: maestroActual.nombre, loteId: l.loteId,
+      });
+    });
+  });
+  return filas;
+}
+function construirMediciones() {
+  const fecha = document.getElementById("fecha").value;
+  return categoriasMediblesHoy().map(({ frente, cat }) => {
+    const v = jornada.cantidades[`${frente}|${cat}`] || {};
+    const cant = parseFloat(String(v.cantidad || "").replace(",", "."));
+    if (!(cant > 0)) return null;
+    const f = CATALOGO.frentes.find(x => x.cod === frente);
+    const nps = jornada.lineas.filter(l => l.np && l.np.cat === cat && l.codFrente === frente).map(l => l.np.desc);
+    return {
+      fecha, oficial: v.oficial || `(registró ${maestroActual.nombre})`, frenteCod: frente, frenteNombre: f ? f.nombre : "",
+      categoria: CATEGORIAS[cat].nombre, categoriaLetra: cat, unidad: CATEGORIAS[cat].unidad, cantidad: cant,
+      observaciones: `Registrado por ${maestroActual.nombre}${nps.length ? " · incluye no presupuestada: " + nps.join("; ") : ""}`,
+    };
+  }).filter(Boolean);
+}
+
+async function guardarJornada() {
+  const prob = problemasJornada();
+  if (prob.length) { mostrarToast(prob[0]); return; }
+  const fecha = document.getElementById("fecha").value;
+  const guardados = lsGet(claveLS("guardados"), []);
+  if (guardados.includes(fecha) && !confirm(`Ya guardaste un registro del ${fecha} desde este celular.\n¿Seguro que quieres guardar OTRO? (Si es el mismo, se duplicaría)`)) return;
+
+  const filas = construirFilasJornada();
+  const meds = construirMediciones();
+  const btn = document.getElementById("btnGuardar");
+  btn.disabled = true; btn.textContent = "Guardando…";
+  try {
+    await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ registros: filas, hoja: "Registros" }) });
+    for (const m of meds) {
+      await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(m) });
+    }
+    lsSet(claveLS("cuadrilla"), jornada.cuadrilla);
+    lsSet(claveLS("guardados"), [fecha, ...guardados.filter(f => f !== fecha)].slice(0, 60));
+    mostrarToast(`✔ Guardado: ${filas.length} registro(s) de horas${meds.length ? " y " + meds.length + " medición(es)" : ""}`);
+    iniciarJornada();
+  } catch (e) {
+    mostrarToast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
+  }
+  btn.textContent = "Guardar el día";
+  actualizarBotonGuardar();
+}
+
+cargarCatalogo();
+</script>
+
+<datalist id="listaProveedores">
+</datalist>
+<datalist id="listaUnidades">
+</datalist>
+<script>
+  document.getElementById("listaProveedores").innerHTML =
+    PROVEEDORES_SUGERIDOS.map(p => `<option value="${p}">`).join("");
+  document.getElementById("listaUnidades").innerHTML =
+    UNIDADES_SUGERIDAS.map(u => `<option value="${u}">`).join("");
+</script>
+
+</body>
+</html>
