@@ -186,6 +186,15 @@
   table.resumen tr.error td { color: #B4453A; font-weight: 600; }
   .extra { color: #7A5E00; font-weight: 600; }
   button:disabled { opacity: .55; }
+  .fecha-rapida { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .fecha-rapida button { border: 1.5px solid var(--verde-claro); background: white; color: var(--verde-oscuro);
+    border-radius: 18px; padding: 7px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .fecha-rapida button.activo { background: var(--verde); color: white; border-color: var(--verde); }
+  #fechaTxt { font-size: 13.5px; font-weight: 700; color: var(--verde-oscuro); }
+  .aviso-fecha { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 8px; padding: 10px 12px;
+    font-size: 13px; color: #5C4600; margin-bottom: 10px; }
+  .aviso-fecha button { margin-top: 8px; width: 100%; background: var(--dorado); color: #1E2A22; border: none;
+    border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
   .interruptor button { font-size: 13.5px; }
   .bus-resultado { background: #FBF3D9; border: 1.5px solid var(--dorado); border-radius: 10px; padding: 14px; margin-top: 12px; }
   .bus-codigos { display: flex; gap: 10px; }
@@ -226,7 +235,12 @@
     </select>
 
     <label for="fecha">Fecha</label>
-    <input type="date" id="fecha" onchange="modo === 'personal' ? renderJornada() : renderBloques()">
+    <input type="date" id="fecha" onchange="alCambiarFecha()">
+    <div class="fecha-rapida">
+      <button type="button" id="btnHoy" onclick="ponerFecha(0)">Hoy</button>
+      <button type="button" id="btnAyer" onclick="ponerFecha(-1)">Ayer</button>
+      <span id="fechaTxt"></span>
+    </div>
   </div>
 
   <div id="zonaJornada"></div>
@@ -267,6 +281,7 @@ async function cargarCatalogo() {
   poblarMaestros();
   const hoy = new Date(); hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
   document.getElementById("fecha").value = hoy.toISOString().slice(0, 10);
+  actualizarFechaTxt();
   renderJornada();
 }
 
@@ -1023,6 +1038,7 @@ function renderJornada() {
 
     <div class="card">
       <h2>4. Actividades del día</h2>
+      ${avisoHorarioFuturo()}
       <div id="lineas">${jornada.lineas.map(renderLinea).join("") || `<div class="vacio">Agrega la primera actividad</div>`}</div>
       <button class="btn btn-agregar-bloque" onclick="agregarLinea()" ${jornada.cuadrilla.length ? "" : "disabled"}>
         + ${jornada.lineas.length ? "Siguiente actividad" : "Agregar actividad"}${ultimaHoraFin() ? " desde las " + ultimaHoraFin() : ""}
@@ -1307,6 +1323,42 @@ function renderResumenDia() {
   </div>`;
 }
 
+
+// ---------- Fecha: Hoy / Ayer y aviso de horario futuro ----------
+function fechaLocal(desfaseDias) {
+  const d = new Date(); d.setDate(d.getDate() + desfaseDias);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 10);
+}
+function ponerFecha(desfase) { document.getElementById("fecha").value = fechaLocal(desfase); alCambiarFecha(); }
+function alCambiarFecha() {
+  actualizarFechaTxt();
+  if (modo === "personal") renderJornada(); else if (modo !== "buscador") renderBloques();
+}
+function actualizarFechaTxt() {
+  const v = document.getElementById("fecha").value;
+  const el = document.getElementById("fechaTxt"); if (!el) return;
+  const dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  if (!v) { el.textContent = ""; return; }
+  const d = new Date(v + "T12:00:00");
+  el.textContent = `Registrando: ${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]}`;
+  document.getElementById("btnHoy").classList.toggle("activo", v === fechaLocal(0));
+  document.getElementById("btnAyer").classList.toggle("activo", v === fechaLocal(-1));
+}
+function avisoHorarioFuturo() {
+  if (document.getElementById("fecha").value !== fechaLocal(0)) return "";
+  const ahora = new Date(); const hhmm = String(ahora.getHours()).padStart(2, "0") + ":" + String(ahora.getMinutes()).padStart(2, "0");
+  const futura = jornada.lineas.find(l => l.horaFin && l.horaFin > hhmm && (!l.horaIni || l.horaFin > l.horaIni));
+  if (!futura) return "";
+  return `<div class="aviso-fecha">Estás registrando con fecha de <b>HOY</b>, pero hay actividades hasta las <b>${futura.horaFin}</b>, que todavía no ha llegado. ¿Es el trabajo de ayer?
+    <button type="button" onclick="ponerFecha(-1)">Sí, cambiar a ayer</button></div>`;
+}
+
+// ---------- Evitar duplicados sin preguntar ----------
+function claveFila(f) { return [f.fecha, f.nombre, f.codact, f.tipoHora, f.horas, String(f.observaciones || "").slice(0, 11)].join("|"); }
+function claveMed(m) { return ["M", m.fecha, m.frenteCod, m.categoriaLetra, m.cantidad].join("|"); }
+
 // ---------- Validación y guardado ----------
 function problemasJornada() {
   const p = [];
@@ -1365,12 +1417,16 @@ function construirMediciones() {
 async function guardarJornada() {
   const prob = problemasJornada();
   if (prob.length) { mostrarToast(prob[0]); return; }
-  const fecha = document.getElementById("fecha").value;
-  const guardados = lsGet(claveLS("guardados"), []);
-  if (guardados.includes(fecha) && !confirm(`Ya guardaste un registro del ${fecha} desde este celular.\n¿Seguro que quieres guardar OTRO? (Si es el mismo, se duplicaría)`)) return;
-
-  const filas = construirFilasJornada();
-  const meds = construirMediciones();
+  // Lo que ya se envió desde este celular (misma persona, fecha, actividad y horario) se omite solo
+  const enviados = new Set(lsGet(claveLS("enviados"), []));
+  const todasFilas = construirFilasJornada(), todasMeds = construirMediciones();
+  const filas = todasFilas.filter(f => !enviados.has(claveFila(f)));
+  const meds = todasMeds.filter(m => !enviados.has(claveMed(m)));
+  const omitidas = (todasFilas.length - filas.length) + (todasMeds.length - meds.length);
+  if (!filas.length && !meds.length) {
+    mostrarToast("Esto ya estaba guardado desde este celular. No se repitió.");
+    iniciarJornada(); return;
+  }
   const btn = document.getElementById("btnGuardar");
   btn.disabled = true; btn.textContent = "Guardando…";
   try {
@@ -1380,8 +1436,9 @@ async function guardarJornada() {
       await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(m) });
     }
     lsSet(claveLS("cuadrilla"), jornada.cuadrilla);
-    lsSet(claveLS("guardados"), [fecha, ...guardados.filter(f => f !== fecha)].slice(0, 60));
-    mostrarToast(`✔ Guardado: ${filas.length} registro(s) de horas${meds.length ? " y " + meds.length + " medición(es)" : ""}`);
+    lsSet(claveLS("enviados"), [...filas.map(claveFila), ...meds.map(claveMed), ...enviados].slice(0, 4000));
+    mostrarToast(`✔ Guardado: ${filas.length} registro(s) de horas${meds.length ? " y " + meds.length + " medición(es)" : ""}` +
+      (omitidas ? ` · ${omitidas} ya estaban guardados y no se repitieron` : ""));
     iniciarJornada();
   } catch (e) {
     mostrarToast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
