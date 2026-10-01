@@ -204,6 +204,20 @@
   .bus-desc { font-size: 13px; color: var(--verde-oscuro); margin-top: 10px; line-height: 1.4; }
   .bus-ruta { font-size: 11.5px; color: #6B756F; margin-top: 8px; line-height: 1.4; }
   .btn-copiar { margin-top: 10px; }
+  /* ---------- v3: supervisión del maestro y control de horas ---------- */
+  .linea-top .dur.mal { color: #B4453A; }
+  .alerta-hora { background: #FDEBEA; border: 1.5px solid #B4453A; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #7A2A22; margin-top: 8px; }
+  .alerta-hora label { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; font-weight: 600; color: #1E2A22; }
+  .card-sup { border: 2px solid var(--verde-claro); }
+  .sup-toggle { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--verde-oscuro); margin: 0; }
+  .sup-toggle input { width: 22px; height: 22px; }
+  .sup-horas { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .sup-horas input[type=time] { flex: 1; min-width: 0; padding: 8px 6px; font-size: 15px; border: 1.5px solid var(--gris-borde); border-radius: 8px; }
+  .sup-total { background: #E3EEE6; border-radius: 8px; padding: 8px 10px; margin-top: 10px; font-size: 13.5px; color: var(--verde-oscuro); }
+  .sup-total b { font-size: 16px; }
+  .sup-aviso { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #5C4600; margin-top: 8px; }
+  .sup-error { background: #FDEBEA; border: 1.5px solid #B4453A; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #7A2A22; margin-top: 8px; }
+  .sup-aviso input { margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -1002,7 +1016,8 @@ function lsGet(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
 function iniciarJornada() {
-  jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {} };
+  jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {},
+    sup: { activo: lsGet(claveLS("supActivo"), true), ini: "07:00", fin: "", nocturno: false, motivo: "", auto: true } };
   contLinea = 0;
   const propios = frentesDelMaestro();
   jornada.frenteDia = lsGet(claveLS("frente"), "") || (propios[0] ? propios[0].cod : "");
@@ -1046,6 +1061,7 @@ function renderJornada() {
       ${!jornada.cuadrilla.length ? `<p class="nota">Primero arma la cuadrilla</p>` : ""}
     </div>
 
+    ${renderSupervision()}
     ${renderCantidades()}
     ${renderResumenDia()}
   `;
@@ -1135,9 +1151,14 @@ function renderLinea(l) {
       <input type="time" value="${l.horaIni}" onchange="setLinea(${l.id}, 'horaIni', this.value)" aria-label="Hora inicio">
       <span>a</span>
       <input type="time" value="${l.horaFin}" onchange="setLinea(${l.id}, 'horaFin', this.value)" aria-label="Hora fin">
-      <span class="dur">${horasTxt}</span>
+      <span class="dur ${finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno ? "mal" : ""}">${horasTxt}</span>
       <button class="btn-x" onclick="quitarLinea(${l.id})" aria-label="Quitar actividad">✕</button>
     </div>
+    ${finAntesDeInicio(l.horaIni, l.horaFin) ? `
+      <div class="alerta-hora">${l.nocturno ? "Turno de noche: termina al día siguiente." :
+        `La hora de fin (<b>${l.horaFin}</b>) quedó antes que la de inicio. Si terminaron en la tarde, cámbiala a <b>${horaTarde(l.horaFin)}</b> (PM).`}
+        <label><input type="checkbox" ${l.nocturno ? "checked" : ""} onchange="setLinea(${l.id}, 'nocturno', this.checked); renderJornada()"> 🌙 Fue turno de noche</label>
+      </div>` : ""}
     ${act ? `
       <div class="act-elegida" onclick="abrirPicker(${l.id})">
         <div class="act-titulo">${esc(act.titulo)} ${act.np ? `<span class="tag-np">no presupuestada</span>` : ""}</div>
@@ -1230,7 +1251,7 @@ function renderCantidades() {
   const oficiales = CATALOGO.personal.filter(p => normTxt(p.cargo).includes("oficial")).map(p => p.nombre).sort();
   return `
   <div class="card">
-    <h2>5. Cantidades del día <span class="nota-h">según el formato del oficial</span></h2>
+    <h2>6. Cantidades del día <span class="nota-h">según el formato del oficial</span></h2>
     ${cats.map(({ frente, cat }) => {
       const k = `${frente}|${cat}`; const v = jornada.cantidades[k] || {};
       return `
@@ -1308,7 +1329,13 @@ function renderResumenDia() {
   const fecha = document.getElementById("fecha").value;
   const mapa = porPersona(); const nombres = Object.keys(mapa);
   if (!nombres.length) return "";
-  const filas = nombres.map(n => {
+  const s = jornada.sup;
+  const filaSup = (s.activo && s.ini && s.fin && !(finAntesDeInicio(s.ini, s.fin) && !s.nocturno)) ? (() => {
+    const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }]);
+    const total = seg.reduce((a, x) => a + x.horas, 0), extra = seg.filter(x => x.tipoHora.includes("Extra")).reduce((a, x) => a + x.horas, 0);
+    return `<tr><td>${esc(nombreCorto(maestroActual.nombre))} <span class="nota-h">(supervisión)</span></td><td>${Math.round(total * 100) / 100} h</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
+  })() : "";
+  const filas = filaSup + nombres.map(n => {
     if (traslapes(mapa[n])) return `<tr class="error"><td>${esc(nombreCorto(n))}</td><td colspan="2">Horarios cruzados: revisa sus actividades</td></tr>`;
     const seg = clasificarDia(fecha, mapa[n]);
     const total = seg.reduce((s, x) => s + x.horas, 0);
@@ -1323,6 +1350,122 @@ function renderResumenDia() {
   </div>`;
 }
 
+
+// ---------- v3: control de horas (AM/PM) ----------
+function finAntesDeInicio(ini, fin) { const a = aHoras(ini), b = aHoras(fin); return a !== null && b !== null && b <= a; }
+function duracionH(ini, fin) { const a = aHoras(ini), b0 = aHoras(fin); if (a === null || b0 === null) return 0; let b = b0; if (b <= a) b += 24; return b - a; }
+function horaTarde(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h < 12 ? `${String(h + 12).padStart(2, "0")}:${String(m).padStart(2, "0")}` : hhmm; }
+
+// ---------- v3: jornada del maestro como SUPERVISIÓN ----------
+// El maestro marca "Hoy solo supervisé" y registra entrada y salida. Sus horas se clasifican
+// (ordinarias / extra / nocturnas) y su costo se reparte entre las actividades de la cuadrilla
+// en proporción a las horas-persona de cada actividad.
+function rangoCuadrilla() {
+  const ivs = jornada.lineas.filter(l => l.horaIni && l.horaFin && (l.codAct || l.np) && l.personas.length && !(finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno));
+  if (!ivs.length) return null;
+  let a = 99, b = -1;
+  ivs.forEach(l => { const x = aHoras(l.horaIni); let y = aHoras(l.horaFin); if (y <= x) y += 24; a = Math.min(a, x); b = Math.max(b, y); });
+  const fmt = h => { const hh = Math.floor(h % 24), mm = Math.round((h - Math.floor(h)) * 60); return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`; };
+  return { a, b, ini: fmt(a), fin: fmt(b) };
+}
+function setSup(campo, valor) {
+  jornada.sup[campo] = valor;
+  if (campo === "ini" || campo === "fin") jornada.sup.auto = false;
+  if (campo === "activo") lsSet(claveLS("supActivo"), valor);
+  if (campo !== "motivo") renderJornada();
+}
+function supEnCuadrilla() { return jornada.cuadrilla.some(p => p.nombre === maestroActual.nombre); }
+function excesoSupervision() {
+  const s = jornada.sup, r = rangoCuadrilla();
+  if (!r || !s.ini || !s.fin) return null;
+  const a = aHoras(s.ini); let b = aHoras(s.fin); if (b <= a) b += 24;
+  const antes = Math.max(0, r.a - a), despues = Math.max(0, b - r.b);
+  return (antes > 0.5 || despues > 0.5) ? { antes, despues, r } : null;
+}
+function renderSupervision() {
+  if (!maestroActual) return "";
+  const s = jornada.sup, r = rangoCuadrilla();
+  if (s.activo && s.auto && r) { s.ini = r.ini; s.fin = r.fin; }
+  let cuerpo = "";
+  if (s.activo) {
+    const fecha = document.getElementById("fecha").value;
+    const malAMPM = finAntesDeInicio(s.ini, s.fin) && !s.nocturno;
+    let total = "";
+    if (s.ini && s.fin && !malAMPM) {
+      const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }]);
+      const t = seg.reduce((x, y) => x + y.horas, 0);
+      const ord = seg.filter(x => !x.tipoHora.includes("Extra")).reduce((x, y) => x + y.horas, 0);
+      const ext = t - ord, noc = seg.filter(x => x.tipoHora.includes("Nocturn")).reduce((x, y) => x + y.horas, 0);
+      const dom = seg.some(x => x.tipoHora.includes("Dominical"));
+      total = `<div class="sup-total">Tu jornada: <b>${Math.round(t * 100) / 100} h</b> · ${Math.round(ord * 100) / 100} ordinarias${ext > 0.01 ? ` · <span class="extra">${Math.round(ext * 100) / 100} extra</span>` : ""}${noc > 0.01 ? ` · ${Math.round(noc * 100) / 100} nocturnas` : ""}${dom ? " · dominical/festivo" : ""}</div>`;
+    }
+    const ex = excesoSupervision();
+    cuerpo = `
+      <div class="sup-horas">
+        <input type="time" value="${s.ini}" onchange="setSup('ini', this.value)" aria-label="Tu hora de entrada">
+        <span>a</span>
+        <input type="time" value="${s.fin}" onchange="setSup('fin', this.value)" aria-label="Tu hora de salida">
+      </div>
+      ${r && !s.auto && (s.ini !== r.ini || s.fin !== r.fin) ? `<button class="btn btn-suave" onclick="jornada.sup.auto=true; renderJornada()">Usar el horario de la cuadrilla (${r.ini} a ${r.fin})</button>` : ""}
+      ${finAntesDeInicio(s.ini, s.fin) ? `<div class="alerta-hora">${s.nocturno ? "Turno de noche: terminas al día siguiente." : `Tu salida (<b>${s.fin}</b>) quedó antes que tu entrada. Si saliste en la tarde, cámbiala a <b>${horaTarde(s.fin)}</b> (PM).`}
+        <label><input type="checkbox" ${s.nocturno ? "checked" : ""} onchange="setSup('nocturno', this.checked)"> 🌙 Fue turno de noche</label></div>` : ""}
+      ${total}
+      ${ex ? `<div class="sup-aviso">Tu horario va ${ex.antes > 0.5 ? `${Math.round(ex.antes * 10) / 10} h antes` : ""}${ex.antes > 0.5 && ex.despues > 0.5 ? " y " : ""}${ex.despues > 0.5 ? `${Math.round(ex.despues * 10) / 10} h después` : ""} del de tu cuadrilla (${ex.r.ini} a ${ex.r.fin}). <b>¿Qué hiciste en ese tiempo?</b>
+        <input type="text" maxlength="120" placeholder="Ej. Recibo de material, reunión con interventoría" value="${esc(s.motivo)}" oninput="setSup('motivo', this.value)"></div>` : ""}
+      ${supEnCuadrilla() ? `<div class="sup-error">También estás en la cuadrilla. Si hoy solo supervisaste, quítate de la cuadrilla. Si trabajaste con ellos, desmarca "Hoy solo supervisé".</div>` : ""}
+      ${!r ? `<p class="nota">Primero registra las actividades de tu cuadrilla: tu tiempo se reparte entre ellas.</p>` :
+        `<p class="nota">Tu costo se reparte entre las ${jornada.lineas.filter(l => l.codAct || l.np).length} actividad(es) de tu cuadrilla, según las horas de cada una.</p>`}`;
+  }
+  return `
+  <div class="card card-sup">
+    <h2>5. Tu jornada: ${esc(nombreCorto(maestroActual.nombre))}</h2>
+    <label class="sup-toggle"><input type="checkbox" ${s.activo ? "checked" : ""} onchange="setSup('activo', this.checked)"> Hoy solo supervisé a mi cuadrilla</label>
+    ${s.activo ? "" : `<p class="nota">Si hiciste trabajo con la cuadrilla, agrégate en el paso 3 y márcate en cada actividad.</p>`}
+    ${cuerpo}
+  </div>`;
+}
+function problemasSupervision() {
+  const s = jornada.sup, p = [];
+  if (!maestroActual || !s.activo) return p;
+  if (supEnCuadrilla()) p.push("Estás en la cuadrilla y en supervisión: quítate de la cuadrilla o desmarca 'Hoy solo supervisé'");
+  if (!s.ini || !s.fin) p.push("Tu jornada: falta tu hora de entrada o de salida");
+  else if (finAntesDeInicio(s.ini, s.fin) && !s.nocturno) p.push(`Tu salida (${s.fin}) es antes que tu entrada. Si saliste en la tarde, escribe ${horaTarde(s.fin)}`);
+  else if (duracionH(s.ini, s.fin) > 14) p.push("Tu jornada dura más de 14 horas, revisa las horas");
+  if (!rangoCuadrilla()) p.push("Registra primero las actividades de tu cuadrilla");
+  if (excesoSupervision() && (s.motivo || "").trim().length < 4) p.push("Escribe qué hiciste fuera del horario de tu cuadrilla");
+  return p;
+}
+function filasSupervision(fecha, creado) {
+  const s = jornada.sup;
+  if (!maestroActual || !s.activo || problemasSupervision().length) return [];
+  const lineas = jornada.lineas.filter(l => l.horaIni && l.horaFin && (l.codAct || l.np) && l.personas.length);
+  const pesos = lineas.map(l => l.personas.length * duracionH(l.horaIni, l.horaFin));
+  const W = pesos.reduce((a, b) => a + b, 0); if (!W) return [];
+  const segs = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }]);
+  const filas = [];
+  segs.forEach((seg, i) => {
+    let resto = Math.round(seg.horas * 100) / 100;
+    lineas.forEach((l, j) => {
+      const h = j === lineas.length - 1 ? Math.round(resto * 100) / 100 : Math.round(seg.horas * pesos[j] / W * 100) / 100;
+      resto -= h; if (h <= 0) return;
+      const frente = CATALOGO.frentes.find(f => f.cod === l.codFrente);
+      const a = l.np ? null : CATALOGO.actividades.find(x => x.cod === l.codAct);
+      filas.push({
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_s${i}${j}`,
+        fecha, nombre: maestroActual.nombre, cargo: maestroActual.cargo, residente: maestroActual.residente,
+        codfrente: l.codFrente, frenteNombre: frente ? frente.nombre : "",
+        codcap: a ? a.cod.split(".").slice(0, 2).join(".") : "", codsubcap: a ? a.codSubcap : "",
+        codact: l.np ? `NP-${l.codFrente}-${l.np.cat}` : l.codAct,
+        actDesc: "[SUPERVISIÓN] " + (l.np ? `[NO PRESUPUESTADA] ${l.np.desc}` : (a ? a.desc : "")),
+        actUnidad: l.np ? CATEGORIAS[l.np.cat].unidad : (a ? a.unidad : ""),
+        horas: h, tipoHora: seg.tipoHora, cantidad: null,
+        observaciones: `SUPERVISIÓN ${s.ini}-${s.fin} · ${Math.round(pesos[j] / W * 100)}% de la cuadrilla${s.motivo ? " · Fuera del horario de la cuadrilla: " + s.motivo : ""}`,
+        creado, registradoPor: maestroActual.nombre, loteId: "SUP_" + l.loteId,
+      });
+    });
+  });
+  return filas;
+}
 
 // ---------- Fecha: Hoy / Ayer y aviso de horario futuro ----------
 function fechaLocal(desfaseDias) {
@@ -1367,7 +1510,10 @@ function problemasJornada() {
     if (!l.horaIni || !l.horaFin) p.push(`Actividad ${i + 1}: falta la hora de inicio o de fin`);
     if (!(l.codAct || l.np)) p.push(`Actividad ${i + 1}: falta elegir la actividad`);
     if (!l.personas.length) p.push(`Actividad ${i + 1}: no tiene personas`);
+    if (finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno) p.push(`Actividad ${i + 1}: la hora de fin (${l.horaFin}) es antes que la de inicio. Si terminaron en la tarde, escribe ${horaTarde(l.horaFin)}`);
+    if (duracionH(l.horaIni, l.horaFin) > 14) p.push(`Actividad ${i + 1}: dura más de 14 horas, revisa las horas`);
   });
+  problemasSupervision().forEach(x => p.push(x));
   const mapa = porPersona();
   Object.entries(mapa).forEach(([n, ivs]) => { if (traslapes(ivs)) p.push(`${nombreCorto(n)} tiene horarios cruzados`); });
   return p;
@@ -1396,6 +1542,7 @@ function construirFilasJornada() {
       });
     });
   });
+  filasSupervision(fecha, creado).forEach(f => filas.push(f));
   return filas;
 }
 function construirMediciones() {
