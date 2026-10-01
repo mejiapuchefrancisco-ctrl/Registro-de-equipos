@@ -218,6 +218,10 @@
   .sup-aviso { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #5C4600; margin-top: 8px; }
   .sup-error { background: #FDEBEA; border: 1.5px solid #B4453A; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #7A2A22; margin-top: 8px; }
   .sup-aviso input { margin-top: 6px; }
+  .chip.frente { border-radius: 8px; text-align: left; line-height: 1.25; }
+  .chip.frente small { display: block; font-size: 10.5px; font-weight: 400; opacity: .8; }
+  .chip.frente.off { text-decoration: none; background: white; color: #6B756F; border-style: dashed; }
+  .agregar-frente { margin-top: 8px; font-size: 13px; padding: 8px; }
 </style>
 </head>
 <body>
@@ -832,7 +836,7 @@ function actualizarBotonGuardar() {
   if (modo === "buscador") return;
   let listo;
   if (modo === "personal") {
-    listo = maestroActual && jornada.lineas.length > 0;
+    listo = maestroActual && (jornada.lineas.length > 0 || (jornada.sup && jornada.sup.activo));
     const n = listo ? construirFilasJornada().length : 0;
     document.getElementById("btnGuardar").textContent = n ? `Guardar el día · ${n} registros` : "Guardar el día";
   } else if (modo === "equipos") {
@@ -1017,10 +1021,14 @@ function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch
 
 function iniciarJornada() {
   jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {},
-    sup: { activo: lsGet(claveLS("supActivo"), true), ini: "07:00", fin: "", nocturno: false, motivo: "", auto: true } };
+    sup: { activo: lsGet(claveLS("supActivo"), true), ini: "07:00", fin: "", nocturno: false, motivo: "", auto: true,
+           frentes: [], frentesAuto: true } };
   contLinea = 0;
   const propios = frentesDelMaestro();
-  jornada.frenteDia = lsGet(claveLS("frente"), "") || (propios[0] ? propios[0].cod : "");
+  const guardados = lsGet(claveLS("frentes"), null);
+  jornada.frentesDia = Array.isArray(guardados) && guardados.length ? guardados
+    : [lsGet(claveLS("frente"), "") || (propios[0] ? propios[0].cod : "")].filter(Boolean);
+  jornada.frenteDia = jornada.frentesDia[0] || "";
   renderJornada();
 }
 
@@ -1030,10 +1038,13 @@ function renderJornada() {
   const previa = lsGet(claveLS("cuadrilla"), []);
   z.innerHTML = `
     <div class="card">
-      <h2>2. Frente principal del día</h2>
-      <select onchange="jornada.frenteDia=this.value; lsSet(claveLS('frente'), this.value); renderJornada()">
-        ${frenteOpciones({ codFrente: jornada.frenteDia })}
+      <h2>2. Frentes de hoy <span class="contador">${jornada.frentesDia.length}</span></h2>
+      <div class="chips">${chipsFrentes(jornada.frentesDia, "toggleFrenteDia")}</div>
+      <select class="agregar-frente" onchange="if(this.value){toggleFrenteDia(this.value)}">
+        <option value="">+ Agregar otro frente</option>
+        ${CATALOGO.frentes.filter(f => !opcionesFrentes(jornada.frentesDia).includes(f.cod)).map(f => `<option value="${f.cod}">${esc(f.nombre)}</option>`).join("")}
       </select>
+      <p class="nota">Marca todos los frentes donde estuviste hoy.</p>
     </div>
 
     <div class="card">
@@ -1112,7 +1123,7 @@ function agregarLinea() {
   contLinea++;
   const ini = ultimaHoraFin() || "07:00";
   jornada.lineas.push({
-    id: contLinea, horaIni: ini, horaFin: "", codFrente: jornada.frenteDia,
+    id: contLinea, horaIni: ini, horaFin: "", codFrente: (jornada.lineas.length ? jornada.lineas[jornada.lineas.length - 1].codFrente : jornada.frenteDia),
     codAct: "", np: null, // np = { cat, desc } si es no presupuestada
     personas: jornada.cuadrilla.map(p => p.nombre), todos: true,
     loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -1144,7 +1155,7 @@ function renderLinea(l) {
   const act = textoActividad(l);
   const horasTxt = duracionTxt(l.horaIni, l.horaFin);
   const frenteNom = (CATALOGO.frentes.find(f => f.cod === l.codFrente) || {}).nombre || "";
-  const otroFrente = l.codFrente !== jornada.frenteDia;
+  const otroFrente = jornada.frentesDia.length > 1 || l.codFrente !== jornada.frenteDia;
   return `
   <div class="linea ${act ? "" : "incompleta"}">
     <div class="linea-top">
@@ -1400,7 +1411,10 @@ function renderSupervision() {
       total = `<div class="sup-total">Tu jornada: <b>${Math.round(t * 100) / 100} h</b> · ${Math.round(ord * 100) / 100} ordinarias${ext > 0.01 ? ` · <span class="extra">${Math.round(ext * 100) / 100} extra</span>` : ""}${noc > 0.01 ? ` · ${Math.round(noc * 100) / 100} nocturnas` : ""}${dom ? " · dominical/festivo" : ""}</div>`;
     }
     const ex = excesoSupervision();
+    const sel = frentesSupervision();
     cuerpo = `
+      <label>Frentes que supervisaste hoy</label>
+      <div class="chips">${chipsFrentes(sel, "toggleFrenteSup", [...new Set([...jornada.frentesDia, ...jornada.lineas.map(l => l.codFrente), ...frentesDelMaestro().map(f => f.cod)])])}</div>
       <div class="sup-horas">
         <input type="time" value="${s.ini}" onchange="setSup('ini', this.value)" aria-label="Tu hora de entrada">
         <span>a</span>
@@ -1413,13 +1427,12 @@ function renderSupervision() {
       ${ex ? `<div class="sup-aviso">Tu horario va ${ex.antes > 0.5 ? `${Math.round(ex.antes * 10) / 10} h antes` : ""}${ex.antes > 0.5 && ex.despues > 0.5 ? " y " : ""}${ex.despues > 0.5 ? `${Math.round(ex.despues * 10) / 10} h después` : ""} del de tu cuadrilla (${ex.r.ini} a ${ex.r.fin}). <b>¿Qué hiciste en ese tiempo?</b>
         <input type="text" maxlength="120" placeholder="Ej. Recibo de material, reunión con interventoría" value="${esc(s.motivo)}" oninput="setSup('motivo', this.value)"></div>` : ""}
       ${supEnCuadrilla() ? `<div class="sup-error">También estás en la cuadrilla. Si hoy solo supervisaste, quítate de la cuadrilla. Si trabajaste con ellos, desmarca "Hoy solo supervisé".</div>` : ""}
-      ${!r ? `<p class="nota">Primero registra las actividades de tu cuadrilla: tu tiempo se reparte entre ellas.</p>` :
-        `<p class="nota">Tu costo se reparte entre las ${jornada.lineas.filter(l => l.codAct || l.np).length} actividad(es) de tu cuadrilla, según las horas de cada una.</p>`}`;
+      <p class="nota">${sel.length ? `Tu tiempo se reparte entre ${sel.length === 1 ? "el frente " + nombreFrenteCorto(sel[0]) : "los frentes " + sel.map(nombreFrenteCorto).join(", ")}, según las horas de tu cuadrilla en cada uno${sel.some(c => !jornada.lineas.some(l => l.codFrente === c && (l.codAct || l.np))) ? " (y en partes iguales donde no registraste cuadrilla)" : ""}.` : "Marca al menos un frente."}</p>`;
   }
   return `
   <div class="card card-sup">
     <h2>5. Tu jornada: ${esc(nombreCorto(maestroActual.nombre))}</h2>
-    <label class="sup-toggle"><input type="checkbox" ${s.activo ? "checked" : ""} onchange="setSup('activo', this.checked)"> Hoy solo supervisé a mi cuadrilla</label>
+    <label class="sup-toggle"><input type="checkbox" ${s.activo ? "checked" : ""} onchange="setSup('activo', this.checked)"> Hoy hice supervisión en mis frentes de trabajo</label>
     ${s.activo ? "" : `<p class="nota">Si hiciste trabajo con la cuadrilla, agrégate en el paso 3 y márcate en cada actividad.</p>`}
     ${cuerpo}
   </div>`;
@@ -1431,40 +1444,83 @@ function problemasSupervision() {
   if (!s.ini || !s.fin) p.push("Tu jornada: falta tu hora de entrada o de salida");
   else if (finAntesDeInicio(s.ini, s.fin) && !s.nocturno) p.push(`Tu salida (${s.fin}) es antes que tu entrada. Si saliste en la tarde, escribe ${horaTarde(s.fin)}`);
   else if (duracionH(s.ini, s.fin) > 14) p.push("Tu jornada dura más de 14 horas, revisa las horas");
-  if (!rangoCuadrilla()) p.push("Registra primero las actividades de tu cuadrilla");
+  if (!frentesSupervision().length) p.push("Tu jornada: marca al menos un frente que supervisaste");
   if (excesoSupervision() && (s.motivo || "").trim().length < 4) p.push("Escribe qué hiciste fuera del horario de tu cuadrilla");
   return p;
 }
 function filasSupervision(fecha, creado) {
   const s = jornada.sup;
   if (!maestroActual || !s.activo || problemasSupervision().length) return [];
-  const lineas = jornada.lineas.filter(l => l.horaIni && l.horaFin && (l.codAct || l.np) && l.personas.length);
-  const pesos = lineas.map(l => l.personas.length * duracionH(l.horaIni, l.horaFin));
-  const W = pesos.reduce((a, b) => a + b, 0); if (!W) return [];
+  const sel = frentesSupervision();
+  // Destinos: actividades de la cuadrilla en los frentes supervisados (peso = horas-persona)
+  // + "supervisión general" en los frentes supervisados donde no hubo cuadrilla registrada
+  const lineas = jornada.lineas.filter(l => sel.includes(l.codFrente) && l.horaIni && l.horaFin && (l.codAct || l.np) && l.personas.length);
+  const destinos = lineas.map(l => ({ l, w: l.personas.length * duracionH(l.horaIni, l.horaFin) }));
+  const pesoFrente = {}; destinos.forEach(d => { pesoFrente[d.l.codFrente] = (pesoFrente[d.l.codFrente] || 0) + d.w; });
+  const pf = Object.values(pesoFrente);
+  const promedio = pf.length ? pf.reduce((a, b) => a + b, 0) / pf.length : 1;
+  sel.filter(c => !pesoFrente[c]).forEach(c => destinos.push({ general: c, w: promedio }));
+  const W = destinos.reduce((a, d) => a + d.w, 0); if (!W) return [];
   const segs = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }]);
   const filas = [];
   segs.forEach((seg, i) => {
     let resto = Math.round(seg.horas * 100) / 100;
-    lineas.forEach((l, j) => {
-      const h = j === lineas.length - 1 ? Math.round(resto * 100) / 100 : Math.round(seg.horas * pesos[j] / W * 100) / 100;
+    destinos.forEach((d, j) => {
+      const h = j === destinos.length - 1 ? Math.round(resto * 100) / 100 : Math.round(seg.horas * d.w / W * 100) / 100;
       resto -= h; if (h <= 0) return;
-      const frente = CATALOGO.frentes.find(f => f.cod === l.codFrente);
-      const a = l.np ? null : CATALOGO.actividades.find(x => x.cod === l.codAct);
+      const codF = d.general || d.l.codFrente;
+      const frente = CATALOGO.frentes.find(f => f.cod === codF);
+      const a = (d.general || d.l.np) ? null : CATALOGO.actividades.find(x => x.cod === d.l.codAct);
       filas.push({
         id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_s${i}${j}`,
         fecha, nombre: maestroActual.nombre, cargo: maestroActual.cargo, residente: maestroActual.residente,
-        codfrente: l.codFrente, frenteNombre: frente ? frente.nombre : "",
+        codfrente: codF, frenteNombre: frente ? frente.nombre : "",
         codcap: a ? a.cod.split(".").slice(0, 2).join(".") : "", codsubcap: a ? a.codSubcap : "",
-        codact: l.np ? `NP-${l.codFrente}-${l.np.cat}` : l.codAct,
-        actDesc: "[SUPERVISIÓN] " + (l.np ? `[NO PRESUPUESTADA] ${l.np.desc}` : (a ? a.desc : "")),
-        actUnidad: l.np ? CATEGORIAS[l.np.cat].unidad : (a ? a.unidad : ""),
+        codact: d.general ? `SUP-${codF}` : (d.l.np ? `NP-${codF}-${d.l.np.cat}` : d.l.codAct),
+        actDesc: "[SUPERVISIÓN] " + (d.general ? `Supervisión general frente ${frente ? frente.nombre : codF}` :
+          (d.l.np ? `[NO PRESUPUESTADA] ${d.l.np.desc}` : (a ? a.desc : ""))),
+        actUnidad: d.general ? "h" : (d.l.np ? CATEGORIAS[d.l.np.cat].unidad : (a ? a.unidad : "")),
         horas: h, tipoHora: seg.tipoHora, cantidad: null,
-        observaciones: `SUPERVISIÓN ${s.ini}-${s.fin} · ${Math.round(pesos[j] / W * 100)}% de la cuadrilla${s.motivo ? " · Fuera del horario de la cuadrilla: " + s.motivo : ""}`,
-        creado, registradoPor: maestroActual.nombre, loteId: "SUP_" + l.loteId,
+        observaciones: `SUPERVISIÓN ${s.ini}-${s.fin} · frentes ${sel.join(", ")} · ${Math.round(d.w / W * 100)}%${s.motivo ? " · Fuera del horario de la cuadrilla: " + s.motivo : ""}`,
+        creado, registradoPor: maestroActual.nombre, loteId: "SUP_" + (d.general ? `${codF}_${creado}` : d.l.loteId),
       });
     });
   });
   return filas;
+}
+
+// ---------- v3b: varios frentes por jornada ----------
+function nombreFrenteCorto(cod) { const f = CATALOGO.frentes.find(x => x.cod === cod); return f ? f.nombre.split(" - ")[0] : cod; }
+function opcionesFrentes(base) {
+  return [...new Set([...frentesDelMaestro().map(f => f.cod), ...base])];
+}
+function chipsFrentes(seleccion, fn, universo) {
+  const lista = universo || opcionesFrentes(seleccion);
+  return lista.map(cod => {
+    const f = CATALOGO.frentes.find(x => x.cod === cod); if (!f) return "";
+    const partes = f.nombre.split(" - "); const corto = partes[0], resto = partes.slice(1).join(" - ");
+    return `<button class="chip frente ${seleccion.includes(cod) ? "on" : "off"}" onclick="${fn}('${cod}')">Frente ${esc(corto)}<small>${esc(resto.slice(0, 28))}</small></button>`;
+  }).join("");
+}
+function toggleFrenteDia(cod) {
+  const a = jornada.frentesDia;
+  jornada.frentesDia = a.includes(cod) ? (a.length > 1 ? a.filter(x => x !== cod) : a) : [...a, cod];
+  jornada.frenteDia = jornada.frentesDia[0];
+  lsSet(claveLS("frentes"), jornada.frentesDia);
+  renderJornada();
+}
+function frentesSupervision() {
+  const s = jornada.sup;
+  if (s.frentesAuto) {
+    s.frentes = [...new Set([...jornada.frentesDia, ...jornada.lineas.filter(l => l.codAct || l.np).map(l => l.codFrente)])];
+  }
+  return s.frentes;
+}
+function toggleFrenteSup(cod) {
+  const s = jornada.sup; const a = frentesSupervision();
+  s.frentes = a.includes(cod) ? a.filter(x => x !== cod) : [...a, cod];
+  s.frentesAuto = false;
+  renderJornada();
 }
 
 // ---------- Fecha: Hoy / Ayer y aviso de horario futuro ----------
@@ -1505,7 +1561,7 @@ function claveMed(m) { return ["M", m.fecha, m.frenteCod, m.categoriaLetra, m.ca
 // ---------- Validación y guardado ----------
 function problemasJornada() {
   const p = [];
-  if (!jornada.lineas.length) p.push("No hay actividades");
+  if (!jornada.lineas.length && !(jornada.sup && jornada.sup.activo)) p.push("No hay actividades");
   jornada.lineas.forEach((l, i) => {
     if (!l.horaIni || !l.horaFin) p.push(`Actividad ${i + 1}: falta la hora de inicio o de fin`);
     if (!(l.codAct || l.np)) p.push(`Actividad ${i + 1}: falta elegir la actividad`);
