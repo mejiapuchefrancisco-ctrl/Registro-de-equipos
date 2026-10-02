@@ -836,7 +836,7 @@ function actualizarBotonGuardar() {
   if (modo === "buscador") return;
   let listo;
   if (modo === "personal") {
-    listo = maestroActual && (jornada.lineas.length > 0 || (jornada.sup && jornada.sup.activo));
+    listo = maestroActual && (jornada.lineas.length > 0 || (jornada.sup && jornada.sup.activo && !supYaGuardada()));
     const n = listo ? construirFilasJornada().length : 0;
     document.getElementById("btnGuardar").textContent = n ? `Guardar el día · ${n} registros` : "Guardar el día";
   } else if (modo === "equipos") {
@@ -1385,6 +1385,14 @@ function setSup(campo, valor) {
   if (campo === "activo") lsSet(claveLS("supActivo"), valor);
   if (campo !== "motivo") renderJornada();
 }
+// v3c: la supervisión del maestro se guarda UNA sola vez por fecha (aunque guarde varias veces en el día)
+function fechaActual() { const el = document.getElementById("fecha"); return el ? el.value : ""; }
+function supYaGuardada(fecha) { return (lsGet(claveLS("supGuardada"), {}) || {})[fecha || fechaActual()] || null; }
+function marcarSupGuardada(fecha, info) {
+  const m = lsGet(claveLS("supGuardada"), {}) || {}; m[fecha] = info;
+  const llaves = Object.keys(m).sort().slice(-40); const n = {}; llaves.forEach(k => n[k] = m[k]);
+  lsSet(claveLS("supGuardada"), n);
+}
 function supEnCuadrilla() { return jornada.cuadrilla.some(p => p.nombre === maestroActual.nombre); }
 function excesoSupervision() {
   const s = jornada.sup, r = rangoCuadrilla();
@@ -1398,7 +1406,11 @@ function renderSupervision() {
   const s = jornada.sup, r = rangoCuadrilla();
   if (s.activo && s.auto && r) { s.ini = r.ini; s.fin = r.fin; }
   let cuerpo = "";
-  if (s.activo) {
+  const yaSup = s.activo ? supYaGuardada() : null;
+  if (yaSup) {
+    cuerpo = `<div class="sup-total">✔ Tu supervisión de este día ya quedó guardada: <b>${yaSup.ini} a ${yaSup.fin}</b> (${yaSup.horas} h). No se vuelve a sumar aunque guardes más actividades hoy.</div>
+      <p class="nota">Si te equivocaste en tus horas, avísale al residente para corregirlo.</p>`;
+  } else if (s.activo) {
     const fecha = document.getElementById("fecha").value;
     const malAMPM = finAntesDeInicio(s.ini, s.fin) && !s.nocturno;
     let total = "";
@@ -1439,7 +1451,7 @@ function renderSupervision() {
 }
 function problemasSupervision() {
   const s = jornada.sup, p = [];
-  if (!maestroActual || !s.activo) return p;
+  if (!maestroActual || !s.activo || supYaGuardada()) return p;
   if (supEnCuadrilla()) p.push("Estás en la cuadrilla y en supervisión: quítate de la cuadrilla o desmarca 'Hoy solo supervisé'");
   if (!s.ini || !s.fin) p.push("Tu jornada: falta tu hora de entrada o de salida");
   else if (finAntesDeInicio(s.ini, s.fin) && !s.nocturno) p.push(`Tu salida (${s.fin}) es antes que tu entrada. Si saliste en la tarde, escribe ${horaTarde(s.fin)}`);
@@ -1450,7 +1462,7 @@ function problemasSupervision() {
 }
 function filasSupervision(fecha, creado) {
   const s = jornada.sup;
-  if (!maestroActual || !s.activo || problemasSupervision().length) return [];
+  if (!maestroActual || !s.activo || supYaGuardada(fecha) || problemasSupervision().length) return [];
   const sel = frentesSupervision();
   // Destinos: actividades de la cuadrilla en los frentes supervisados (peso = horas-persona)
   // + "supervisión general" en los frentes supervisados donde no hubo cuadrilla registrada
@@ -1561,7 +1573,7 @@ function claveMed(m) { return ["M", m.fecha, m.frenteCod, m.categoriaLetra, m.ca
 // ---------- Validación y guardado ----------
 function problemasJornada() {
   const p = [];
-  if (!jornada.lineas.length && !(jornada.sup && jornada.sup.activo)) p.push("No hay actividades");
+  if (!jornada.lineas.length && !(jornada.sup && jornada.sup.activo && !supYaGuardada())) p.push("No hay actividades");
   jornada.lineas.forEach((l, i) => {
     if (!l.horaIni || !l.horaFin) p.push(`Actividad ${i + 1}: falta la hora de inicio o de fin`);
     if (!(l.codAct || l.np)) p.push(`Actividad ${i + 1}: falta elegir la actividad`);
@@ -1639,6 +1651,9 @@ async function guardarJornada() {
       await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(m) });
     }
     lsSet(claveLS("cuadrilla"), jornada.cuadrilla);
+    const filasSup = filas.filter(f => String(f.actDesc || "").startsWith("[SUPERVISIÓN]"));
+    if (filasSup.length) marcarSupGuardada(filasSup[0].fecha, { ini: jornada.sup.ini, fin: jornada.sup.fin,
+      horas: Math.round(filasSup.reduce((a, f) => a + Number(f.horas || 0), 0) * 100) / 100 });
     lsSet(claveLS("enviados"), [...filas.map(claveFila), ...meds.map(claveMed), ...enviados].slice(0, 4000));
     mostrarToast(`✔ Guardado: ${filas.length} registro(s) de horas${meds.length ? " y " + meds.length + " medición(es)" : ""}` +
       (omitidas ? ` · ${omitidas} ya estaban guardados y no se repitieron` : ""));
