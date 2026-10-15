@@ -71,13 +71,6 @@
       "residenteKey": "R7"
     },
     {
-      "nombre": "JOHN JOINER RESTREPO HERNANDEZ",
-      "cedula": "71665191",
-      "cargo": "Ayudante",
-      "residente": null,
-      "residenteKey": null
-    },
-    {
       "nombre": "CRISTIAN DUVAN BUILES ACEVEDO",
       "cedula": "1020447591",
       "cargo": "Auxiliar De Almacen",
@@ -109,13 +102,6 @@
       "nombre": "CARLOS MARIO RODAS SUAREZ",
       "cedula": "71319043",
       "cargo": "Auxiliar De Almacen",
-      "residente": null,
-      "residenteKey": null
-    },
-    {
-      "nombre": "DAIRO DE JESUS HENAO",
-      "cedula": "98498461",
-      "cargo": "Ayudante",
       "residente": null,
       "residenteKey": null
     },
@@ -246,13 +232,6 @@
       "residenteKey": null
     },
     {
-      "nombre": "RODOLFO CRUZ",
-      "cedula": "48912234",
-      "cargo": "Ayudante",
-      "residente": null,
-      "residenteKey": null
-    },
-    {
       "nombre": "FREYDER EDUARDO MOLINA HIDALGO",
       "cedula": "1017253134",
       "cargo": "Ayudante",
@@ -297,13 +276,6 @@
     {
       "nombre": "EDILBERTO HERNANDEZ FUENTES",
       "cedula": "84068586",
-      "cargo": "Ayudante",
-      "residente": null,
-      "residenteKey": null
-    },
-    {
-      "nombre": "FERNANDO DE JESUS ARROYAVE",
-      "cedula": "98457631",
       "cargo": "Ayudante",
       "residente": null,
       "residenteKey": null
