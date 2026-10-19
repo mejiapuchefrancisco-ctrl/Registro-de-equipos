@@ -222,6 +222,31 @@
   .chip.frente small { display: block; font-size: 10.5px; font-weight: 400; opacity: .8; }
   .chip.frente.off { text-decoration: none; background: white; color: #6B756F; border-style: dashed; }
   .agregar-frente { margin-top: 8px; font-size: 13px; padding: 8px; }
+  /* ---------- v4: control contra el Sheet ---------- */
+  .card-pend { border: 2px solid var(--dorado); }
+  .card-pend.ok { border-color: var(--verde-claro); color: var(--verde-oscuro); font-size: 13.5px; font-weight: 600; }
+  .pend-fila { padding: 6px 0; border-bottom: 1px solid #F0F2F0; }
+  .pend-nombre { font-size: 13.5px; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 4px; }
+  .chip.pend { background: #FFF3CD; border-color: var(--dorado); color: #5C4600; font-weight: 600; }
+  .chip.pend.on { background: var(--dorado); color: #1E2A22; }
+  .chip.ocultar { background: white; color: #6B756F; font-size: 11px; border-style: dashed; }
+  .chip small.ya { display: block; font-size: 10px; font-weight: 600; color: #7A5E00; }
+  .chip.nov { background: #F3F4F3; color: #6B756F; border-style: dashed; }
+  .chip em { font-style: normal; font-size: 10.5px; font-weight: 700; color: #7A5E00; }
+  .chip button.nov-btn { color: var(--verde-oscuro); font-weight: 700; font-size: 15px; }
+  .nov-editor { background: #F6F8F6; border: 1.5px solid var(--gris-borde); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 13px; }
+  .nov-editor input[type=text] { margin-top: 8px; }
+  .fila-botones { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+  .fila-botones .btn { width: auto; flex: 1; }
+  .sug-np { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 12.5px; color: #5C4600; }
+  .sug-item { background: white; border: 1px solid var(--gris-borde); border-radius: 8px; padding: 7px 9px; margin-top: 6px; cursor: pointer; color: var(--gris-texto); }
+  .sug-item span, .lista-act .otro-frente span { display: block; font-size: 11px; color: #6B756F; }
+  .lista-act .otro-frente { border-style: dashed; }
+  .just-label { display: block; margin-top: 8px; font-weight: 700; color: #1E2A22; }
+  .card-cierre { border: 2px solid var(--verde-claro); }
+  .card-cierre.bloquea { border-color: #B4453A; background: #FFF8F7; }
+  .cierre-fila { padding: 8px 0; border-bottom: 1px solid #F0F2F0; }
+  .version-app { text-align: center; font-size: 11px; color: #9AA39D; margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -269,6 +294,7 @@
     + Agregar otro bloque de actividad
   </button>
 
+  <p class="version-app">Versión 4 · 19-oct-2026</p>
   <div style="height: 90px"></div>
 </main>
 
@@ -350,7 +376,7 @@ function onMaestroChange() {
   maestroActual = CATALOGO.personal.find(p => p.nombre === nombre) || null;
   document.getElementById("btnAgregarBloque").disabled = !maestroActual;
   actualizarBotonGuardar();
-  if (modo === "personal") { iniciarJornada(); return; }
+  if (modo === "personal") { iniciarJornada(); if (maestroActual) cargarSheet(); return; }
   if (maestroActual && bloques.length === 0) agregarBloque();
 }
 
@@ -833,10 +859,10 @@ function renderMateriales(b) {
 }
 
 function actualizarBotonGuardar() {
-  if (modo === "buscador") return;
+  if (modo === "buscador" || guardando) return;
   let listo;
   if (modo === "personal") {
-    listo = maestroActual && (jornada.lineas.length > 0 || (jornada.sup && jornada.sup.activo && !supYaGuardada()));
+    listo = maestroActual && (jornada.lineas.length > 0 || (jornada.sup && jornada.sup.activo && !supYaGuardada()) || Object.keys(jornada.novedades || {}).length > 0);
     const n = listo ? construirFilasJornada().length : 0;
     document.getElementById("btnGuardar").textContent = n ? `Guardar el día · ${n} registros` : "Guardar el día";
   } else if (modo === "equipos") {
@@ -1020,7 +1046,7 @@ function lsGet(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def
 function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
 
 function iniciarJornada() {
-  jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {},
+  jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {}, novedades: {}, novEditando: null, just: {}, cierre: null,
     sup: { activo: lsGet(claveLS("supActivo"), true), ini: "07:00", fin: "", nocturno: false, motivo: "", auto: true,
            frentes: [], frentesAuto: true } };
   contLinea = 0;
@@ -1037,6 +1063,8 @@ function renderJornada() {
   if (!maestroActual) { z.innerHTML = `<div class="vacio">Selecciona tu nombre para empezar</div>`; actualizarBotonGuardar(); return; }
   const previa = lsGet(claveLS("cuadrilla"), []);
   z.innerHTML = `
+    ${renderCierreSemanal()}
+    ${renderPendientes()}
     <div class="card">
       <h2>2. Frentes de hoy <span class="contador">${jornada.frentesDia.length}</span></h2>
       <div class="chips">${chipsFrentes(jornada.frentesDia, "toggleFrenteDia")}</div>
@@ -1049,10 +1077,10 @@ function renderJornada() {
 
     <div class="card">
       <h2>3. Cuadrilla de hoy <span class="contador">${jornada.cuadrilla.length}</span></h2>
-      <div class="chips">${jornada.cuadrilla.map(p => `
-        <span class="chip on">${esc(nombreCorto(p.nombre))}
-          <button aria-label="Quitar" onclick='quitarDeCuadrilla(${JSON.stringify(p.nombre)})'>✕</button></span>`).join("") || `<span class="vacio-inline">Nadie todavía</span>`}
+      <div class="chips">${jornada.cuadrilla.map(chipCuadrilla).join("") || `<span class="vacio-inline">Nadie todavía</span>`}
       </div>
+      ${jornada.cuadrilla.length ? `<p class="nota">Si alguien no trabajó hoy o estuvo en un curso, toca <b>⋯</b> en su nombre para marcar la novedad.</p>` : ""}
+      ${renderNovedadEditor()}
       ${previa.length && !jornada.cuadrilla.length ? `<button class="btn btn-suave" onclick="usarCuadrillaPrevia()">Usar la cuadrilla de la última vez (${previa.length})</button>` : ""}
       <div class="buscador-personal">
         <input type="text" id="buscaCuadrilla" placeholder="Agregar persona: escribe 2 letras del nombre"
@@ -1094,6 +1122,10 @@ function buscarParaCuadrilla(txt) {
 }
 function agregarACuadrilla(nombre, cargo) {
   if (jornada.cuadrilla.some(p => p.nombre === nombre)) return;
+  if (maestroActual && nombre === maestroActual.nombre && jornada.sup && jornada.sup.activo) {
+    mostrarToast("Tu jornada se registra en el paso 5 (supervisión). Si hoy trabajaste con la cuadrilla, primero desmarca la supervisión.");
+    return;
+  }
   jornada.cuadrilla.push({ nombre, cargo });
   jornada.lineas.forEach(l => { if (l.todos) l.personas.push(nombre); });
   renderJornada();
@@ -1125,7 +1157,7 @@ function agregarLinea() {
   jornada.lineas.push({
     id: contLinea, horaIni: ini, horaFin: "", codFrente: (jornada.lineas.length ? jornada.lineas[jornada.lineas.length - 1].codFrente : jornada.frenteDia),
     codAct: "", np: null, // np = { cat, desc } si es no presupuestada
-    personas: jornada.cuadrilla.map(p => p.nombre), todos: true,
+    personas: jornada.cuadrilla.map(p => p.nombre).filter(n => !sinTrabajo(n)), todos: true,
     loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
   });
   lineaEnPicker = contLinea;
@@ -1137,6 +1169,7 @@ function setLinea(id, campo, valor) {
   if (campo === "horaIni" || campo === "horaFin" || campo === "codFrente") renderJornada();
 }
 function togglePersonaLinea(id, nombre) {
+  if (sinTrabajo(nombre)) { mostrarToast("Esta persona tiene una novedad hoy (no trabajó). Quítale la novedad si sí trabajó."); return; }
   const l = jornada.lineas.find(x => x.id === id);
   l.personas = l.personas.includes(nombre) ? l.personas.filter(n => n !== nombre) : [...l.personas, nombre];
   l.todos = l.personas.length === jornada.cuadrilla.length;
@@ -1177,15 +1210,19 @@ function renderLinea(l) {
       </div>` : ""}
     ${lineaEnPicker === l.id || !act ? renderPicker(l) : ""}
     <div class="chips chips-linea">
-      ${jornada.cuadrilla.map(p => `<button class="chip ${l.personas.includes(p.nombre) ? "on" : "off"}" onclick='togglePersonaLinea(${l.id}, ${JSON.stringify(p.nombre)})'>${esc(nombreCorto(p.nombre))}</button>`).join("")}
+      ${jornada.cuadrilla.filter(p => !sinTrabajo(p.nombre)).map(p => `<button class="chip ${l.personas.includes(p.nombre) ? "on" : "off"}" onclick='togglePersonaLinea(${l.id}, ${JSON.stringify(p.nombre)})'>${esc(nombreCorto(p.nombre))}</button>`).join("")}
     </div>
   </div>`;
 }
 
 function abrirPicker(id) { lineaEnPicker = id; renderJornada(); }
 
+// v3d: una actividad aparece en un frente si su código empieza por el frente o si es una adicional asignada a él ("*" = todos)
+function actEnFrente(a, codFrente) {
+  return !!a && (a.cod.startsWith(codFrente + ".") || (Array.isArray(a.frentes) && (a.frentes.includes("*") || a.frentes.includes(codFrente))));
+}
 function recientes(codFrente) {
-  return lsGet(claveLS("recientes"), []).filter(c => c.startsWith(codFrente + ".")).slice(0, 6);
+  return lsGet(claveLS("recientes"), []).filter(c => actEnFrente(CATALOGO.actividades.find(x => x.cod === c), codFrente)).slice(0, 6);
 }
 function renderPicker(l) {
   const rec = recientes(l.codFrente);
@@ -1202,16 +1239,17 @@ function renderPicker(l) {
     <label>Buscar actividad del presupuesto</label>
     <input type="text" placeholder="Ej. demolicion muro, pintura, escombros" oninput="buscarActividad(${l.id}, this.value)" autocomplete="off">
     <div class="lista-act" id="resAct-${l.id}"></div>
-    <details class="np" ${l.np ? "open" : ""}>
+    ${renderSugerenciasNP(l)}
+    <details class="np" ${l.np || l.npPend ? "open" : ""}>
       <summary>No está en el presupuesto</summary>
       <label>Categoría</label>
       <select id="npCat-${l.id}">
         <option value="">— Elige la categoría —</option>
-        <optgroup label="Medibles">${Object.entries(CATEGORIAS).filter(([, c]) => c.medible).map(([k, c]) => `<option value="${k}" ${l.np && l.np.cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
-        <optgroup label="No medibles">${Object.entries(CATEGORIAS).filter(([, c]) => !c.medible).map(([k, c]) => `<option value="${k}" ${l.np && l.np.cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
+        <optgroup label="Medibles">${Object.entries(CATEGORIAS).filter(([, c]) => c.medible).map(([k, c]) => `<option value="${k}" ${(l.np || l.npPend) && (l.np || l.npPend).cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
+        <optgroup label="No medibles">${Object.entries(CATEGORIAS).filter(([, c]) => !c.medible).map(([k, c]) => `<option value="${k}" ${(l.np || l.npPend) && (l.np || l.npPend).cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
       </select>
       <label>Descripción corta</label>
-      <input type="text" id="npDesc-${l.id}" maxlength="120" placeholder="Ej. Resane de muros zona bandas" value="${l.np ? esc(l.np.desc) : ""}">
+      <input type="text" id="npDesc-${l.id}" maxlength="120" placeholder="Ej. Resane de muros zona bandas" value="${(l.np || l.npPend) ? esc((l.np || l.npPend).desc) : ""}">
       <button class="btn btn-suave" onclick="elegirNoPresupuestada(${l.id})">Usar esta actividad</button>
     </details>
   </div>`;
@@ -1221,18 +1259,23 @@ function buscarActividad(id, txt) {
   const cont = document.getElementById(`resAct-${id}`);
   const palabras = normTxt(txt).split(/\s+/).filter(w => w.length >= 3);
   if (!palabras.length) { cont.innerHTML = ""; return; }
-  const enc = CATALOGO.actividades
-    .filter(a => a.cod.startsWith(l.codFrente + ".") && palabras.every(w => normTxt(a.desc).includes(w) || a.cod.includes(w)))
-    .slice(0, 12);
-  cont.innerHTML = enc.length ? enc.map(a => `
+  const coincide = a => palabras.every(w => normTxt(a.desc).includes(w) || a.cod.includes(w));
+  const enc = CATALOGO.actividades.filter(a => actEnFrente(a, l.codFrente) && coincide(a)).slice(0, 12);
+  const otros = enc.length >= 8 ? [] : CATALOGO.actividades.filter(a => !actEnFrente(a, l.codFrente) && coincide(a)).slice(0, 8);
+  cont.innerHTML = (enc.length ? enc.map(a => `
     <div onclick="elegirActividad(${id}, '${a.cod}')">
       <b>${esc(a.desc.split("(")[0].trim().slice(0, 80))}</b>
-      <span>${a.cod} · ${a.unidad}${CAT_SINCO[a.cod] ? " · categoría " + CAT_SINCO[a.cod] : ""}</span>
-    </div>`).join("") : `<p class="nota">Sin resultados en el frente ${l.codFrente}. Prueba otra palabra o usa "No está en el presupuesto".</p>`;
+      <span>${a.cod} · ${a.unidad}${CAT_SINCO[a.cod] ? " · categoría " + CAT_SINCO[a.cod] : ""}${a.frentes ? " · adicional" : ""}</span>
+    </div>`).join("") : `<p class="nota">Sin resultados en el frente ${l.codFrente}.</p>`)
+    + (otros.length ? `<p class="nota">En otros frentes (si la eliges, la actividad queda en ese frente):</p>` + otros.map(a => `
+    <div class="otro-frente" onclick="elegirActividadOtroFrente(${id}, '${a.cod}')">
+      <b>${esc(a.desc.split("(")[0].trim().slice(0, 80))}</b>
+      <span>Frente ${esc(nombreFrenteCorto(frenteDeCod(a.cod)))} · ${a.cod} · ${a.unidad}</span>
+    </div>`).join("") : (!enc.length ? `<p class="nota">Prueba otra palabra o usa "No está en el presupuesto".</p>` : ""));
 }
 function elegirActividad(id, cod) {
   const l = jornada.lineas.find(x => x.id === id);
-  l.codAct = cod; l.np = null; lineaEnPicker = null;
+  l.codAct = cod; l.np = null; l.npSug = null; l.npPend = null; lineaEnPicker = null;
   const rec = lsGet(claveLS("recientes"), []).filter(c => c !== cod);
   lsSet(claveLS("recientes"), [cod, ...rec].slice(0, 30));
   renderJornada();
@@ -1242,8 +1285,14 @@ function elegirNoPresupuestada(id) {
   const desc = document.getElementById(`npDesc-${id}`).value.trim();
   if (!cat) { mostrarToast("Elige la categoría"); return; }
   if (desc.length < 4) { mostrarToast("Escribe una descripción corta de la actividad"); return; }
+  if (/supervis/.test(normTxt(desc))) { mostrarToast("La supervisión no es una actividad de la cuadrilla: tu jornada se registra en el paso 5."); return; }
   const l = jornada.lineas.find(x => x.id === id);
-  l.np = { cat, desc }; l.codAct = ""; lineaEnPicker = null;
+  if (l.npVisto !== desc) {
+    l.npVisto = desc;
+    const sug = sugerenciasNP(desc, l.codFrente);
+    if (sug.length) { l.npSug = sug; l.npPend = { cat, desc }; renderJornada(); return; }
+  }
+  l.np = { cat, desc }; l.codAct = ""; l.npSug = null; l.npPend = null; lineaEnPicker = null;
   renderJornada();
 }
 
@@ -1298,9 +1347,9 @@ function cuotaOrdinariaDia(fechaStr) {
   return 0;
 }
 // intervalos: [{ini, fin, ref}] -> [{ref, tipoHora, horas}]
-function clasificarDia(fechaStr, intervalos) {
+function clasificarDia(fechaStr, intervalos, ordYaUsadas) {
   const dom = new Date(fechaStr + "T00:00:00").getDay() === 0 || esFestivoColombia(fechaStr);
-  let restante = cuotaOrdinariaDia(fechaStr);
+  let restante = Math.max(0, cuotaOrdinariaDia(fechaStr) - (ordYaUsadas || 0));
   const salida = [];
   const orden = intervalos.map(iv => {
     const a = aHoras(iv.ini); let b = aHoras(iv.fin); if (b <= a) b += 24;
@@ -1332,32 +1381,40 @@ function porPersona() {
   const mapa = {};
   jornada.lineas.forEach(l => {
     if (!l.horaIni || !l.horaFin || !(l.codAct || l.np)) return;
-    l.personas.forEach(n => { (mapa[n] = mapa[n] || []).push({ ini: l.horaIni, fin: l.horaFin, ref: l.id }); });
+    l.personas.filter(n => !sinTrabajo(n)).forEach(n => { (mapa[n] = mapa[n] || []).push({ ini: l.horaIni, fin: l.horaFin, ref: l.id }); });
+  });
+  Object.entries(jornada.novedades || {}).forEach(([n, x]) => {
+    if (x.tipo === "CAP" && x.ini && x.fin && !finAntesDeInicio(x.ini, x.fin)) (mapa[n] = mapa[n] || []).push({ ini: x.ini, fin: x.fin, ref: "NOV" });
   });
   return mapa;
 }
 function renderResumenDia() {
   const fecha = document.getElementById("fecha").value;
   const mapa = porPersona(); const nombres = Object.keys(mapa);
-  if (!nombres.length) return "";
+  if (!nombres.length && !(jornada.sup && jornada.sup.activo && jornada.sup.ini && jornada.sup.fin && !supYaGuardada())) return "";
   const s = jornada.sup;
   const filaSup = (s.activo && s.ini && s.fin && !(finAntesDeInicio(s.ini, s.fin) && !s.nocturno)) ? (() => {
-    const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }]);
+    const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }], ordYa(maestroActual.nombre, fecha));
     const total = seg.reduce((a, x) => a + x.horas, 0), extra = seg.filter(x => x.tipoHora.includes("Extra")).reduce((a, x) => a + x.horas, 0);
-    return `<tr><td>${esc(nombreCorto(maestroActual.nombre))} <span class="nota-h">(supervisión)</span></td><td>${Math.round(total * 100) / 100} h</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
+    const yaS = horasYa(maestroActual.nombre, fecha);
+    return `<tr><td>${esc(nombreCorto(maestroActual.nombre))} <span class="nota-h">(supervisión)</span></td><td>${Math.round(total * 100) / 100} h${yaS ? ` <span class="nota-h">+ ${r2(yaS)} ya</span>` : ""}</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
   })() : "";
   const filas = filaSup + nombres.map(n => {
     if (traslapes(mapa[n])) return `<tr class="error"><td>${esc(nombreCorto(n))}</td><td colspan="2">Horarios cruzados: revisa sus actividades</td></tr>`;
-    const seg = clasificarDia(fecha, mapa[n]);
+    const cr = cruceVivo(n);
+    if (cr) return `<tr class="error"><td>${esc(nombreCorto(n))}</td><td colspan="2">${esc(cr.charAt(0).toUpperCase() + cr.slice(1))}</td></tr>`;
+    const seg = clasificarDia(fecha, mapa[n], ordYa(n, fecha));
     const total = seg.reduce((s, x) => s + x.horas, 0);
     const extra = seg.filter(x => x.tipoHora.includes("Extra")).reduce((s, x) => s + x.horas, 0);
-    return `<tr><td>${esc(nombreCorto(n))}</td><td>${Math.round(total * 100) / 100} h</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
+    const ya = horasYa(n, fecha);
+    return `<tr><td>${esc(nombreCorto(n))}</td><td>${Math.round(total * 100) / 100} h${ya ? ` <span class="nota-h">+ ${r2(ya)} ya</span>` : ""}</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
   }).join("");
   return `
   <div class="card">
     <h2>Resumen del día por persona</h2>
     <table class="resumen"><tr><th>Persona</th><th>Total</th><th>Extra</th></tr>${filas}</table>
-    <p class="nota">Las horas extra se calculan con toda la jornada de la persona (Ley 2101).</p>
+    ${renderJustificaciones()}
+    <p class="nota">Las horas extra se calculan con toda la jornada de la persona (Ley 2101), sumando lo que ya estaba registrado ese día ("ya").</p>
   </div>`;
 }
 
@@ -1415,7 +1472,7 @@ function renderSupervision() {
     const malAMPM = finAntesDeInicio(s.ini, s.fin) && !s.nocturno;
     let total = "";
     if (s.ini && s.fin && !malAMPM) {
-      const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }]);
+      const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }], ordYa(maestroActual.nombre, fecha));
       const t = seg.reduce((x, y) => x + y.horas, 0);
       const ord = seg.filter(x => !x.tipoHora.includes("Extra")).reduce((x, y) => x + y.horas, 0);
       const ext = t - ord, noc = seg.filter(x => x.tipoHora.includes("Nocturn")).reduce((x, y) => x + y.horas, 0);
@@ -1473,7 +1530,7 @@ function filasSupervision(fecha, creado) {
   const promedio = pf.length ? pf.reduce((a, b) => a + b, 0) / pf.length : 1;
   sel.filter(c => !pesoFrente[c]).forEach(c => destinos.push({ general: c, w: promedio }));
   const W = destinos.reduce((a, d) => a + d.w, 0); if (!W) return [];
-  const segs = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }]);
+  const segs = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }], ordYa(maestroActual.nombre, fecha));
   const filas = [];
   segs.forEach((seg, i) => {
     let resto = Math.round(seg.horas * 100) / 100;
@@ -1493,7 +1550,7 @@ function filasSupervision(fecha, creado) {
           (d.l.np ? `[NO PRESUPUESTADA] ${d.l.np.desc}` : (a ? a.desc : ""))),
         actUnidad: d.general ? "h" : (d.l.np ? CATEGORIAS[d.l.np.cat].unidad : (a ? a.unidad : "")),
         horas: h, tipoHora: seg.tipoHora, cantidad: null,
-        observaciones: `SUPERVISIÓN ${s.ini}-${s.fin} · frentes ${sel.join(", ")} · ${Math.round(d.w / W * 100)}%${s.motivo ? " · Fuera del horario de la cuadrilla: " + s.motivo : ""}`,
+        observaciones: `SUPERVISIÓN ${s.ini}-${s.fin} · frentes ${sel.join(", ")} · ${Math.round(d.w / W * 100)}%${s.motivo ? " · Fuera del horario de la cuadrilla: " + s.motivo : ""}${obsJust(maestroActual.nombre)}`,
         creado, registradoPor: maestroActual.nombre, loteId: "SUP_" + (d.general ? `${codF}_${creado}` : d.l.loteId),
       });
     });
@@ -1544,6 +1601,7 @@ function fechaLocal(desfaseDias) {
 function ponerFecha(desfase) { document.getElementById("fecha").value = fechaLocal(desfase); alCambiarFecha(); }
 function alCambiarFecha() {
   actualizarFechaTxt();
+  if (maestroActual && (SHEET.estado !== "ok" || fechaActual() < SHEET.desde)) cargarSheet(true);
   if (modo === "personal") renderJornada(); else if (modo !== "buscador") renderBloques();
 }
 function actualizarFechaTxt() {
@@ -1573,7 +1631,8 @@ function claveMed(m) { return ["M", m.fecha, m.frenteCod, m.categoriaLetra, m.ca
 // ---------- Validación y guardado ----------
 function problemasJornada() {
   const p = [];
-  if (!jornada.lineas.length && !(jornada.sup && jornada.sup.activo && !supYaGuardada())) p.push("No hay actividades");
+  if (cierreBloqueaFecha()) p.push("Primero envía el cierre de cantidades de la semana pasada (arriba, en rojo)");
+  if (!jornada.lineas.length && !(jornada.sup && jornada.sup.activo && !supYaGuardada()) && !Object.keys(jornada.novedades || {}).length) p.push("No hay actividades");
   jornada.lineas.forEach((l, i) => {
     if (!l.horaIni || !l.horaFin) p.push(`Actividad ${i + 1}: falta la hora de inicio o de fin`);
     if (!(l.codAct || l.np)) p.push(`Actividad ${i + 1}: falta elegir la actividad`);
@@ -1582,6 +1641,9 @@ function problemasJornada() {
     if (duracionH(l.horaIni, l.horaFin) > 14) p.push(`Actividad ${i + 1}: dura más de 14 horas, revisa las horas`);
   });
   problemasSupervision().forEach(x => p.push(x));
+  problemasNovedades().forEach(x => p.push(x));
+  problemasCruce().forEach(x => p.push(x));
+  excedidos().forEach(e => { if ((jornada.just[e.n] || "").trim().length < 4) p.push(`${nombreCorto(e.n)} pasa de ${HORAS_DIA_ALERTA} h en el día: escribe el motivo en el resumen del día`); });
   const mapa = porPersona();
   Object.entries(mapa).forEach(([n, ivs]) => { if (traslapes(ivs)) p.push(`${nombreCorto(n)} tiene horarios cruzados`); });
   return p;
@@ -1592,7 +1654,21 @@ function construirFilasJornada() {
   const creado = new Date().toISOString();
   Object.entries(mapa).forEach(([nombre, ivs]) => {
     const persona = jornada.cuadrilla.find(p => p.nombre === nombre) || { cargo: "Sin confirmar" };
-    clasificarDia(fecha, ivs).forEach((seg, i) => {
+    clasificarDia(fecha, ivs, ordYa(nombre, fecha)).forEach((seg, i) => {
+      if (seg.ref === "NOV") {
+        const x = jornada.novedades[nombre]; const codF = jornada.frenteDia;
+        const fr = CATALOGO.frentes.find(f => f.cod === codF);
+        filas.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_v${i}`,
+          fecha, nombre, cargo: persona.cargo, residente: maestroActual.residente,
+          codfrente: codF, frenteNombre: fr ? fr.nombre : "", codcap: "", codsubcap: "",
+          codact: `NP-${codF}-P`, actDesc: `[NO PRESUPUESTADA] [NOVEDAD] Capacitación: ${x.desc.trim()}`, actUnidad: "Glb",
+          horas: seg.horas, tipoHora: seg.tipoHora, cantidad: null,
+          observaciones: `${x.ini}-${x.fin} · NOVEDAD: Capacitación${obsJust(nombre)}`,
+          creado, registradoPor: maestroActual.nombre, loteId: `NOV_CAP_${creado}`,
+        });
+        return;
+      }
       const l = jornada.lineas.find(x => x.id === seg.ref);
       const frente = CATALOGO.frentes.find(f => f.cod === l.codFrente);
       const a = l.np ? null : CATALOGO.actividades.find(x => x.cod === l.codAct);
@@ -1605,12 +1681,13 @@ function construirFilasJornada() {
         actDesc: l.np ? `[NO PRESUPUESTADA] ${l.np.desc}` : (a ? a.desc : ""),
         actUnidad: l.np ? CATEGORIAS[l.np.cat].unidad : (a ? a.unidad : ""),
         horas: seg.horas, tipoHora: seg.tipoHora, cantidad: null,
-        observaciones: `${l.horaIni}-${l.horaFin}${persona.cargo === "Sin confirmar" ? " · Persona registrada manualmente, confirmar cargo y cédula" : ""}`,
+        observaciones: `${l.horaIni}-${l.horaFin}${persona.cargo === "Sin confirmar" ? " · Persona registrada manualmente, confirmar cargo y cédula" : ""}${obsJust(nombre)}`,
         creado, registradoPor: maestroActual.nombre, loteId: l.loteId,
       });
     });
   });
   filasSupervision(fecha, creado).forEach(f => filas.push(f));
+  filasNovedades(fecha, creado).forEach(f => filas.push(f));
   return filas;
 }
 function construirMediciones() {
@@ -1630,8 +1707,15 @@ function construirMediciones() {
 }
 
 async function guardarJornada() {
-  const prob = problemasJornada();
+  const btn = document.getElementById("btnGuardar");
+  const terminar = () => { guardando = false; btn.textContent = "Guardar el día"; actualizarBotonGuardar(); };
+  let prob = problemasJornada();
   if (prob.length) { mostrarToast(prob[0]); return; }
+  guardando = true; btn.disabled = true; btn.textContent = "Revisando el Sheet…";
+  await cargarSheet(true);
+  const conSheet = SHEET.estado === "ok" && Date.now() - SHEET.t < 60 * 1000;
+  prob = problemasJornada(); // con las horas del Sheet ya actualizadas
+  if (prob.length) { renderJornada(); mostrarToast(prob[0]); terminar(); return; }
   // Lo que ya se envió desde este celular (misma persona, fecha, actividad y horario) se omite solo
   const enviados = new Set(lsGet(claveLS("enviados"), []));
   const todasFilas = construirFilasJornada(), todasMeds = construirMediciones();
@@ -1640,10 +1724,21 @@ async function guardarJornada() {
   const omitidas = (todasFilas.length - filas.length) + (todasMeds.length - meds.length);
   if (!filas.length && !meds.length) {
     mostrarToast("Esto ya estaba guardado desde este celular. No se repitió.");
-    iniciarJornada(); return;
+    terminar(); iniciarJornada(); return;
   }
-  const btn = document.getElementById("btnGuardar");
-  btn.disabled = true; btn.textContent = "Guardando…";
+  if (!conSheet) {
+    if (!confirm("No se pudo revisar el Sheet (sin señal). La app no puede verificar si estas personas ya están registradas ese día.\n\n¿Guardar de todas formas?")) { terminar(); return; }
+  } else {
+    const c = conflictos(filas);
+    const duros = c.filter(x => x.duro), blandos = c.filter(x => !x.duro);
+    if (duros.length) {
+      alert("No se guardó. Estas personas ya tienen ese horario registrado ese día:\n\n• " + duros.map(x => x.txt).join("\n• ")
+        + "\n\nQuítalas de la actividad o corrige la hora. Si el registro anterior está mal, avísale al residente.");
+      renderJornada(); terminar(); return;
+    }
+    if (blandos.length && !confirm("Ojo:\n\n• " + blandos.map(x => x.txt).join("\n• ") + "\n\n¿Es trabajo adicional del mismo día? Si es así, guarda. Si es lo mismo, cancela.")) { terminar(); return; }
+  }
+  btn.textContent = "Guardando…";
   try {
     await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ registros: filas, hoja: "Registros" }) });
@@ -1655,14 +1750,15 @@ async function guardarJornada() {
     if (filasSup.length) marcarSupGuardada(filasSup[0].fecha, { ini: jornada.sup.ini, fin: jornada.sup.fin,
       horas: Math.round(filasSup.reduce((a, f) => a + Number(f.horas || 0), 0) * 100) / 100 });
     lsSet(claveLS("enviados"), [...filas.map(claveFila), ...meds.map(claveMed), ...enviados].slice(0, 4000));
+    sumarAlSheetLocal(filas);
     mostrarToast(`✔ Guardado: ${filas.length} registro(s) de horas${meds.length ? " y " + meds.length + " medición(es)" : ""}` +
       (omitidas ? ` · ${omitidas} ya estaban guardados y no se repitieron` : ""));
+    guardando = false;
     iniciarJornada();
   } catch (e) {
     mostrarToast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
   }
-  btn.textContent = "Guardar el día";
-  actualizarBotonGuardar();
+  terminar();
 }
 
 // =====================================================================
@@ -1712,7 +1808,7 @@ function buscarEnCatalogo() {
   const cont = document.getElementById("busResultados"); if (!cont) return;
   const palabras = normTxt(bus.texto).split(/\s+/).filter(w => w.length >= 3);
   if (!palabras.length) { cont.innerHTML = ""; return; }
-  const enc = CATALOGO.actividades.filter(a => a.cod.startsWith(bus.frente + ".") &&
+  const enc = CATALOGO.actividades.filter(a => actEnFrente(a, bus.frente) &&
     palabras.every(w => normTxt(a.desc).includes(w) || a.cod.includes(w))).slice(0, 15);
   cont.innerHTML = enc.length ? enc.map(a => `
     <div onclick="elegirEnBuscador('${a.cod}')">
@@ -1743,6 +1839,486 @@ function copiarCodigo(cod) {
   const ok = () => mostrarToast(`Código ${cod} copiado`);
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(cod).then(ok, () => prompt("Copia el código:", cod));
   else prompt("Copia el código:", cod);
+}
+
+// =====================================================================
+// ============ v4 (19-oct-2026): control contra el Sheet ==============
+// =====================================================================
+// La app lee el Sheet "Registro Mano de Obra - RAW" (compartido como lector) para:
+//  1. no dejar registrar dos veces a la misma persona en el mismo horario (aunque sea otro maestro u otro celular),
+//  2. mostrar al maestro qué días le faltan de su cuadrilla,
+//  3. sumar las horas ya registradas ese día (horas extra bien calculadas y alerta de más de 10 h),
+//  4. pedir el cierre semanal de cantidades.
+const SHEET_ID = "1Sbt-r9yR_pcyluP_JLX9nA2nwxpW3cU2ATVPMwvNP-I";
+const HORAS_DIA_ALERTA = 10;
+const TIPOS_NOV = { NOVINO: "No vino", INCAP: "Incapacidad", PERMISO: "Permiso", VAC: "Vacaciones", CAP: "Capacitación / curso" };
+let SHEET = { estado: "nada", desde: "", filas: [], t: 0, error: "" };
+let promSheet = null;
+let guardando = false;
+let gvizN = 0;
+
+const r2 = x => Math.round((x || 0) * 100) / 100;
+const nn = s => normTxt(s).replace(/\s+/g, " ").trim();
+function aNum(v) { const n = parseFloat(String(v ?? "").replace(",", ".")); return isNaN(n) ? 0 : n; }
+function fechaISO(d) { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); }
+function sumarDias(fechaStr, n) { const d = new Date(fechaStr + "T12:00:00"); d.setDate(d.getDate() + n); return fechaISO(d); }
+function diaSemana(fechaStr) { return new Date(fechaStr + "T12:00:00").getDay(); }
+function lunesDe(fechaStr) { return sumarDias(fechaStr, -((diaSemana(fechaStr) + 6) % 7)); }
+function diaCorto(d) { return ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"][diaSemana(d)] + " " + Number(d.slice(8, 10)); }
+function rangoTxt(obs) {
+  const m = String(obs || "").match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+  return m ? { ini: m[1].padStart(5, "0"), fin: m[2].padStart(5, "0") } : null;
+}
+function cruzan(a, b) {
+  const s = x => { const i = aHoras(x.ini); let j = aHoras(x.fin); if (j <= i) j += 24; return [i, j]; };
+  const [a1, a2] = s(a), [b1, b2] = s(b);
+  return a1 < b2 - 1e-9 && b1 < a2 - 1e-9;
+}
+const sinTrabajo = n => { const x = jornada.novedades && jornada.novedades[n]; return !!x && x.tipo !== "CAP"; };
+const esCantidad = f => String(f.obs || "").startsWith("CANTIDAD SEMANAL");
+
+// ---------- Lectura del Sheet (Google Visualization, JSONP: funciona sin cambiar el Apps Script) ----------
+function gviz(tq, hoja) {
+  return new Promise((resolve, reject) => {
+    const cb = `__gv${Date.now()}_${gvizN++}`;
+    const s = document.createElement("script");
+    const limpiar = () => { clearTimeout(t); try { delete window[cb]; } catch (e) { window[cb] = undefined; } s.remove(); };
+    const t = setTimeout(() => { limpiar(); reject(new Error("tiempo agotado")); }, 20000);
+    window[cb] = resp => {
+      limpiar();
+      if (!resp || resp.status === "error") reject(new Error((resp && resp.errors && resp.errors[0] && resp.errors[0].detailed_message) || "error del Sheet"));
+      else resolve(resp.table || { rows: [] });
+    };
+    s.onerror = () => { limpiar(); reject(new Error("sin conexión")); };
+    s.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}`
+      + `&sheet=${encodeURIComponent(hoja)}&headers=1&tq=${encodeURIComponent(tq)}`;
+    document.head.appendChild(s);
+  });
+}
+function celda(c) {
+  if (!c || c.v === null || c.v === undefined) return "";
+  const v = c.v;
+  if (typeof v === "string") {
+    let m = v.match(/^Date\((\d+),(\d+),(\d+)/);
+    if (m) return `${m[1]}-${String(+m[2] + 1).padStart(2, "0")}-${String(+m[3]).padStart(2, "0")}`;
+    m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  }
+  return v;
+}
+function filasDeTabla(t, campos) {
+  return (t.rows || []).map(r => {
+    const c = r.c || []; const o = {};
+    campos.forEach((k, i) => { o[k] = celda(c[i]); });
+    return o;
+  });
+}
+function rangoSheet() {
+  const hoy = fechaLocal(0), fecha = fechaActual() || hoy;
+  return [sumarDias(hoy, -14), sumarDias(lunesDe(hoy), -7), sumarDias(fecha, -1)].sort()[0];
+}
+function cargarSheet(forzar) {
+  const desde = rangoSheet();
+  if (!forzar && SHEET.estado === "ok" && SHEET.desde <= desde && Date.now() - SHEET.t < 5 * 60 * 1000) return Promise.resolve(SHEET);
+  if (promSheet) return promSheet;
+  if (SHEET.estado !== "ok") SHEET.estado = "cargando";
+  const campos = ["fecha", "nombre", "horas", "tipoHora", "obs", "por"];
+  promSheet = (async () => {
+    try {
+      let t;
+      try { t = await gviz(`select B,C,M,N,P,R where B >= date '${desde}'`, "Registros"); }
+      catch (e) { t = await gviz(`select B,C,M,N,P,R`, "Registros"); } // por si la columna de fecha no es de tipo fecha
+      const filas = filasDeTabla(t, campos)
+        .map(f => ({ fecha: String(f.fecha).slice(0, 10), nombre: String(f.nombre || ""), horas: aNum(f.horas),
+                     tipoHora: String(f.tipoHora || ""), obs: String(f.obs || ""), por: String(f.por || "") }))
+        .filter(f => f.nombre && /^\d{4}-\d{2}-\d{2}$/.test(f.fecha) && f.fecha >= desde);
+      filas.forEach(f => { f.n = nn(f.nombre); });
+      const locales = SHEET.estado === "ok" ? SHEET.filas.filter(f => f.local && !filas.some(g => g.n === f.n && g.fecha === f.fecha && g.obs === f.obs)) : [];
+      SHEET = { estado: "ok", desde, filas: [...filas, ...locales], t: Date.now(), error: "" };
+    } catch (e) {
+      SHEET = { ...SHEET, estado: SHEET.estado === "ok" ? "ok" : "error", error: String(e.message || e) };
+    }
+    promSheet = null;
+    if (modo === "personal" && maestroActual && !guardando) renderJornada();
+    return SHEET;
+  })();
+  return promSheet;
+}
+function sumarAlSheetLocal(filas) {
+  if (SHEET.estado !== "ok") return;
+  filas.forEach(f => SHEET.filas.push({ fecha: f.fecha, nombre: f.nombre, n: nn(f.nombre), horas: aNum(f.horas), tipoHora: f.tipoHora || "",
+    obs: String(f.observaciones || ""), por: f.registradoPor || "", local: true }));
+}
+function regsDia(nombre, fecha) {
+  if (SHEET.estado !== "ok") return [];
+  const k = nn(nombre);
+  return SHEET.filas.filter(f => f.n === k && f.fecha === fecha && !esCantidad(f));
+}
+function horasYa(nombre, fecha) { return regsDia(nombre, fecha).reduce((a, f) => a + f.horas, 0); }
+function ordYa(nombre, fecha) { return regsDia(nombre, fecha).filter(f => !/extra/i.test(f.tipoHora)).reduce((a, f) => a + f.horas, 0); }
+function badgeYa(nombre) {
+  const regs = regsDia(nombre, fechaActual());
+  if (!regs.length) return "";
+  const h = regs.reduce((a, f) => a + f.horas, 0);
+  const nov = regs.find(f => f.obs.startsWith("NOVEDAD"));
+  const por = [...new Set(regs.map(f => nombreCorto(f.por || "")))].filter(Boolean).join(", ");
+  return `<small class="ya">${h > 0 ? `ya tiene ${r2(h)} h` : (nov ? nov.obs.replace("NOVEDAD: ", "") : "ya registrado")}${por ? " · " + esc(por) : ""}</small>`;
+}
+
+// ---------- 5. "Te falta registrar" ----------
+function diasAPendiente() {
+  // semana pasada completa (lunes a sábado) + esta semana hasta ayer
+  const hoy = fechaLocal(0), lun = lunesDe(hoy);
+  const ini = sumarDias(lun, -7), fin = sumarDias(hoy, -1);
+  const dias = [];
+  for (let d = ini; d <= fin; d = sumarDias(d, 1)) { if (diaSemana(d) !== 0 && !esFestivoColombia(d)) dias.push(d); }
+  return dias;
+}
+function miCuadrillaHabitual() {
+  const yo = nn(maestroActual.nombre), desde = sumarDias(fechaLocal(0), -14);
+  const ocultos = new Set(lsGet(claveLS("ocultosPend"), []));
+  const enCat = new Map(CATALOGO.personal.map(p => [nn(p.nombre), p.nombre]));
+  const m = new Map();
+  SHEET.filas.filter(f => nn(f.por) === yo && f.fecha >= desde && !esCantidad(f)).forEach(f => m.set(f.n, f.nombre));
+  lsGet(claveLS("cuadrilla"), []).forEach(p => m.set(nn(p.nombre), p.nombre));
+  m.set(yo, maestroActual.nombre);
+  return [...m.entries()].filter(([k]) => enCat.has(k) && !ocultos.has(k)).map(([k]) => ({ k, nombre: enCat.get(k) }));
+}
+function pendientes() {
+  if (SHEET.estado !== "ok" || !maestroActual) return [];
+  const dias = diasAPendiente(); if (!dias.length) return [];
+  const conReg = new Set(SHEET.filas.filter(f => !esCantidad(f)).map(f => f.n + "|" + f.fecha));
+  return miCuadrillaHabitual()
+    .map(p => ({ ...p, faltan: dias.filter(d => !conReg.has(p.k + "|" + d)) }))
+    .filter(p => p.faltan.length)
+    .sort((a, b) => b.faltan.length - a.faltan.length);
+}
+function renderPendientes() {
+  if (!maestroActual) return "";
+  if (SHEET.estado === "cargando" || SHEET.estado === "nada") return `<div class="card card-pend"><p class="nota">Revisando los registros de la semana…</p></div>`;
+  if (SHEET.estado === "error") return `<div class="card card-pend"><p class="nota">Sin conexión con el Sheet: no se pudo revisar qué falta registrar ni si hay repetidos.
+    <button class="campo-libre" onclick="cargarSheet(true)">Reintentar</button></p></div>`;
+  const dias = diasAPendiente(); const p = pendientes();
+  if (!dias.length) return "";
+  const rango = `${diaCorto(dias[0])} a ${diaCorto(dias[dias.length - 1])}`;
+  if (!p.length) return `<div class="card card-pend ok">✔ Tu cuadrilla está al día (${rango}).</div>`;
+  return `<div class="card card-pend">
+    <h2>Te falta registrar <span class="contador">${p.reduce((a, x) => a + x.faltan.length, 0)}</span></h2>
+    <p class="nota">Días de ${rango} sin ningún registro. Toca el día para registrarlo. Si la persona no trabajó, márcale una <b>Novedad</b> en el paso 3 (no vino, incapacidad, permiso…).</p>
+    ${p.map(x => `<div class="pend-fila">
+      <div class="pend-nombre">${esc(nombreCorto(x.nombre))}${nn(x.nombre) === nn(maestroActual.nombre) ? " (tú)" : ""}</div>
+      <div class="chips">${x.faltan.map(d => `<button class="chip pend ${d === fechaActual() ? "on" : ""}" onclick="irAFecha('${d}')">${diaCorto(d)}${diaSemana(d) === 6 ? " (si trabajó)" : ""}</button>`).join("")}
+        <button class="chip ocultar" title="Ya no está en mi cuadrilla" onclick='ocultarPend(${JSON.stringify(x.k)})'>No es de mi cuadrilla</button></div>
+    </div>`).join("")}
+  </div>`;
+}
+function irAFecha(d) {
+  document.getElementById("fecha").value = d; alCambiarFecha();
+  const c = document.getElementById("cardQuien"); if (c) c.scrollIntoView({ behavior: "smooth" });
+}
+function ocultarPend(k) {
+  if (!confirm("¿Esta persona ya no está en tu cuadrilla? Dejará de aparecerte en pendientes.")) return;
+  lsSet(claveLS("ocultosPend"), [...new Set([...lsGet(claveLS("ocultosPend"), []), k])]);
+  renderJornada();
+}
+
+// ---------- 3. Novedades (no vino, incapacidad, permiso, vacaciones, capacitación) ----------
+function chipCuadrilla(p) {
+  const nov = jornada.novedades[p.nombre];
+  return `<span class="chip on ${nov && nov.tipo !== "CAP" ? "nov" : ""}">
+    <span>${esc(nombreCorto(p.nombre))}${nov ? ` <em>${esc(TIPOS_NOV[nov.tipo])}</em>` : ""}${badgeYa(p.nombre)}</span>
+    <button class="nov-btn" aria-label="Novedad" title="Novedad" onclick='editarNovedad(${JSON.stringify(p.nombre)})'>⋯</button>
+    <button aria-label="Quitar" onclick='quitarDeCuadrilla(${JSON.stringify(p.nombre)})'>✕</button></span>`;
+}
+function finCuota() {
+  const h = cuotaOrdinariaDia(fechaActual()) || 8;
+  const t = 7 + h; return `${String(Math.floor(t)).padStart(2, "0")}:${t % 1 ? "30" : "00"}`;
+}
+function editarNovedad(nombre) { jornada.novEditando = jornada.novEditando === nombre ? null : nombre; renderJornada(); }
+function setNovTipo(tipo) {
+  const n = jornada.novEditando; if (!n) return;
+  const prev = jornada.novedades[n] || {};
+  jornada.novedades[n] = { tipo, ini: prev.ini || "07:00", fin: prev.fin || finCuota(), desc: prev.desc || "" };
+  if (tipo !== "CAP") jornada.lineas.forEach(l => { l.personas = l.personas.filter(x => x !== n); });
+  renderJornada();
+}
+function setNov(campo, valor) {
+  const n = jornada.novEditando; if (!n || !jornada.novedades[n]) return;
+  jornada.novedades[n][campo] = valor;
+  if (campo !== "desc") renderJornada();
+}
+function quitarNovedad() { delete jornada.novedades[jornada.novEditando]; jornada.novEditando = null; renderJornada(); }
+function renderNovedadEditor() {
+  const n = jornada.novEditando; if (!n) return "";
+  const nov = jornada.novedades[n];
+  return `<div class="nov-editor">
+    <b>Novedad de ${esc(nombreCorto(n))}</b>
+    <div class="chips">${Object.entries(TIPOS_NOV).map(([k, t]) => `<button class="chip ${nov && nov.tipo === k ? "on" : "off"}" onclick="setNovTipo('${k}')">${t}</button>`).join("")}</div>
+    ${nov && nov.tipo === "CAP" ? `
+      <div class="sup-horas">
+        <input type="time" value="${nov.ini}" onchange="setNov('ini', this.value)" aria-label="Inicio del curso"><span>a</span>
+        <input type="time" value="${nov.fin}" onchange="setNov('fin', this.value)" aria-label="Fin del curso">
+      </div>
+      <input type="text" maxlength="100" placeholder="¿Qué curso o capacitación? Ej. Curso de alturas" value="${esc(nov.desc)}" oninput="setNov('desc', this.value)">
+      <p class="nota">La capacitación se paga normal y se carga a gastos generales. Si después del curso trabajó, márcalo también en sus actividades.</p>`
+      : `<p class="nota">No vino, incapacidad, permiso y vacaciones quedan con 0 horas: solo sirve para que se sepa por qué no trabajó y no salga como pendiente.</p>`}
+    <div class="fila-botones">
+      <button class="btn btn-suave" onclick="jornada.novEditando=null; renderJornada()">Listo</button>
+      ${nov ? `<button class="campo-libre" onclick="quitarNovedad()">Quitar la novedad</button>` : ""}
+    </div>
+  </div>`;
+}
+function problemasNovedades() {
+  const p = [];
+  Object.entries(jornada.novedades || {}).forEach(([n, x]) => {
+    if (x.tipo !== "CAP") return;
+    if (!x.ini || !x.fin) p.push(`Capacitación de ${nombreCorto(n)}: falta la hora`);
+    else if (finAntesDeInicio(x.ini, x.fin)) p.push(`Capacitación de ${nombreCorto(n)}: la hora de fin es antes que la de inicio`);
+    if ((x.desc || "").trim().length < 4) p.push(`Capacitación de ${nombreCorto(n)}: escribe qué curso fue`);
+  });
+  return p;
+}
+function filasNovedades(fecha, creado) {
+  const filas = [];
+  const fr = CATALOGO.frentes.find(f => f.cod === jornada.frenteDia);
+  Object.entries(jornada.novedades || {}).forEach(([n, x], i) => {
+    if (x.tipo === "CAP") return;
+    const persona = jornada.cuadrilla.find(p => p.nombre === n) || { cargo: "Sin confirmar" };
+    filas.push({
+      id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_n${i}`,
+      fecha, nombre: n, cargo: persona.cargo, residente: maestroActual.residente,
+      codfrente: jornada.frenteDia, frenteNombre: fr ? fr.nombre : "", codcap: "", codsubcap: "",
+      codact: `NOV-${x.tipo}`, actDesc: `[NOVEDAD] ${TIPOS_NOV[x.tipo]}`, actUnidad: "",
+      horas: 0, tipoHora: "Ordinaria Diurna", cantidad: null,
+      observaciones: `NOVEDAD: ${TIPOS_NOV[x.tipo]}`, creado, registradoPor: maestroActual.nombre, loteId: `NOV_${creado}`,
+    });
+  });
+  return filas;
+}
+
+// ---------- 4. Más de 10 h en el día: pedir el motivo ----------
+function totalesDia() {
+  const fecha = fechaActual(); const out = {};
+  Object.entries(porPersona()).forEach(([n, ivs]) => {
+    if (traslapes(ivs)) return;
+    out[n] = { nuevo: ivs.reduce((a, iv) => a + duracionH(iv.ini, iv.fin), 0), ya: horasYa(n, fecha) };
+  });
+  const s = jornada.sup;
+  if (maestroActual && s && s.activo && !supYaGuardada() && s.ini && s.fin && !(finAntesDeInicio(s.ini, s.fin) && !s.nocturno)) {
+    const n = maestroActual.nombre;
+    out[n] = out[n] || { nuevo: 0, ya: horasYa(n, fecha) };
+    out[n].nuevo += duracionH(s.ini, s.fin);
+  }
+  return out;
+}
+function excedidos() {
+  return Object.entries(totalesDia()).filter(([n, t]) => t.nuevo > 0 && t.nuevo + t.ya > HORAS_DIA_ALERTA + 1e-9 && !cruceVivo(n))
+    .map(([n, t]) => ({ n, total: t.nuevo + t.ya, ya: t.ya }));
+}
+function obsJust(n) {
+  const j = (jornada.just[n] || "").trim();
+  return j && excedidos().some(e => e.n === n) ? ` · Más de ${HORAS_DIA_ALERTA} h: ${j}` : "";
+}
+function renderJustificaciones() {
+  const exc = excedidos(); if (!exc.length) return "";
+  return `<div class="sup-aviso"><b>Más de ${HORAS_DIA_ALERTA} horas en el día.</b> El límite legal es de 2 horas extra diarias. Escribe el motivo de cada persona; si no, no se puede guardar.
+    ${exc.map(e => `<label class="just-label">${esc(nombreCorto(e.n))}: ${r2(e.total)} h${e.ya ? ` (incluye ${r2(e.ya)} h que ya estaban registradas)` : ""}</label>
+      <input type="text" maxlength="120" placeholder="Ej. Vaciado de placa que no se podía suspender" value="${esc(jornada.just[e.n] || "")}"
+             oninput='jornada.just[${JSON.stringify(e.n)}] = this.value'>`).join("")}
+  </div>`;
+}
+
+// ---------- 1. Registros dobles: comparar contra el Sheet antes de guardar ----------
+function conflictos(filas) {
+  const fecha = fechaActual(); const out = []; const vistos = new Set();
+  const nuevos = {};
+  filas.forEach(f => { const r = rangoTxt(f.observaciones); if (!r || !(aNum(f.horas) > 0)) return; (nuevos[f.nombre] = nuevos[f.nombre] || []).push(r); });
+  Object.entries(nuevos).forEach(([n, ivs]) => {
+    regsDia(n, fecha).filter(f => f.horas > 0 && !f.local).forEach(f => {
+      const r = rangoTxt(f.obs);
+      if (!r) {
+        const k = n + "|sin";
+        if (!vistos.has(k)) { vistos.add(k); out.push({ duro: false, txt: `${nombreCorto(n)} ya tiene ${r2(horasYa(n, fecha))} h registradas ese día (por ${nombreCorto(f.por) || "otro registro"})` }); }
+        return;
+      }
+      if (ivs.some(iv => cruzan(iv, r))) {
+        const k = `${n}|${r.ini}|${r.fin}`;
+        if (!vistos.has(k)) { vistos.add(k); out.push({ duro: true, txt: `${nombreCorto(n)}: ya está registrado de ${r.ini} a ${r.fin} (por ${nombreCorto(f.por) || "otro registro"})` }); }
+      }
+    });
+  });
+  return out;
+}
+
+// Mismo control, en vivo mientras el maestro llena el día (antes de pedir el motivo de más de 10 h)
+function cruceVivo(n) {
+  const fecha = fechaActual(); const ivs = [...(porPersona()[n] || [])];
+  const s = jornada.sup;
+  if (maestroActual && n === maestroActual.nombre && s && s.activo && !supYaGuardada() && s.ini && s.fin) ivs.push({ ini: s.ini, fin: s.fin });
+  for (const f of regsDia(n, fecha)) {
+    if (!(f.horas > 0) || f.local) continue;
+    const r = rangoTxt(f.obs);
+    if (r && ivs.some(iv => iv.ini && iv.fin && cruzan(iv, r))) return `ya está registrado de ${r.ini} a ${r.fin} (por ${nombreCorto(f.por) || "otro registro"})`;
+  }
+  return "";
+}
+function problemasCruce() {
+  const nombres = new Set(Object.keys(porPersona()));
+  if (maestroActual) nombres.add(maestroActual.nombre);
+  return [...nombres].map(n => { const c = cruceVivo(n); return c ? `${nombreCorto(n)} ${c} ese día. Quítalo de la actividad o corrige la hora.` : ""; }).filter(Boolean);
+}
+
+// ---------- 7. Buscar en otros frentes y sugerir antes de "no presupuestada" ----------
+const PALABRAS_VACIAS = new Set(["para", "con", "del", "los", "las", "una", "unos", "unas", "que", "por", "como", "este", "esta", "entre",
+  "sobre", "desde", "hasta", "zona", "sector", "frente", "area", "todo", "toda", "hacia"]);
+function frenteDeCod(cod) { return String(cod).split(".")[0]; }
+function sugerenciasNP(desc, codFrente) {
+  const pal = [...new Set(normTxt(desc).split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !PALABRAS_VACIAS.has(w)))];
+  if (!pal.length) return [];
+  const minimo = Math.min(2, pal.length);
+  return CATALOGO.actividades
+    .map(a => { const d = normTxt(a.desc.split("(")[0]); return { a, s: pal.filter(w => d.includes(w)).length, mismo: actEnFrente(a, codFrente) ? 1 : 0 }; })
+    .filter(x => x.s >= minimo)
+    .sort((x, y) => (y.s - x.s) || (y.mismo - x.mismo))
+    .slice(0, 6).map(x => x.a.cod);
+}
+function elegirActividadOtroFrente(id, cod) {
+  const f = frenteDeCod(cod);
+  if (!confirm(`Esta actividad es del frente ${nombreFrenteCorto(f)}. La actividad y sus horas quedarán cargadas a ese frente. ¿Trabajaron allá?`)) return;
+  const l = jornada.lineas.find(x => x.id === id); l.codFrente = f;
+  if (!jornada.frentesDia.includes(f)) jornada.frentesDia = [...jornada.frentesDia, f];
+  elegirActividad(id, cod);
+}
+function confirmarNP(id) {
+  const l = jornada.lineas.find(x => x.id === id);
+  if (!l.npPend) return;
+  l.np = l.npPend; l.codAct = ""; l.npSug = null; l.npPend = null; lineaEnPicker = null;
+  renderJornada();
+}
+function renderSugerenciasNP(l) {
+  if (!l.npSug || !l.npSug.length) return "";
+  return `<div class="sug-np"><b>Antes de marcarla como no presupuestada: ¿es alguna de estas actividades del presupuesto?</b>
+    ${l.npSug.map(cod => {
+      const a = CATALOGO.actividades.find(x => x.cod === cod); if (!a) return "";
+      const otro = !actEnFrente(a, l.codFrente);
+      return `<div class="sug-item" onclick="${otro ? `elegirActividadOtroFrente(${l.id}, '${cod}')` : `elegirActividad(${l.id}, '${cod}')`}">
+        <b>${esc(a.desc.split("(")[0].trim().slice(0, 80))}</b><span>${cod} · ${esc(a.unidad)}${otro ? " · frente " + esc(nombreFrenteCorto(frenteDeCod(cod))) : ""}</span></div>`;
+    }).join("")}
+    <button class="btn btn-suave" onclick="confirmarNP(${l.id})">Ninguna: es no presupuestada</button>
+  </div>`;
+}
+
+// ---------- Cierre semanal de cantidades (obligatorio desde el martes) ----------
+function semanaCierre() {
+  const hoy = fechaLocal(0), lun = lunesDe(hoy), wd = diaSemana(hoy);
+  if (wd === 6 || wd === 0) return { lun, sab: sumarDias(lun, 5), actual: true };
+  return { lun: sumarDias(lun, -7), sab: sumarDias(lun, -2), actual: false };
+}
+function estadoCierre() {
+  if (SHEET.estado !== "ok" || !maestroActual) return null;
+  const { lun, sab, actual } = semanaCierre(); const yo = nn(maestroActual.nombre);
+  const hecho = !!(lsGet(claveLS("cierres"), {}) || {})[lun] ||
+    SHEET.filas.some(f => f.n === yo && esCantidad(f) && f.fecha >= lun && f.fecha <= sab);
+  const hubo = SHEET.filas.some(f => nn(f.por) === yo && f.fecha >= lun && f.fecha <= sab && f.horas > 0 && !esCantidad(f)
+    && !(f.n === yo && f.obs.startsWith("SUPERVISIÓN")));
+  const wd = diaSemana(fechaLocal(0));
+  const requerido = !hecho && hubo;
+  return { lun, sab, actual, hecho, requerido, bloquea: requerido && !actual && wd >= 2 && wd <= 5 };
+}
+function cierreBloqueaFecha() {
+  const e = estadoCierre();
+  return !!(e && e.bloquea && fechaActual() >= lunesDe(fechaLocal(0)));
+}
+function renderCierreSemanal() {
+  const e = estadoCierre();
+  if (!e || (!e.requerido && !jornada.cierre)) return "";
+  const titulo = `${diaCorto(e.lun)} a ${diaCorto(e.sab)}`;
+  const msg = e.bloquea ? `<b>Obligatorio:</b> para registrar esta semana, primero envía lo que tu cuadrilla ejecutó la semana pasada.`
+    : e.actual ? `Envía las cantidades que tu cuadrilla ejecutó esta semana en cada actividad.`
+    : `Tienes hasta hoy lunes. Desde el martes la app no deja registrar la semana nueva sin este cierre.`;
+  return `<div class="card card-cierre ${e.bloquea ? "bloquea" : ""}">
+    <h2>Cierre de cantidades · ${titulo}</h2>
+    <p class="nota">${msg}</p>
+    ${jornada.cierre ? renderCierreLista() : `<button class="btn btn-secundario" onclick="abrirCierre()">Hacer el cierre de la semana</button>`}
+  </div>`;
+}
+async function abrirCierre() {
+  const e = estadoCierre(); if (!e) return;
+  jornada.cierre = { estado: "cargando", items: [], lun: e.lun, sab: e.sab };
+  renderJornada();
+  try {
+    const yo = maestroActual.nombre.replace(/'/g, "");
+    const t = await gviz(`select F,J,K,L,M,P,C where R = '${yo}' and B >= date '${e.lun}' and B <= date '${e.sab}'`, "Registros");
+    const filas = filasDeTabla(t, ["fr", "cod", "desc", "und", "horas", "obs", "nombre"]);
+    const mapa = new Map();
+    filas.forEach(f => {
+      const obs = String(f.obs || ""), cod = String(f.cod || "");
+      if (!cod || obs.startsWith("SUPERVISIÓN") || obs.startsWith("NOVEDAD") || obs.startsWith("CANTIDAD") || /^(NOV|SUP)-/.test(cod)) return;
+      const und = String(f.und || "").trim();
+      if (!und || /^(glb|global|h)$/i.test(und)) return; // lo que no se mide (aseo, apoyo, etc.)
+      const np = cod.startsWith("NP-");
+      const desc = String(f.desc || "").replace("[NO PRESUPUESTADA] ", "").trim();
+      const k = np ? `${cod}|${desc}` : cod;
+      const it = mapa.get(k) || { k, cod, np, desc: np ? desc : desc.split("(")[0].trim(), und, fr: String(f.fr || ""), hh: 0, cant: "" };
+      it.hh += aNum(f.horas); mapa.set(k, it);
+    });
+    jornada.cierre.items = [...mapa.values()].sort((a, b) => b.hh - a.hh);
+    jornada.cierre.estado = "ok";
+  } catch (err) {
+    jornada.cierre.estado = "error";
+  }
+  renderJornada();
+}
+function renderCierreLista() {
+  const c = jornada.cierre;
+  if (c.estado === "cargando") return `<p class="nota">Buscando las actividades de tu cuadrilla en esa semana…</p>`;
+  if (c.estado === "error") return `<p class="nota">No se pudo leer el Sheet. <button class="campo-libre" onclick="abrirCierre()">Reintentar</button></p>`;
+  if (!c.items.length) return `<p class="nota">No hay actividades medibles de tu cuadrilla esa semana.</p>
+    <button class="btn btn-secundario" onclick="enviarCierre()">Confirmar: no hubo cantidades que medir</button>`;
+  return `${c.items.map((it, i) => `
+    <div class="cierre-fila">
+      <div class="cant-nombre">${esc(it.desc.slice(0, 90))}${it.np ? ` <span class="tag-np">no presupuestada</span>` : ""}</div>
+      <div class="act-sub">${esc(it.cod)} · ${r2(it.hh)} horas-hombre en la semana</div>
+      <div class="cant-inputs">
+        <input type="text" inputmode="decimal" placeholder="0" value="${esc(it.cant)}" oninput="jornada.cierre.items[${i}].cant = this.value">
+        <span class="unidad">${esc(it.und)}</span>
+      </div>
+    </div>`).join("")}
+    <p class="nota">Cantidad <b>terminada en la semana</b> en cada actividad, en área o volumen neto. Si no se terminó nada, escribe 0.</p>
+    <button class="btn btn-primario" onclick="enviarCierre()">Enviar el cierre de la semana</button>`;
+}
+async function enviarCierre() {
+  const c = jornada.cierre; if (!c || c.estado !== "ok") return;
+  const faltan = c.items.filter(it => String(it.cant).trim() === "" || isNaN(parseFloat(String(it.cant).replace(",", "."))));
+  if (faltan.length) { mostrarToast(`Falta la cantidad de ${faltan.length} actividad(es). Si no se terminó nada, escribe 0.`); return; }
+  const creado = new Date().toISOString();
+  const items = c.items.length ? c.items : [{ cod: "SIN-CANTIDADES", np: false, desc: "Sin cantidades medibles en la semana", und: "", fr: jornada.frenteDia, hh: 0, cant: "0" }];
+  const filas = items.map((it, i) => {
+    const codF = it.np ? (String(it.cod).match(/^NP-(\d\d)/) || [])[1] || it.fr : frenteDeCod(it.cod);
+    const fr = CATALOGO.frentes.find(f => f.cod === codF);
+    const a = it.np ? null : CATALOGO.actividades.find(x => x.cod === it.cod);
+    return {
+      id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_c${i}`,
+      fecha: c.sab, nombre: maestroActual.nombre, cargo: maestroActual.cargo, residente: maestroActual.residente,
+      codfrente: codF, frenteNombre: fr ? fr.nombre : "",
+      codcap: a ? a.cod.split(".").slice(0, 2).join(".") : "", codsubcap: a ? a.codSubcap : "",
+      codact: it.cod, actDesc: `[CANTIDAD SEMANAL] ${it.np ? "[NO PRESUPUESTADA] " : ""}${it.desc}`, actUnidad: it.und,
+      horas: 0, tipoHora: "Ordinaria Diurna", cantidad: parseFloat(String(it.cant).replace(",", ".")),
+      observaciones: `CANTIDAD SEMANAL ${c.lun} a ${c.sab} · ${r2(it.hh)} horas-hombre`,
+      creado, registradoPor: maestroActual.nombre, loteId: `CANT_${c.lun}`,
+    };
+  });
+  try {
+    await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify({ registros: filas, hoja: "Registros" }) });
+    const m = lsGet(claveLS("cierres"), {}) || {}; m[c.lun] = creado; lsSet(claveLS("cierres"), m);
+    sumarAlSheetLocal(filas);
+    jornada.cierre = null;
+    mostrarToast(`✔ Cierre de la semana enviado (${filas.length} actividad(es))`);
+    renderJornada();
+  } catch (e) {
+    mostrarToast("No se pudo enviar el cierre. Revisa tu conexión e intenta de nuevo.");
+  }
 }
 
 cargarCatalogo();
