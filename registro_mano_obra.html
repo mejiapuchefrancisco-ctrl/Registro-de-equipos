@@ -140,6 +140,189 @@
   .caja-codigos b { color: var(--verde-oscuro); }
   .caja-codigos div { margin-bottom: 4px; }
   .nota-caja-codigos { font-size: 11px; color: var(--gris-texto); margin-top: 6px !important; font-weight: normal; }
+
+  /* ---------- v2: jornada ---------- */
+  .contador { background: var(--verde); color: white; border-radius: 10px; padding: 1px 8px; font-size: 11px; margin-left: 4px; }
+  .nota-h { font-weight: 400; color: #6B756F; font-size: 11.5px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; border-radius: 16px; padding: 7px 12px; font-size: 13px;
+          border: 1.5px solid var(--gris-borde); background: white; color: var(--gris-texto); cursor: pointer; font-family: inherit; }
+  .chip.on { background: #E3EEE6; border-color: var(--verde-claro); color: var(--verde-oscuro); font-weight: 600; }
+  .chip.off { background: #F3F4F3; color: #9AA39D; text-decoration: line-through; }
+  .chip.rec { background: #FBF3D9; border-color: var(--dorado); color: var(--verde-oscuro); text-align: left; }
+  .chip button { background: none; border: none; color: #B4453A; font-size: 14px; cursor: pointer; padding: 0 0 0 2px; }
+  .vacio-inline { color: #8A948E; font-size: 13px; }
+  .btn-suave { background: #EEF3EF; color: var(--verde-oscuro); border: 1.5px solid var(--verde-claro); width: 100%; margin-top: 8px; }
+  .nota { font-size: 11.5px; color: #6B756F; margin: 6px 0 0; }
+  .linea { border: 1.5px solid var(--gris-borde); border-left: 4px solid var(--verde); border-radius: 8px; padding: 10px; margin-bottom: 10px; background: white; }
+  .linea.incompleta { border-left-color: var(--dorado); }
+  .linea-top { display: flex; align-items: center; gap: 6px; }
+  .linea-top input[type=time] { width: auto; flex: 1; min-width: 0; padding: 8px 6px; font-size: 15px; border: 1.5px solid var(--gris-borde); border-radius: 8px; }
+  .linea-top span { font-size: 12px; }
+  .linea-top .dur { font-weight: 700; color: var(--verde-oscuro); min-width: 42px; text-align: right; }
+  .act-elegida { margin-top: 8px; cursor: pointer; }
+  .act-titulo { font-size: 14px; font-weight: 600; color: var(--verde-oscuro); }
+  .act-sub { font-size: 11.5px; color: #6B756F; }
+  .tag-np { background: #FBF3D9; color: #7A5E00; border-radius: 6px; padding: 1px 6px; font-size: 10.5px; font-weight: 600; }
+  .picker { background: #F7F9F7; border: 1px dashed var(--verde-claro); border-radius: 8px; padding: 10px; margin-top: 8px; }
+  .lista-act div { background: white; border: 1px solid var(--gris-borde); border-radius: 8px; padding: 8px 10px; margin-top: 6px; cursor: pointer; }
+  .lista-act div:active { background: #E3EEE6; }
+  .lista-act b { display: block; font-size: 13px; color: var(--verde-oscuro); }
+  .lista-act span { font-size: 11px; color: #6B756F; }
+  details.np { margin-top: 10px; font-size: 13px; }
+  details.np summary { cursor: pointer; color: #7A5E00; font-weight: 600; padding: 4px 0; }
+  .chips-linea { margin-top: 10px; }
+  .chips-linea .chip { padding: 5px 10px; font-size: 12px; }
+  .cant-fila { border-top: 1px solid #EEF1EE; padding: 8px 0; }
+  .cant-fila:first-of-type { border-top: none; }
+  .cant-nombre { font-size: 13.5px; font-weight: 600; color: var(--verde-oscuro); margin-bottom: 6px; }
+  .cant-inputs { display: flex; gap: 6px; align-items: center; }
+  .cant-inputs input { width: 90px !important; flex: none; }
+  .cant-inputs .unidad { font-size: 13px; font-weight: 600; min-width: 24px; }
+  .cant-inputs select { flex: 1; min-width: 0; font-size: 13px; padding: 9px 6px; }
+  table.resumen { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.resumen th { text-align: left; font-size: 11.5px; color: #6B756F; font-weight: 600; padding: 4px 0; border-bottom: 1px solid var(--gris-borde); }
+  table.resumen td { padding: 6px 0; border-bottom: 1px solid #F0F2F0; }
+  table.resumen tr.error td { color: #B4453A; font-weight: 600; }
+  .extra { color: #7A5E00; font-weight: 600; }
+  button:disabled { opacity: .55; }
+  .fecha-rapida { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .fecha-rapida button { border: 1.5px solid var(--verde-claro); background: white; color: var(--verde-oscuro);
+    border-radius: 18px; padding: 7px 16px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .fecha-rapida button.activo { background: var(--verde); color: white; border-color: var(--verde); }
+  #fechaTxt { font-size: 13.5px; font-weight: 700; color: var(--verde-oscuro); }
+  .aviso-fecha { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 8px; padding: 10px 12px;
+    font-size: 13px; color: #5C4600; margin-bottom: 10px; }
+  .aviso-fecha button { margin-top: 8px; width: 100%; background: var(--dorado); color: #1E2A22; border: none;
+    border-radius: 8px; padding: 10px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .interruptor button { font-size: 13.5px; }
+  .bus-resultado { background: #FBF3D9; border: 1.5px solid var(--dorado); border-radius: 10px; padding: 14px; margin-top: 12px; }
+  .bus-codigos { display: flex; gap: 10px; }
+  .bus-codigos > div { flex: 1; background: white; border-radius: 8px; padding: 10px; text-align: center; }
+  .bus-codigos small { display: block; font-size: 10.5px; color: #6B756F; font-weight: 600; letter-spacing: .3px; }
+  .bus-codigos b { display: block; font-size: 22px; color: var(--verde-oscuro); margin-top: 2px; }
+  .bus-desc { font-size: 13px; color: var(--verde-oscuro); margin-top: 10px; line-height: 1.4; }
+  .bus-ruta { font-size: 11.5px; color: #6B756F; margin-top: 8px; line-height: 1.4; }
+  .btn-copiar { margin-top: 10px; }
+  /* ---------- v3: supervisión del maestro y control de horas ---------- */
+  .linea-top .dur.mal { color: #B4453A; }
+  .alerta-hora { background: #FDEBEA; border: 1.5px solid #B4453A; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #7A2A22; margin-top: 8px; }
+  .alerta-hora label { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; font-weight: 600; color: #1E2A22; }
+  .card-sup { border: 2px solid var(--verde-claro); }
+  .sup-toggle { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: var(--verde-oscuro); margin: 0; }
+  .sup-toggle input { width: 22px; height: 22px; }
+  .sup-horas { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+  .sup-horas input[type=time] { flex: 1; min-width: 0; padding: 8px 6px; font-size: 15px; border: 1.5px solid var(--gris-borde); border-radius: 8px; }
+  .sup-total { background: #E3EEE6; border-radius: 8px; padding: 8px 10px; margin-top: 10px; font-size: 13.5px; color: var(--verde-oscuro); }
+  .sup-total b { font-size: 16px; }
+  .sup-aviso { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #5C4600; margin-top: 8px; }
+  .sup-error { background: #FDEBEA; border: 1.5px solid #B4453A; border-radius: 8px; padding: 8px 10px; font-size: 12.5px; color: #7A2A22; margin-top: 8px; }
+  .sup-aviso input { margin-top: 6px; }
+  .chip.frente { border-radius: 8px; text-align: left; line-height: 1.25; }
+  .chip.frente small { display: block; font-size: 10.5px; font-weight: 400; opacity: .8; }
+  .chip.frente.off { text-decoration: none; background: white; color: #6B756F; border-style: dashed; }
+  .agregar-frente { margin-top: 8px; font-size: 13px; padding: 8px; }
+  /* ---------- v4: control contra el Sheet ---------- */
+  .card-pend { border: 2px solid var(--dorado); }
+  .card-pend.ok { border-color: var(--verde-claro); color: var(--verde-oscuro); font-size: 13.5px; font-weight: 600; }
+  .pend-fila { padding: 6px 0; border-bottom: 1px solid #F0F2F0; }
+  .pend-nombre { font-size: 13.5px; font-weight: 700; color: var(--verde-oscuro); margin-bottom: 4px; }
+  .chip.pend { background: #FFF3CD; border-color: var(--dorado); color: #5C4600; font-weight: 600; }
+  .chip.pend.on { background: var(--dorado); color: #1E2A22; }
+  .chip.ocultar { background: white; color: #6B756F; font-size: 11px; border-style: dashed; }
+  .chip small.ya { display: block; font-size: 10px; font-weight: 600; color: #7A5E00; }
+  .chip.nov { background: #F3F4F3; color: #6B756F; border-style: dashed; }
+  .chip em { font-style: normal; font-size: 10.5px; font-weight: 700; color: #7A5E00; }
+  .chip button.nov-btn { color: var(--verde-oscuro); font-weight: 700; font-size: 15px; }
+  .nov-editor { background: #F6F8F6; border: 1.5px solid var(--gris-borde); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 13px; }
+  .nov-editor input[type=text] { margin-top: 8px; }
+  .fila-botones { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+  .fila-botones .btn { width: auto; flex: 1; }
+  .sug-np { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 8px; padding: 8px 10px; margin-top: 8px; font-size: 12.5px; color: #5C4600; }
+  .sug-item { background: white; border: 1px solid var(--gris-borde); border-radius: 8px; padding: 7px 9px; margin-top: 6px; cursor: pointer; color: var(--gris-texto); }
+  .sug-item span, .lista-act .otro-frente span { display: block; font-size: 11px; color: #6B756F; }
+  .lista-act .otro-frente { border-style: dashed; }
+  .just-label { display: block; margin-top: 8px; font-weight: 700; color: #1E2A22; }
+  .card-cierre { border: 2px solid var(--verde-claro); }
+  .card-cierre.bloquea { border-color: #B4453A; background: #FFF8F7; }
+  .cierre-fila { padding: 8px 0; border-bottom: 1px solid #F0F2F0; }
+  .version-app { text-align: center; font-size: 11px; color: #9AA39D; margin-top: 10px; }
+  /* ---------- v5: inicio, pasos, horas con botones, novedades, mi semana ---------- */
+  .chip { min-height: 40px; }
+  .chip.hora { font-weight: 700; }
+  .chip.hora.on { background: var(--verde); border-color: var(--verde); color: white; }
+  .chip.otra { position: relative; gap: 6px; }
+  .chip.otra input[type=time] { width: 112px; padding: 4px 6px; font-size: 14px; border: 1px solid var(--gris-borde); border-radius: 6px; }
+  .hoy-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+  .anillo { width: 64px; height: 64px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center;
+    background: conic-gradient(var(--verde) calc(var(--p) * 1%), #E3E9E4 0); }
+  .anillo span { width: 50px; height: 50px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; color: var(--verde-oscuro); }
+  .hoy-top b { display: block; font-size: 17px; color: var(--verde-oscuro); }
+  .hoy-top small { font-size: 13px; color: #5B6760; }
+  .btn-grande { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; text-align: left; border: none; border-radius: 10px;
+    background: var(--verde); color: white; padding: 12px 14px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 8px; }
+  .btn-grande small { font-size: 12.5px; font-weight: 400; opacity: .92; }
+  .banner-cola { background: #FFF3CD; border: 1.5px solid var(--dorado); border-radius: 10px; padding: 10px 12px; font-size: 13px; color: #5C4600; margin-bottom: 14px; }
+  .tira { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; text-align: center; }
+  .tira button { border: 1.5px solid transparent; border-radius: 8px; background: #EEF1EE; min-height: 46px; font-family: inherit; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: #5B6760; padding: 2px; }
+  .tira button b { font-size: 12.5px; color: var(--gris-texto); }
+  .tira .completo { background: #DCEBE0; } .tira .completo b { color: var(--verde-oscuro); }
+  .tira .parcial { background: #FFF3CD; border-color: var(--dorado); } .tira .parcial b { color: #5C4600; }
+  .tira .sel { border-color: var(--verde); border-width: 2px; }
+  .paso-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .paso-top button { width: 44px; height: 44px; border: none; background: white; border-radius: 22px; font-size: 22px; color: var(--verde-oscuro); cursor: pointer; flex: none; }
+  .paso-top b { display: block; font-size: 17px; color: var(--verde-oscuro); }
+  .paso-top span { font-size: 12.5px; color: #5B6760; }
+  .barra-pasos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-bottom: 14px; }
+  .barra-pasos i { height: 5px; border-radius: 3px; background: var(--gris-borde); }
+  .barra-pasos i.on { background: var(--verde); }
+  .fila-p { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #F0F2F0; }
+  .fila-p label { display: flex; align-items: center; gap: 10px; flex: 1; margin: 0; cursor: pointer; min-height: 40px; }
+  .fila-p input[type=checkbox] { width: 24px; height: 24px; accent-color: var(--verde); flex: none; }
+  .fila-p b { display: block; font-size: 14.5px; color: var(--gris-texto); }
+  .fila-p small { display: block; font-size: 12px; color: #6B756F; }
+  .fila-p.con-nov b { color: #6B756F; }
+  .fila-p .tag-nov { color: #7A5E00; font-weight: 700; }
+  .btn-nov { border: 1.5px solid var(--gris-borde); background: white; border-radius: 8px; padding: 0 10px; min-height: 40px; font-size: 13px; font-weight: 600;
+    color: var(--verde-oscuro); cursor: pointer; font-family: inherit; }
+  .grupo-nov { font-size: 11px; font-weight: 700; color: #6B756F; letter-spacing: .3px; margin: 10px 0 2px; text-transform: uppercase; }
+  .nov-res { background: #E3EEE6; border-radius: 8px; padding: 8px 10px; margin-top: 10px; font-size: 13px; color: var(--verde-oscuro); }
+  .nov-res.no { background: #F3F4F3; color: #5B6760; }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #E3E9E4; border-radius: 10px; padding: 4px; margin-top: 8px; }
+  .seg button { border: none; border-radius: 8px; min-height: 40px; background: transparent; font-weight: 700; font-family: inherit; cursor: pointer; color: var(--gris-texto); }
+  .seg button.on { background: var(--verde); color: white; }
+  .tl { position: relative; height: 14px; background: #F1F3F1; border-radius: 4px; margin-top: 4px; }
+  .tl span { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+  .tl .ord { background: var(--verde); } .tl .ext { background: #E0A526; } .tl .dom { background: #3D6E8C; }
+  .tl .ya { background: repeating-linear-gradient(45deg, #C9D3CC 0 4px, #E3E9E4 4px 8px); }
+  .tl .nov { background: #8A5A9E; }
+  .tl-escala { position: relative; height: 14px; font-size: 10.5px; color: #6B756F; }
+  .tl-escala span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .rev-fila { padding: 8px 0; border-bottom: 1px solid #F0F2F0; }
+  .rev-fila .cab { display: flex; justify-content: space-between; gap: 8px; font-size: 13.5px; }
+  .rev-fila .cab b { color: var(--gris-texto); }
+  .leyenda { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11.5px; color: #6B756F; margin-top: 8px; }
+  .leyenda i { display: inline-block; width: 12px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  .problemas { background: #FDEBEA; border: 1.5px solid #B4453A; border-radius: 8px; padding: 8px 12px; font-size: 13px; color: #7A2A22; margin-bottom: 14px; }
+  .problemas li { margin: 3px 0; }
+  .sem-grid { display: grid; grid-template-columns: 78px repeat(7, minmax(0, 1fr)) 30px 36px; gap: 3px; align-items: center; font-size: 12px; }
+  .sem-grid .h { font-weight: 700; color: #6B756F; text-align: center; font-size: 11px; }
+  .sem-grid .n { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sem-grid .c { height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 700; background: #F1F3F1; color: #9AA39D; }
+  .sem-grid .c.t { background: #DCEBE0; color: var(--verde-oscuro); }
+  .sem-grid .c.alto { background: #FFE3B0; color: #5C3F00; }
+  .sem-grid .c.dom { background: #DCE6F2; color: #1F3B5C; }
+  .sem-grid .c.nv { background: #EFE7F3; color: #5B3770; font-size: 10.5px; }
+  .sem-grid .tot { text-align: right; font-weight: 700; }
+  .sem-grid .ex { text-align: center; font-weight: 700; color: #5C3F00; border-radius: 6px; padding: 5px 0; }
+  .sem-grid .ex.mal { background: #B3261E; color: white; }
+  .nov-sem { padding: 8px 0; border-bottom: 1px solid #F0F2F0; font-size: 13px; }
+  .nov-sem b { color: var(--gris-texto); }
+  .pill { display: inline-block; border-radius: 6px; padding: 1px 7px; font-size: 11.5px; font-weight: 700; margin: 3px 4px 0 0; }
+  .pill.paga { background: var(--verde); color: white; } .pill.nopaga { background: #FDEBEA; color: #7A2A22; }
+  .pill.gris { background: #E3E9E4; color: #3A4740; } .pill.pend { background: #FFE3B0; color: #5C3F00; }
 </style>
 </head>
 <body>
@@ -157,12 +340,14 @@
 <main>
 
   <div class="interruptor">
-    <button id="btnModoPersonal" class="activo" onclick="cambiarModo('personal')">👷 Personal</button>
-    <button id="btnModoEquipos" onclick="cambiarModo('equipos')">🚜 Equipos</button>
-    <button id="btnModoMateriales" onclick="cambiarModo('materiales')">📦 Materiales</button>
+    <button id="btnModoPersonal" class="activo" onclick="cambiarModo('personal')">Registro</button>
+    <button id="btnModoSemana" onclick="cambiarModo('semana')">Mi semana</button>
+    <button id="btnModoBuscador" onclick="cambiarModo('buscador')">Buscar códigos</button>
+    <button id="btnModoEquipos" onclick="cambiarModo('equipos')" style="display:none">🚜 Equipos</button>
+    <button id="btnModoMateriales" onclick="cambiarModo('materiales')" style="display:none">📦 Materiales</button>
   </div>
 
-  <div class="card">
+  <div class="card" id="cardQuien">
     <h2 id="tituloPaso1">1. ¿Quién eres?</h2>
     <label for="selMaestro" id="labelPaso1">Busca tu nombre</label>
     <select id="selMaestro" onchange="onMaestroChange()">
@@ -170,19 +355,28 @@
     </select>
 
     <label for="fecha">Fecha</label>
-    <input type="date" id="fecha" onchange="renderBloques()">
+    <input type="date" id="fecha" onchange="alCambiarFecha()">
+    <div class="fecha-rapida">
+      <button type="button" id="btnHoy" onclick="ponerFecha(0)">Hoy</button>
+      <button type="button" id="btnAyer" onclick="ponerFecha(-1)">Ayer</button>
+      <span id="fechaTxt"></span>
+    </div>
   </div>
 
-  <div id="zonaBloques"></div>
+  <div id="zonaJornada"></div>
+  <div id="zonaSemana" style="display:none"></div>
+  <div id="zonaBuscador" style="display:none"></div>
+  <div id="zonaBloques" style="display:none"></div>
 
-  <button class="btn btn-agregar-bloque" id="btnAgregarBloque" onclick="agregarBloque()" disabled>
+  <button class="btn btn-agregar-bloque" id="btnAgregarBloque" onclick="agregarBloque()" disabled style="display:none">
     + Agregar otro bloque de actividad
   </button>
 
+  <p class="version-app">Versión 5 · 27-oct-2026</p>
   <div style="height: 90px"></div>
 </main>
 
-<div class="barra-inferior">
+<div class="barra-inferior" id="barraGuardar">
   <button class="btn btn-primario" id="btnGuardar" onclick="guardarTodo()" disabled>
     Guardar el día
   </button>
@@ -191,7 +385,7 @@
 <script>
 // =================== CONFIGURACIÓN ===================
 // Reemplaza esta URL por la de tu Google Apps Script publicado (ver instrucciones).
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz1CFQcDCcEKTKBl11EBXC_8Lth5vDQX5ZAec3XLw4rB2P5nyUdvtmouv5S2a0Mdsnr/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbygQ9lgDfHZulIjanGB_WwC9-5y3JyJ9gSmQIKJ2ccOlbkWhZOTs3ipXFqKaHK_B5oz/exec";
 // =======================================================
 
 const PROVEEDORES_SUGERIDOS = ["ALDECCO", "MAS EQUIPOS", "EQUIPOS INMEDIATOS"];
@@ -207,7 +401,10 @@ async function cargarCatalogo() {
   const resp = await fetch("catalogo.json");
   CATALOGO = await resp.json();
   poblarMaestros();
-  document.getElementById("fecha").value = new Date().toISOString().slice(0, 10);
+  const hoy = new Date(); hoy.setMinutes(hoy.getMinutes() - hoy.getTimezoneOffset());
+  document.getElementById("fecha").value = hoy.toISOString().slice(0, 10);
+  actualizarFechaTxt();
+  renderJornada();
 }
 
 function cambiarModo(nuevoModo) {
@@ -216,9 +413,19 @@ function cambiarModo(nuevoModo) {
   document.getElementById("btnModoPersonal").classList.toggle("activo", modo === "personal");
   document.getElementById("btnModoEquipos").classList.toggle("activo", modo === "equipos");
   document.getElementById("btnModoMateriales").classList.toggle("activo", modo === "materiales");
-  const titulos = { personal: "Registro de Mano de Obra", equipos: "Registro de Equipos", materiales: "Pedido de Materiales" };
-  const paso1 = { personal: "1. ¿Quién eres?", equipos: "1. ¿Quién solicita el equipo?", materiales: "1. ¿Quién solicita el material?" };
-  const btnTexto = { personal: "+ Agregar otro bloque de actividad", equipos: "+ Agregar otro bloque de equipos", materiales: "+ Agregar otro bloque de materiales" };
+  document.getElementById("btnModoBuscador").classList.toggle("activo", modo === "buscador");
+  document.getElementById("btnModoSemana").classList.toggle("activo", modo === "semana");
+  const titulos = { buscador: "Buscador de códigos", personal: "Registro de campo", semana: "Mi semana", equipos: "Registro de Equipos", materiales: "Pedido de Materiales" };
+  document.getElementById("zonaSemana").style.display = modo === "semana" ? "" : "none";
+  if (modo === "semana") {
+    document.getElementById("tituloApp").textContent = titulos.semana;
+    ["zonaJornada", "zonaBuscador", "zonaBloques", "btnAgregarBloque", "barraGuardar"].forEach(id => { document.getElementById(id).style.display = "none"; });
+    document.getElementById("cardQuien").style.display = "";
+    renderSemana();
+    return;
+  }
+  const paso1 = { buscador: "", personal: "1. ¿Quién eres?", equipos: "1. ¿Quién solicita el equipo?", materiales: "1. ¿Quién solicita el material?" };
+  const btnTexto = { buscador: "", personal: "+ Agregar otro bloque de actividad", equipos: "+ Agregar otro bloque de equipos", materiales: "+ Agregar otro bloque de materiales" };
   document.getElementById("tituloApp").textContent = titulos[modo];
   document.getElementById("tituloPaso1").textContent = paso1[modo];
   document.getElementById("labelPaso1").textContent = "Busca tu nombre";
@@ -226,8 +433,15 @@ function cambiarModo(nuevoModo) {
   // Al cambiar de modo reiniciamos los bloques para no mezclar datos
   bloques = [];
   contadorBloque = 0;
-  if (maestroActual) agregarBloque();
-  renderBloques();
+  const esJornada = modo === "personal", esBuscador = modo === "buscador";
+  document.getElementById("zonaJornada").style.display = esJornada ? "" : "none";
+  document.getElementById("zonaBuscador").style.display = esBuscador ? "" : "none";
+  document.getElementById("zonaBloques").style.display = (esJornada || esBuscador) ? "none" : "";
+  document.getElementById("btnAgregarBloque").style.display = (esJornada || esBuscador) ? "none" : "";
+  document.getElementById("cardQuien").style.display = esBuscador ? "none" : "";
+  document.getElementById("barraGuardar").style.display = esBuscador ? "none" : "";
+  if (esBuscador) { renderBuscador(); }
+  else if (esJornada) { renderJornada(); } else { if (maestroActual) agregarBloque(); renderBloques(); }
   actualizarBotonGuardar();
 }
 
@@ -249,6 +463,7 @@ function onMaestroChange() {
   maestroActual = CATALOGO.personal.find(p => p.nombre === nombre) || null;
   document.getElementById("btnAgregarBloque").disabled = !maestroActual;
   actualizarBotonGuardar();
+  if (modo === "personal" || modo === "semana") { iniciarJornada(); if (maestroActual) cargarSheet(); if (modo === "semana") renderSemana(); return; }
   if (maestroActual && bloques.length === 0) agregarBloque();
 }
 
@@ -512,10 +727,12 @@ function actualizarPersona(idBloque, nombre, campo, valor) {
 // Cuota de horas ORDINARIAS según el día de la semana (a partir de la hora
 // en que la persona inició su turno — no se asume que todos entran a las 7am,
 // para poder registrar bien los turnos nocturnos):
-//   Lunes a Miércoles: 8h ordinarias, luego extra
-//   Jueves y Viernes:  9h ordinarias, luego extra
-//   Sábado y Domingo:  0h ordinarias — TODO lo trabajado es extra
-// (8+8+8+9+9 = 42h/semana, el máximo legal vigente desde el 15-jul-2026)
+//   Lunes a Jueves: 8h ordinarias (ej. 7am-3pm), luego extra
+//   Viernes:        7.5h ordinarias (ej. 7am-2:30pm), luego extra
+//   Sábado:         5h ordinarias (ej. 7am-12m), luego extra —
+//                   salvo que esa semana tenga un festivo, en cuyo caso
+//                   el sábado completo es extra (0h ordinarias).
+//   Domingo:        0h ordinarias — TODO lo trabajado es extra.
 //
 // Recargo nocturno: 19:00 a 06:00 (Ley 2466 de 2025, vigente desde dic-2025)
 // Domingo Y festivos: usa las tarifas "Dominical/Festivo ..." automáticamente.
@@ -528,6 +745,22 @@ const FESTIVOS_COLOMBIA_2026 = [
 
 function esFestivoColombia(fechaStr) {
   return FESTIVOS_COLOMBIA_2026.includes(fechaStr);
+}
+
+function semanaTieneFestivo(fechaStr) {
+  // ¿Algún día de lunes a sábado de la semana de 'fechaStr' es festivo?
+  // (para decidir si el sábado de esa semana cuenta como todo extra o no)
+  const fecha = new Date(fechaStr + "T00:00:00");
+  const diasDesdeElLunes = (fecha.getDay() + 6) % 7; // lunes=0 ... domingo=6
+  const lunes = new Date(fecha);
+  lunes.setDate(fecha.getDate() - diasDesdeElLunes);
+  for (let i = 0; i < 6; i++) { // lunes(0) a sábado(5)
+    const d = new Date(lunes);
+    d.setDate(lunes.getDate() + i);
+    const dStr = d.toISOString().slice(0, 10);
+    if (esFestivoColombia(dStr)) return true;
+  }
+  return false;
 }
 
 function esHoraNocturna(horaAbsoluta) {
@@ -558,10 +791,18 @@ function calcularSegmentosHora(fechaStr, horaInicioStr, horaFinStr) {
 
   const esDominicalFestivo = (diaSemana === 0) || esFestivoColombia(fechaStr);
 
+  // Cuota de horas ORDINARIAS del día (a partir de la hora en que inició el turno):
+  //   Lunes a Jueves: 8h ordinarias (ej. 7am-3pm), luego extra
+  //   Viernes:        7.5h ordinarias (ej. 7am-2:30pm), luego extra
+  //   Sábado:         5h ordinarias (ej. 7am-12m), luego extra —
+  //                   PERO si esa semana (lunes a sábado) tiene un festivo,
+  //                   el sábado completo cuenta como extra (0h ordinarias).
+  //   Domingo:        0h ordinarias — todo lo trabajado es extra.
   let cuotaOrdinaria;
-  if (diaSemana >= 1 && diaSemana <= 3) cuotaOrdinaria = 8;        // lunes a miércoles
-  else if (diaSemana === 4 || diaSemana === 5) cuotaOrdinaria = 9; // jueves y viernes
-  else cuotaOrdinaria = 0;                                         // sábado y domingo
+  if (diaSemana >= 1 && diaSemana <= 4) cuotaOrdinaria = 8;         // lunes a jueves
+  else if (diaSemana === 5) cuotaOrdinaria = 7.5;                    // viernes
+  else if (diaSemana === 6) cuotaOrdinaria = semanaTieneFestivo(fechaStr) ? 0 : 5; // sábado
+  else cuotaOrdinaria = 0;                                           // domingo
 
   const finOrdinaria = inicio + cuotaOrdinaria;
 
@@ -705,9 +946,20 @@ function renderMateriales(b) {
 }
 
 function actualizarBotonGuardar() {
+  if (modo === "buscador" || modo === "semana" || guardando) return;
   let listo;
   if (modo === "personal") {
-    listo = maestroActual && bloques.some(b => b.codActividad && b.personas.length > 0);
+    // v5: el botón de abajo avanza de paso; solo en el paso 4 envía
+    const p = jornada.paso || 0, btn = document.getElementById("btnGuardar");
+    document.getElementById("barraGuardar").style.display = maestroActual && p > 0 ? "" : "none";
+    if (p > 0 && p < 4) {
+      btn.textContent = ["", "Siguiente: actividades", "Siguiente: mi jornada", "Siguiente: revisar"][p];
+      btn.disabled = !maestroActual;
+      return;
+    }
+    listo = maestroActual && (jornada.lineas.length > 0 || (jornada.sup && jornada.sup.activo && !supYaGuardada()) || Object.keys(jornada.novedades || {}).length > 0);
+    const n = listo ? construirFilasJornada().length : 0;
+    btn.textContent = n ? `Enviar el día · ${n} registros` : "Enviar el día";
   } else if (modo === "equipos") {
     listo = maestroActual && bloques.some(b => b.codActividad && b.equipos.length > 0);
   } else {
@@ -717,6 +969,7 @@ function actualizarBotonGuardar() {
 }
 
 async function guardarTodo() {
+  if (modo === "personal") { return (jornada.paso || 0) < 4 ? siguientePaso() : guardarJornada(); }
   const fecha = document.getElementById("fecha").value;
   const filas = [];
 
@@ -846,6 +1099,1794 @@ function mostrarToast(msg) {
   t.textContent = msg;
   t.style.display = "block";
   setTimeout(() => { t.style.display = "none"; }, 3500);
+}
+
+// =====================================================================
+// ============ JORNADA (Mano de Obra + Cantidades) — v2 ===============
+// =====================================================================
+// Un solo registro diario por maestro: cuadrilla -> actividades del día
+// (línea de tiempo) -> cantidades medidas. Las horas se clasifican a nivel
+// de DÍA por persona (la cuota ordinaria se consume en orden cronológico
+// sumando todas sus actividades), no actividad por actividad.
+
+const CATEGORIAS = {
+  A: { nombre: "Vaciado de concreto", unidad: "m³", medible: true },
+  B: { nombre: "Mamposteria (muro en bloque + dovelas)", unidad: "m²", medible: true },
+  C: { nombre: "Revoque", unidad: "m²", medible: true },
+  D: { nombre: "Pintura", unidad: "m²", medible: true },
+  E: { nombre: "Enchape / Revestimiento ceramico", unidad: "m²", medible: true },
+  F: { nombre: "Instalacion de piso (baldosa/granito/porcelanato)", unidad: "m²", medible: true },
+  G: { nombre: "Instalacion de cielo raso", unidad: "m²", medible: true },
+  H: { nombre: "Muro en drywall / Superboard", unidad: "m²", medible: true },
+  I: { nombre: "Demolicion (muros y pisos)", unidad: "m²", medible: true },
+  J: { nombre: "Excavacion", unidad: "m³", medible: true },
+  K: { nombre: "Retiro de escombros / Trasiego", unidad: "m³", medible: true },
+  L: { nombre: "Aseo y orden", unidad: "Glb", medible: false },
+  M: { nombre: "Apoyo y logistica (cargue, acarreo)", unidad: "Glb", medible: false },
+  N: { nombre: "Desmonte y retiro", unidad: "Glb", medible: false },
+  O: { nombre: "Instalaciones provisionales", unidad: "Glb", medible: false },
+  P: { nombre: "Otra (describir)", unidad: "Glb", medible: false },
+};
+// Código SINCO -> categoría medible (A-K), de categorias_sinco.csv validado por Control de Costos
+const CAT_SINCO = {"01.01.01.01":"H","01.01.02.06":"I","01.01.02.08":"I","01.01.02.09":"K","01.01.02.10":"K","01.02.01.01":"H","01.02.02.02":"D","01.02.02.03":"D","01.02.03.01":"G","01.02.03.02":"G","01.02.03.03":"G","01.02.03.06":"G","02.01.01.01":"H","02.01.02.01":"I","02.01.02.02":"I","02.01.02.03":"I","02.01.02.11":"I","02.01.02.16":"K","02.01.02.17":"K","02.02.01.01":"K","02.02.01.02":"J","02.02.01.03":"J","02.02.02.01":"A","02.02.02.02":"A","02.02.02.03":"A","02.03.01.01":"B","02.03.01.02":"B","02.03.01.03":"B","02.03.01.04":"B","02.03.02.01":"C","02.03.02.02":"C","02.03.02.03":"D","02.03.02.04":"D","02.05.01.01":"F","02.05.01.02":"F","02.05.01.04":"D","02.05.01.05":"G","02.05.01.06":"H","02.05.01.07":"I","02.05.01.09":"I","02.05.02.01":"F","02.05.02.02":"F","02.05.02.04":"D","02.05.02.05":"G","02.05.02.06":"H","02.05.02.07":"I","02.05.02.09":"I","02.05.03.01":"F","02.05.03.02":"F","02.05.03.04":"D","02.05.03.05":"G","02.05.03.06":"G","02.05.03.07":"H","02.05.03.10":"I","02.05.03.11":"I","02.05.04.01":"A","02.05.04.04":"D","02.05.04.05":"H","02.05.04.07":"D","02.08.01.01":"G","02.08.01.02":"F","02.08.01.03":"D","02.08.01.04":"F","02.09.01.01":"G","02.09.01.02":"F","02.09.01.03":"D","02.09.01.04":"F","02.11.01.01":"G","02.11.01.02":"F","02.11.01.03":"D","02.11.01.04":"F","02.12.01.01":"G","02.12.01.02":"F","02.12.01.03":"D","02.12.01.04":"F","03.01.01.01":"H","03.01.02.01":"I","03.01.02.04":"K","03.01.02.05":"K","03.03.01.01":"H","03.03.01.02":"H","03.03.02.01":"C","03.03.02.02":"D","03.03.03.01":"G","03.03.03.02":"G","03.03.03.03":"G","03.03.03.04":"G","03.03.04.01":"F","03.03.04.02":"F","03.03.04.03":"F","04.01.01.01":"H","04.01.02.01.01":"I","04.01.02.02.01":"A","04.01.02.02.04":"K","04.01.02.02.06":"I","04.01.02.02.07":"I","04.01.02.02.08":"I","04.01.02.03.06":"I","04.01.02.03.07":"I","04.01.02.03.09":"K","04.01.02.03.10":"K","04.02.01.01":"J","04.02.01.02":"K","04.02.01.03":"K","04.02.01.04":"A","04.02.01.05":"A","04.02.01.06":"J","04.02.01.07":"A","04.02.02.01":"A","04.02.02.02":"A","04.02.02.03":"A","04.02.02.04":"A","04.02.02.05":"A","04.02.02.06":"B","04.02.02.07":"A","04.02.02.08":"A","04.02.03.02":"A","04.02.03.03":"A","04.02.04.01":"G","04.03.01.01":"B","04.03.01.02":"B","04.03.01.03":"B","04.03.01.04":"B","04.03.02.01":"C","04.03.02.02":"C","04.03.02.03":"D","04.03.02.04":"D","04.03.03.01":"G","04.03.04.01":"F","04.03.04.02":"F","04.03.04.03":"F","04.03.04.04":"F","04.03.04.05":"F","04.03.04.06":"A","04.03.04.07":"F","04.03.05.07":"E","05.01.01.01":"H","05.01.02.01":"I","05.01.02.12":"I","05.01.02.15":"I","05.01.03.08":"I","05.01.03.12":"I","05.01.04.01.01":"I","05.01.04.01.02":"I","05.01.04.01.12":"I","05.01.04.01.15":"I","05.01.04.01.16":"I","05.01.04.02.01":"A","05.01.04.02.02":"I","05.01.04.02.03":"K","05.01.04.02.05":"K","05.01.05.09":"I","05.01.06.05":"I","05.01.06.07":"I","05.01.07.09":"I","05.01.08.02":"I","05.01.09.02":"I","05.01.09.03":"I","05.01.09.04":"I","05.01.10.03":"I","05.01.11.02":"I","05.01.12.02":"I","05.01.13.09":"I","05.01.13.10":"I","05.01.13.15":"K","05.01.13.16":"K","05.02.01.01":"A","05.02.01.02":"A","05.02.03.01":"E","05.03.01.01":"H","05.03.01.02":"H","05.03.02.01":"C","05.03.02.02":"C","05.03.02.03":"E","05.03.02.05":"D","05.03.02.06":"D","05.03.02.07":"D","05.03.02.08":"A","05.03.04.01":"G","05.03.04.02":"G","05.03.04.03":"G","05.03.04.04":"G","05.03.04.05":"G","05.03.04.06":"G","05.03.04.07":"G","05.03.05.01":"F","05.03.05.02":"F","05.03.05.03":"F","05.03.05.04":"F","05.03.05.05":"F","05.03.05.06":"F","05.03.05.07":"F","05.07.01.01":"F","05.07.01.05":"D","05.07.02.01":"F","05.07.02.05":"D","05.07.02.06":"D","05.07.03.01":"F","05.07.03.05":"D","05.07.04.02":"F","05.07.04.03":"F","05.07.04.05":"D","06.01.01.01":"H","06.01.02.03":"I","06.02.01.01":"K","06.02.01.02":"C","06.02.01.03":"J","06.02.01.04":"J","06.02.01.05":"J","06.02.01.06":"J","06.02.01.07":"J","06.02.02.01":"A","06.02.02.02":"A","06.02.02.03":"A","06.02.02.04":"A","06.02.02.05":"A","06.02.02.06":"A","06.02.02.08":"A","06.02.02.09":"A","06.02.02.10":"A","06.02.02.11":"A","06.02.03.01":"A","06.02.03.02":"A","06.02.03.03":"A","06.02.03.04":"A","06.02.03.05":"A","06.02.03.06":"B","06.02.03.07":"A","06.02.03.08":"A","06.02.03.09":"A","06.02.05.01":"G","06.02.05.02":"G","06.03.01.02":"B","06.03.01.03":"B","06.03.01.04":"B","06.03.01.05":"B","06.03.01.06":"B","06.03.01.07":"B","06.03.01.08":"H","06.03.01.09":"H","06.03.02.01":"C","06.03.02.02":"C","06.03.02.03":"E","06.03.02.05":"D","06.03.02.06":"D","06.03.02.07":"D","06.03.02.09":"E","06.03.02.10":"E","06.03.03.02":"A","06.03.04.01":"G","06.03.04.02":"G","06.03.04.03":"G","06.03.04.04":"G","06.03.04.05":"G","06.03.05.01":"F","06.03.05.02":"F","06.03.05.03":"F","06.03.05.04":"F","06.03.05.05":"F","06.04.01.05":"F","06.07.01.06.14":"A","06.09.01.05.09":"A","07.01.01.01":"H","07.01.02.08":"I","07.01.02.10":"I","07.01.02.13":"I","07.01.02.17":"I","07.01.03.08":"I","07.01.03.10":"I","07.01.03.13":"I","07.01.03.17":"I","07.01.04.08":"I","07.01.04.10":"I","07.01.04.13":"I","07.01.05.08":"I","07.01.05.12":"I","07.01.05.13":"I","07.01.06.08":"I","07.01.06.12":"I","07.01.06.13":"I","07.01.07.09":"I","07.01.07.10":"I","07.01.07.15":"I","07.01.07.17":"K","07.01.07.18":"K","07.02.01.01":"J","07.02.01.02":"J","07.02.01.03":"J","07.02.01.04":"K","07.02.01.05":"K","07.02.02.01":"A","07.02.02.02":"A","07.03.01.01":"B","07.03.01.02":"B","07.03.01.03":"B","07.03.01.04":"B","07.03.01.05":"B","07.03.02.01":"C","07.03.02.02":"C","07.03.02.03":"E","07.03.02.06":"D","07.03.02.07":"D","07.03.04.01":"G","07.03.04.02":"G","07.03.04.03":"G","07.03.04.04":"G","07.03.04.05":"G","07.03.04.06":"G","07.03.05.01":"F","07.03.05.02":"F","07.03.05.03":"F","07.03.05.04":"F","07.03.05.05":"F","08.01.01.02":"I","08.02.01.01":"J","08.02.03.02":"J","08.02.03.03":"J","08.02.03.04":"J","08.02.03.05":"J","08.02.03.06":"J","08.02.03.07":"J","08.03.01.19":"A","08.04.02.03.06":"A","09.01.01.01":"H","09.01.02.13":"K","09.01.02.14":"K","09.02.01.01":"A","09.02.01.02":"A","09.02.02.02":"A","09.02.02.04":"D","09.02.03.01":"G","09.03.02.01":"C","09.03.02.02":"C","09.03.02.03":"D","09.03.02.05":"D","09.03.03.03":"G","09.03.03.05":"G","09.03.04.01":"F","11.02.01.01":"D","11.02.03.01":"G","11.02.03.02":"I","12.01.01.02":"I","12.02.01.01":"J","12.02.03.01":"J","12.02.03.02":"J","12.02.03.03":"J","12.02.03.04":"J","12.02.03.05":"J","12.03.01.18":"D","12.04.02.01.04":"A","13.01.01.01":"H","13.01.02.01":"I","13.01.02.03":"K","13.01.02.04":"K","13.03.01.01":"H","13.03.01.02":"H","13.03.02.01":"D","13.03.02.02":"D","13.03.03.01":"G","13.03.03.02":"G","13.03.03.03":"G"};
+
+let jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {} };
+let contLinea = 0;
+let lineaEnPicker = null; // id de la línea cuyo selector de actividad está abierto
+
+const normTxt = s => (s || "").toString().normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+const esc = s => (s || "").toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+const claveLS = sufijo => `jmc_${sufijo}_${maestroActual ? maestroActual.nombre : "x"}`;
+function lsGet(k, def) { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch (e) { return def; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+function iniciarJornada() {
+  jornada = { frenteDia: "", cuadrilla: [], lineas: [], cantidades: {}, novedades: {}, novEditando: null, just: {}, cierre: null,
+    sup: { activo: lsGet(claveLS("supActivo"), true), ini: "07:00", fin: "", nocturno: false, motivo: "", auto: true,
+           frentes: [], frentesAuto: true } };
+  contLinea = 0;
+  const propios = frentesDelMaestro();
+  const guardados = lsGet(claveLS("frentes"), null);
+  jornada.frentesDia = Array.isArray(guardados) && guardados.length ? guardados
+    : [lsGet(claveLS("frente"), "") || (propios[0] ? propios[0].cod : "")].filter(Boolean);
+  jornada.frenteDia = jornada.frentesDia[0] || "";
+  // v5: arranca en el inicio y con la cuadrilla de la última vez ya cargada (se desmarca a quien no vino)
+  jornada.paso = 0;
+  const yo = maestroActual ? maestroActual.nombre : "";
+  jornada.cuadrilla = lsGet(claveLS("cuadrilla"), []).filter(p => p && p.nombre && !(p.nombre === yo && jornada.sup.activo));
+  renderJornada();
+}
+
+// v5: la jornada se muestra en un inicio (qué falta) y 4 pasos: 1 cuadrilla, 2 actividades, 3 mi jornada, 4 revisar y enviar
+function renderJornada() {
+  const z = document.getElementById("zonaJornada");
+  const card = document.getElementById("cardQuien");
+  if (modo === "semana") { renderSemana(); return; }
+  if (!maestroActual) {
+    card.style.display = "";
+    z.innerHTML = `<div class="vacio">Selecciona tu nombre para empezar</div>`; actualizarBotonGuardar(); return;
+  }
+  const p = jornada.paso || 0;
+  card.style.display = p === 0 ? "" : "none";
+  if (p === 0) z.innerHTML = renderInicio();
+  else z.innerHTML = encabezadoPaso(p) + [renderPaso1, renderPaso2, renderSupervision, renderPaso4][p - 1]();
+  actualizarBotonGuardar();
+}
+
+function encabezadoPaso(p) {
+  const titulos = ["", "¿Quién trabajó?", "¿Qué hicieron?", "Tu jornada", "Revisa y envía"];
+  return `<div class="paso-top">
+      <button aria-label="Volver" onclick="irPaso(${p - 1})">‹</button>
+      <div><b>${titulos[p]}</b><span>${esc(fechaLarga(fechaActual()))} · paso ${p} de 4</span></div>
+    </div>
+    <div class="barra-pasos">${[1, 2, 3, 4].map(i => `<i class="${i <= p ? "on" : ""}"></i>`).join("")}</div>`;
+}
+function fechaLarga(d) {
+  if (!d) return "";
+  const dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  const meses = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  const x = new Date(d + "T12:00:00");
+  return `${dias[x.getDay()]} ${x.getDate()} ${meses[x.getMonth()]}`;
+}
+function irPaso(p) {
+  jornada.paso = Math.max(0, Math.min(4, p));
+  lineaEnPicker = null;
+  renderJornada();
+  window.scrollTo({ top: 0 });
+}
+function siguientePaso() {
+  const p = jornada.paso || 0;
+  if (p === 1) {
+    if (!jornada.cuadrilla.length && !(jornada.sup && jornada.sup.activo)) { mostrarToast("Agrega al menos una persona o marca tu supervisión"); return; }
+    const trabajan = jornada.cuadrilla.filter(x => !sinTrabajo(x.nombre));
+    return irPaso(trabajan.length ? 2 : 3);
+  }
+  if (p === 2) {
+    const prob = [];
+    jornada.lineas.forEach((l, i) => {
+      if (!l.horaIni || !l.horaFin) prob.push(`Actividad ${i + 1}: falta la hora de inicio o de fin`);
+      if (!(l.codAct || l.np)) prob.push(`Actividad ${i + 1}: falta elegir la actividad`);
+      if (!l.personas.length) prob.push(`Actividad ${i + 1}: no tiene personas`);
+      if (finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno) prob.push(`Actividad ${i + 1}: la hora de fin es antes que la de inicio`);
+    });
+    if (prob.length) { mostrarToast(prob[0]); return; }
+    return irPaso(3);
+  }
+  if (p === 3) {
+    const prob = problemasSupervision();
+    if (prob.length) { mostrarToast(prob[0]); return; }
+    return irPaso(4);
+  }
+}
+
+// ---------- Paso 1: frentes y cuadrilla (quién trabajó y novedades) ----------
+function renderPaso1() {
+  const presentes = jornada.cuadrilla.filter(p => !sinTrabajo(p.nombre)).length;
+  const previa = lsGet(claveLS("cuadrilla"), []);
+  return `
+    ${jornada.desdeAnterior ? `<div class="card card-pend ok">Copiado del ${esc(fechaLarga(jornada.desdeAnterior))}. Desmarca a quien no vino y revisa.
+      <button class="btn btn-primario" style="margin-top:10px" onclick="irPaso(4)">Todo igual: revisar y enviar</button></div>` : ""}
+    <div class="card">
+      <h2>Frentes de hoy <span class="contador">${jornada.frentesDia.length}</span></h2>
+      <div class="chips">${chipsFrentes(jornada.frentesDia, "toggleFrenteDia")}</div>
+      <select class="agregar-frente" onchange="if(this.value){toggleFrenteDia(this.value)}">
+        <option value="">+ Agregar otro frente</option>
+        ${CATALOGO.frentes.filter(f => !opcionesFrentes(jornada.frentesDia).includes(f.cod)).map(f => `<option value="${f.cod}">${esc(f.nombre)}</option>`).join("")}
+      </select>
+    </div>
+    <div class="card">
+      <h2>Tu cuadrilla <span class="contador">${presentes} de ${jornada.cuadrilla.length}</span></h2>
+      ${jornada.cuadrilla.map(filaCuadrilla).join("") || `<div class="vacio">Nadie todavía</div>`}
+      ${previa.length && !jornada.cuadrilla.length ? `<button class="btn btn-suave" onclick="usarCuadrillaPrevia()">Usar la cuadrilla de la última vez (${previa.length})</button>` : ""}
+      <div class="buscador-personal">
+        <input type="text" id="buscaCuadrilla" placeholder="+ Agregar persona (escribe 2 letras)"
+               oninput="buscarParaCuadrilla(this.value)" autocomplete="off">
+        <div class="resultados" id="resCuadrilla" style="display:none"></div>
+      </div>
+      <button class="campo-libre" onclick="agregarLibreCuadrilla()">¿No aparece? Agregar nombre manualmente</button>
+      <p class="nota">Desmarca a quien no trabajó y escoge el motivo. Si estuvo en examen, curso o permiso parte del día, toca <b>Novedad</b>.</p>
+    </div>`;
+}
+function filaCuadrilla(p) {
+  const nov = jornada.novedades[p.nombre];
+  const trabaja = !sinTrabajo(p.nombre);
+  return `<div class="fila-p ${trabaja ? "" : "con-nov"}">
+      <label><input type="checkbox" ${trabaja ? "checked" : ""} onchange='togglePresente(${JSON.stringify(p.nombre)}, this.checked)'>
+        <span><b>${esc(nombreCorto(p.nombre))}</b><small>${nov ? `<span class="tag-nov">${esc(textoNov(nov))}</span>` : esc(p.cargo || "")}${badgeYa(p.nombre)}</small></span></label>
+      <button class="btn-nov" onclick='editarNovedad(${JSON.stringify(p.nombre)})'>Novedad</button>
+      <button class="btn-x" aria-label="Quitar de la cuadrilla" onclick='quitarDeCuadrilla(${JSON.stringify(p.nombre)})'>✕</button>
+    </div>
+    ${jornada.novEditando === p.nombre ? renderNovedadEditor() : ""}`;
+}
+function togglePresente(nombre, on) {
+  if (on) { const x = jornada.novedades[nombre]; if (x && x.dia) delete jornada.novedades[nombre]; jornada.novEditando = null; }
+  else {
+    jornada.novedades[nombre] = { tipo: "NOVINO", dia: true, ini: "07:00", fin: finCuota(), desc: "", sub: "", soporte: false };
+    jornada.lineas.forEach(l => { l.personas = l.personas.filter(x => x !== nombre); });
+    jornada.novEditando = nombre;
+  }
+  renderJornada();
+}
+
+// ---------- Paso 2: actividades ----------
+function renderPaso2() {
+  return `<div class="card">
+      ${avisoHorarioFuturo()}
+      <div id="lineas">${jornada.lineas.map(renderLinea).join("") || `<div class="vacio">Agrega la primera actividad</div>`}</div>
+      ${renderSinActividad()}
+      <button class="btn btn-agregar-bloque" onclick="agregarLinea()">
+        + ${jornada.lineas.length ? "Otra actividad" : "Agregar actividad"}${ultimaHoraFin() ? " desde " + horaBonita(ultimaHoraFin()) : ""}
+      </button>
+    </div>`;
+}
+function renderSinActividad() {
+  if (!jornada.lineas.length) return "";
+  const usados = new Set(jornada.lineas.flatMap(l => l.personas));
+  const sin = jornada.cuadrilla.filter(p => !sinTrabajo(p.nombre) && !usados.has(p.nombre));
+  return sin.length ? `<p class="nota" style="color:#7A5E00;font-weight:600">${sin.length} sin ninguna actividad: ${sin.map(p => esc(nombreCorto(p.nombre))).join(", ")}</p>` : "";
+}
+
+// ---------- Paso 4: revisar y enviar ----------
+function renderPaso4() {
+  const prob = problemasJornada();
+  return `
+    ${cierreBloqueaFecha() ? renderCierreSemanal() : ""}
+    ${prob.length ? `<div class="problemas"><b>Antes de enviar, corrige:</b><ul>${prob.slice(0, 6).map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>` : ""}
+    ${(() => { // aviso: quien está marcado como presente pero no quedó en ninguna actividad ni tiene novedad
+      const usados = new Set(jornada.lineas.flatMap(l => l.personas));
+      const sin = jornada.cuadrilla.filter(p => !sinTrabajo(p.nombre) && !usados.has(p.nombre) && !intervaloNov(jornada.novedades[p.nombre]));
+      return sin.length ? `<div class="sup-aviso" style="margin-bottom:14px"><b>${sin.map(p => esc(nombreCorto(p.nombre))).join(", ")}</b> no ${sin.length > 1 ? "quedaron" : "quedó"} en ninguna actividad. Si no trabajó, márcale la novedad en el paso 1; si trabajó, agrégalo en el paso 2.
+        <button class="btn btn-suave" onclick="irPaso(1)">Ir al paso 1</button></div>` : "";
+    })()}
+    ${renderRevisar()}
+    ${renderCantidades()}
+    <p class="nota" style="text-align:center">Si no hay señal, el envío queda guardado en el celular y sale solo cuando vuelva.</p>`;
+}
+
+function nombreCorto(n) { const p = n.split(" ").filter(Boolean); return p.length > 2 ? `${p[0]} ${p[p.length >= 4 ? 2 : 1]}` : n; }
+
+// ---------- Cuadrilla ----------
+function buscarParaCuadrilla(txt) {
+  const cont = document.getElementById("resCuadrilla");
+  if (!txt || txt.length < 2) { cont.style.display = "none"; return; }
+  const t = normTxt(txt);
+  const ya = new Set(jornada.cuadrilla.map(p => p.nombre));
+  const enc = CATALOGO.personal.filter(p => normTxt(p.nombre).includes(t) && !ya.has(p.nombre)).slice(0, 8);
+  if (!enc.length) { cont.style.display = "none"; return; }
+  cont.innerHTML = enc.map(p => `<div onclick='agregarACuadrilla(${JSON.stringify(p.nombre)}, ${JSON.stringify(p.cargo)})'>${esc(p.nombre)} <span style="color:#999">(${esc(p.cargo)})</span></div>`).join("");
+  cont.style.display = "block";
+}
+function agregarACuadrilla(nombre, cargo) {
+  if (jornada.cuadrilla.some(p => p.nombre === nombre)) return;
+  if (maestroActual && nombre === maestroActual.nombre && jornada.sup && jornada.sup.activo) {
+    mostrarToast("Tu jornada se registra en el paso 5 (supervisión). Si hoy trabajaste con la cuadrilla, primero desmarca la supervisión.");
+    return;
+  }
+  jornada.cuadrilla.push({ nombre, cargo });
+  jornada.lineas.forEach(l => { if (l.todos) l.personas.push(nombre); });
+  renderJornada();
+  setTimeout(() => { const i = document.getElementById("buscaCuadrilla"); if (i) i.focus(); }, 0);
+}
+function agregarLibreCuadrilla() {
+  const nombre = prompt("Escribe el nombre completo de la persona:");
+  if (nombre && nombre.trim()) agregarACuadrilla(nombre.trim().toUpperCase(), "Sin confirmar");
+}
+function quitarDeCuadrilla(nombre) {
+  jornada.cuadrilla = jornada.cuadrilla.filter(p => p.nombre !== nombre);
+  jornada.lineas.forEach(l => { l.personas = l.personas.filter(n => n !== nombre); });
+  renderJornada();
+}
+function usarCuadrillaPrevia() {
+  const previa = lsGet(claveLS("cuadrilla"), []);
+  previa.forEach(p => { if (!jornada.cuadrilla.some(x => x.nombre === p.nombre)) jornada.cuadrilla.push(p); });
+  renderJornada();
+}
+
+// ---------- Líneas de actividad ----------
+function ultimaHoraFin() {
+  const conFin = jornada.lineas.filter(l => l.horaFin);
+  return conFin.length ? conFin[conFin.length - 1].horaFin : "";
+}
+function agregarLinea() {
+  contLinea++;
+  const ini = ultimaHoraFin() || "07:00";
+  jornada.lineas.push({
+    id: contLinea, horaIni: ini, horaFin: "", codFrente: (jornada.lineas.length ? jornada.lineas[jornada.lineas.length - 1].codFrente : jornada.frenteDia),
+    codAct: "", np: null, // np = { cat, desc } si es no presupuestada
+    personas: jornada.cuadrilla.map(p => p.nombre).filter(n => !sinTrabajo(n)), todos: true,
+    loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+  });
+  lineaEnPicker = contLinea;
+  renderJornada();
+}
+function quitarLinea(id) { jornada.lineas = jornada.lineas.filter(l => l.id !== id); if (lineaEnPicker === id) lineaEnPicker = null; renderJornada(); }
+function setLinea(id, campo, valor) {
+  const l = jornada.lineas.find(x => x.id === id); l[campo] = valor;
+  if (campo === "horaIni" || campo === "horaFin" || campo === "codFrente") renderJornada();
+}
+function togglePersonaLinea(id, nombre) {
+  if (sinTrabajo(nombre)) { mostrarToast("Esta persona tiene una novedad hoy (no trabajó). Quítale la novedad si sí trabajó."); return; }
+  const l = jornada.lineas.find(x => x.id === id);
+  l.personas = l.personas.includes(nombre) ? l.personas.filter(n => n !== nombre) : [...l.personas, nombre];
+  l.todos = l.personas.length === jornada.cuadrilla.length;
+  renderJornada();
+}
+function catDeLinea(l) { return l.np ? l.np.cat : (CAT_SINCO[l.codAct] || null); }
+function textoActividad(l) {
+  if (l.np) return { titulo: l.np.desc || "(sin descripción)", sub: `No presupuestada · ${l.np.cat} ${CATEGORIAS[l.np.cat].nombre}`, np: true };
+  const a = CATALOGO.actividades.find(x => x.cod === l.codAct);
+  if (!a) return null;
+  const c = CAT_SINCO[a.cod];
+  return { titulo: a.desc.split("(")[0].trim().slice(0, 90), sub: `${a.cod}${c ? " · categoría " + c : ""}`, np: false };
+}
+
+function renderLinea(l) {
+  const act = textoActividad(l);
+  const horasTxt = duracionTxt(l.horaIni, l.horaFin);
+  const frenteNom = (CATALOGO.frentes.find(f => f.cod === l.codFrente) || {}).nombre || "";
+  const otroFrente = jornada.frentesDia.length > 1 || l.codFrente !== jornada.frenteDia;
+  return `
+  <div class="linea ${act ? "" : "incompleta"}">
+    <div class="linea-top">
+      <b style="flex:1;color:var(--verde-oscuro);font-size:13.5px">Actividad ${jornada.lineas.indexOf(l) + 1}</b>
+      <span class="dur ${finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno ? "mal" : ""}">${l.horaIni && l.horaFin ? `${horaBonita(l.horaIni)} a ${horaBonita(l.horaFin)} · ${horasTxt}` : ""}</span>
+      <button class="btn-x" onclick="quitarLinea(${l.id})" aria-label="Quitar actividad">✕</button>
+    </div>
+    <label>Desde</label>
+    ${chipsHora(l.horaIni, [...(jornada.lineas.indexOf(l) > 0 && jornada.lineas[jornada.lineas.indexOf(l) - 1].horaFin ? [jornada.lineas[jornada.lineas.indexOf(l) - 1].horaFin] : []), ...HORAS_INI],
+      v => `setLinea(${l.id}, 'horaIni', ${v})`, "Hora de inicio")}
+    <label>Hasta</label>
+    ${chipsHora(l.horaFin, HORAS_FIN, v => `setLinea(${l.id}, 'horaFin', ${v})`, "Hora de fin")}
+    ${finAntesDeInicio(l.horaIni, l.horaFin) ? `
+      <div class="alerta-hora">${l.nocturno ? "Turno de noche: termina al día siguiente." :
+        `La hora de fin (<b>${l.horaFin}</b>) quedó antes que la de inicio. Si terminaron en la tarde, cámbiala a <b>${horaTarde(l.horaFin)}</b> (PM).`}
+        <label><input type="checkbox" ${l.nocturno ? "checked" : ""} onchange="setLinea(${l.id}, 'nocturno', this.checked); renderJornada()"> 🌙 Fue turno de noche</label>
+      </div>` : ""}
+    ${act ? `
+      <div class="act-elegida" onclick="abrirPicker(${l.id})">
+        <div class="act-titulo">${esc(act.titulo)} ${act.np ? `<span class="tag-np">no presupuestada</span>` : ""}</div>
+        <div class="act-sub">${esc(act.sub)}${otroFrente ? " · frente " + l.codFrente : ""} · <u>cambiar</u></div>
+      </div>` : ""}
+    ${lineaEnPicker === l.id || !act ? renderPicker(l) : ""}
+    <div class="chips chips-linea">
+      ${jornada.cuadrilla.filter(p => !sinTrabajo(p.nombre)).map(p => `<button class="chip ${l.personas.includes(p.nombre) ? "on" : "off"}" onclick='togglePersonaLinea(${l.id}, ${JSON.stringify(p.nombre)})'>${esc(nombreCorto(p.nombre))}</button>`).join("")}
+    </div>
+  </div>`;
+}
+
+function abrirPicker(id) { lineaEnPicker = id; renderJornada(); }
+
+// v3d: una actividad aparece en un frente si su código empieza por el frente o si es una adicional asignada a él ("*" = todos)
+function actEnFrente(a, codFrente) {
+  return !!a && (a.cod.startsWith(codFrente + ".") || (Array.isArray(a.frentes) && (a.frentes.includes("*") || a.frentes.includes(codFrente))));
+}
+function recientes(codFrente) {
+  return lsGet(claveLS("recientes"), []).filter(c => actEnFrente(CATALOGO.actividades.find(x => x.cod === c), codFrente)).slice(0, 6);
+}
+function renderPicker(l) {
+  const rec = recientes(l.codFrente);
+  return `
+  <div class="picker">
+    <div class="fila">
+      <div><label>Frente</label>
+        <select onchange="setLinea(${l.id}, 'codFrente', this.value)">${frenteOpciones({ codFrente: l.codFrente })}</select></div>
+    </div>
+    ${rec.length ? `<label>Recientes</label><div class="chips">${rec.map(c => {
+      const a = CATALOGO.actividades.find(x => x.cod === c);
+      return a ? `<button class="chip rec" onclick="elegirActividad(${l.id}, '${c}')">${esc(a.desc.split("(")[0].trim().slice(0, 42))}</button>` : "";
+    }).join("")}</div>` : ""}
+    <label>Buscar actividad del presupuesto</label>
+    <input type="text" placeholder="Ej. demolicion muro, pintura, escombros" oninput="buscarActividad(${l.id}, this.value)" autocomplete="off">
+    <div class="lista-act" id="resAct-${l.id}"></div>
+    ${renderSugerenciasNP(l)}
+    <details class="np" ${l.np || l.npPend ? "open" : ""}>
+      <summary>No está en el presupuesto</summary>
+      <label>Categoría</label>
+      <select id="npCat-${l.id}">
+        <option value="">— Elige la categoría —</option>
+        <optgroup label="Medibles">${Object.entries(CATEGORIAS).filter(([, c]) => c.medible).map(([k, c]) => `<option value="${k}" ${(l.np || l.npPend) && (l.np || l.npPend).cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
+        <optgroup label="No medibles">${Object.entries(CATEGORIAS).filter(([, c]) => !c.medible).map(([k, c]) => `<option value="${k}" ${(l.np || l.npPend) && (l.np || l.npPend).cat === k ? "selected" : ""}>${k} · ${c.nombre}</option>`).join("")}</optgroup>
+      </select>
+      <label>Descripción corta</label>
+      <input type="text" id="npDesc-${l.id}" maxlength="120" placeholder="Ej. Resane de muros zona bandas" value="${(l.np || l.npPend) ? esc((l.np || l.npPend).desc) : ""}">
+      <button class="btn btn-suave" onclick="elegirNoPresupuestada(${l.id})">Usar esta actividad</button>
+    </details>
+  </div>`;
+}
+function buscarActividad(id, txt) {
+  const l = jornada.lineas.find(x => x.id === id);
+  const cont = document.getElementById(`resAct-${id}`);
+  const palabras = normTxt(txt).split(/\s+/).filter(w => w.length >= 3);
+  if (!palabras.length) { cont.innerHTML = ""; return; }
+  // v5: entiende palabras de obra (SINONIMOS) y pone primero lo que la cuadrilla usa
+  const coincide = a => coincideBusqueda(a, palabras);
+  const enc = ordenarResultados(CATALOGO.actividades.filter(a => actEnFrente(a, l.codFrente) && coincide(a)), palabras).slice(0, 12);
+  const otros = enc.length >= 8 ? [] : ordenarResultados(CATALOGO.actividades.filter(a => !actEnFrente(a, l.codFrente) && coincide(a)), palabras).slice(0, 8);
+  cont.innerHTML = (enc.length ? enc.map(a => `
+    <div onclick="elegirActividad(${id}, '${a.cod}')">
+      <b>${esc(a.desc.split("(")[0].trim().slice(0, 80))}</b>
+      <span>${a.cod} · ${a.unidad}${CAT_SINCO[a.cod] ? " · categoría " + CAT_SINCO[a.cod] : ""}${a.frentes ? " · adicional" : ""}</span>
+    </div>`).join("") : `<p class="nota">Sin resultados en el frente ${l.codFrente}.</p>`)
+    + (otros.length ? `<p class="nota">${enc.length ? "" : `<b>En el frente ${esc(nombreFrenteCorto(l.codFrente))} no está presupuestada.</b> `}En otros frentes (si la eliges, la actividad queda en ese frente):</p>` + otros.map(a => `
+    <div class="otro-frente" onclick="elegirActividadOtroFrente(${id}, '${a.cod}')">
+      <b>${esc(a.desc.split("(")[0].trim().slice(0, 80))}</b>
+      <span>Frente ${esc(nombreFrenteCorto(frenteDeCod(a.cod)))} · ${a.cod} · ${a.unidad}</span>
+    </div>`).join("") : (!enc.length ? `<p class="nota">Prueba otra palabra o usa "No está en el presupuesto".</p>` : ""));
+}
+function elegirActividad(id, cod) {
+  const l = jornada.lineas.find(x => x.id === id);
+  l.codAct = cod; l.np = null; l.npSug = null; l.npPend = null; lineaEnPicker = null;
+  const rec = lsGet(claveLS("recientes"), []).filter(c => c !== cod);
+  lsSet(claveLS("recientes"), [cod, ...rec].slice(0, 30));
+  renderJornada();
+}
+function elegirNoPresupuestada(id) {
+  const cat = document.getElementById(`npCat-${id}`).value;
+  const desc = document.getElementById(`npDesc-${id}`).value.trim();
+  if (!cat) { mostrarToast("Elige la categoría"); return; }
+  if (desc.length < 4) { mostrarToast("Escribe una descripción corta de la actividad"); return; }
+  if (/supervis/.test(normTxt(desc))) { mostrarToast("La supervisión no es una actividad de la cuadrilla: tu jornada se registra en el paso 5."); return; }
+  const l = jornada.lineas.find(x => x.id === id);
+  if (l.npVisto !== desc) {
+    l.npVisto = desc;
+    const sug = sugerenciasNP(desc, l.codFrente);
+    if (sug.length) { l.npSug = sug; l.npPend = { cat, desc }; renderJornada(); return; }
+  }
+  l.np = { cat, desc }; l.codAct = ""; l.npSug = null; l.npPend = null; lineaEnPicker = null;
+  renderJornada();
+}
+
+// ---------- Cantidades ----------
+function categoriasMediblesHoy() {
+  const set = new Map(); // clave frente|cat
+  jornada.lineas.forEach(l => {
+    const c = catDeLinea(l);
+    if (c && CATEGORIAS[c] && CATEGORIAS[c].medible) set.set(`${l.codFrente}|${c}`, { frente: l.codFrente, cat: c });
+  });
+  return [...set.values()];
+}
+function renderCantidades() {
+  const cats = categoriasMediblesHoy();
+  if (!cats.length) return "";
+  const oficiales = CATALOGO.personal.filter(p => normTxt(p.cargo).includes("oficial")).map(p => p.nombre).sort();
+  return `
+  <div class="card">
+    <h2>6. Cantidades del día <span class="nota-h">según el formato del oficial</span></h2>
+    ${cats.map(({ frente, cat }) => {
+      const k = `${frente}|${cat}`; const v = jornada.cantidades[k] || {};
+      return `
+      <div class="cant-fila">
+        <div class="cant-nombre">${cat} · ${esc(CATEGORIAS[cat].nombre)}${frente !== jornada.frenteDia ? ` <span class="act-sub">(frente ${frente})</span>` : ""}</div>
+        <div class="cant-inputs">
+          <input type="text" inputmode="decimal" placeholder="0" value="${esc(v.cantidad ?? "")}"
+                 onchange="setCantidad('${k}', 'cantidad', this.value)">
+          <span class="unidad">${CATEGORIAS[cat].unidad}</span>
+          <select onchange="setCantidad('${k}', 'oficial', this.value)" aria-label="Oficial que midió">
+            <option value="">¿Quién midió?</option>
+            ${oficiales.map(o => `<option ${v.oficial === o ? "selected" : ""}>${esc(o)}</option>`).join("")}
+          </select>
+        </div>
+      </div>`;
+    }).join("")}
+    <p class="nota">Solo lo terminado hoy, en área neta. Deja vacío lo que no se midió.</p>
+  </div>`;
+}
+function setCantidad(k, campo, valor) { jornada.cantidades[k] = { ...(jornada.cantidades[k] || {}), [campo]: valor }; }
+
+// ---------- Cálculo de horas a nivel de DÍA ----------
+function aHoras(str) { if (!str) return null; const [h, m] = str.split(":").map(Number); return h + (m || 0) / 60; }
+function duracionTxt(ini, fin) {
+  const a = aHoras(ini), b0 = aHoras(fin); if (a === null || b0 === null) return "";
+  let b = b0; if (b <= a) b += 24; const d = Math.round((b - a) * 100) / 100; return `${d} h`;
+}
+function cuotaOrdinariaDia(fechaStr) {
+  const d = new Date(fechaStr + "T00:00:00").getDay();
+  if (d >= 1 && d <= 4) return 8;
+  if (d === 5) return 7.5;
+  if (d === 6) return semanaTieneFestivo(fechaStr) ? 0 : 5;
+  return 0;
+}
+// intervalos: [{ini, fin, ref}] -> [{ref, tipoHora, horas}]
+function clasificarDia(fechaStr, intervalos, ordYaUsadas) {
+  const dom = new Date(fechaStr + "T00:00:00").getDay() === 0 || esFestivoColombia(fechaStr);
+  let restante = Math.max(0, cuotaOrdinariaDia(fechaStr) - (ordYaUsadas || 0));
+  const salida = [];
+  const orden = intervalos.map(iv => {
+    const a = aHoras(iv.ini); let b = aHoras(iv.fin); if (b <= a) b += 24;
+    return { ...iv, a, b };
+  }).sort((x, y) => x.a - y.a);
+  orden.forEach(iv => {
+    const puntos = new Set([iv.a, iv.b]);
+    if (restante > 0 && iv.a + restante < iv.b) puntos.add(iv.a + restante);
+    for (let k = -1; k <= 2; k++) { [k * 24 + 19, k * 24 + 6].forEach(t => { if (t > iv.a && t < iv.b) puntos.add(t); }); }
+    const cortes = [...puntos].sort((x, y) => x - y);
+    const tot = {};
+    for (let i = 0; i < cortes.length - 1; i++) {
+      const dur = cortes[i + 1] - cortes[i]; if (dur <= 1e-9) continue;
+      const esOrd = restante > 1e-9;
+      const tipo = nombreTipoHora(esOrd, esHoraNocturna((cortes[i] + cortes[i + 1]) / 2), dom);
+      tot[tipo] = (tot[tipo] || 0) + dur;
+      if (esOrd) restante = Math.max(0, restante - dur);
+    }
+    Object.entries(tot).forEach(([tipoHora, h]) => { if (h > 0.001) salida.push({ ref: iv.ref, tipoHora, horas: Math.round(h * 100) / 100 }); });
+  });
+  return salida;
+}
+function traslapes(intervalos) {
+  const o = intervalos.map(iv => { const a = aHoras(iv.ini); let b = aHoras(iv.fin); if (b <= a) b += 24; return [a, b]; }).sort((x, y) => x[0] - y[0]);
+  for (let i = 1; i < o.length; i++) if (o[i][0] < o[i - 1][1] - 1e-9) return true;
+  return false;
+}
+function porPersona() {
+  const mapa = {};
+  jornada.lineas.forEach(l => {
+    if (!l.horaIni || !l.horaFin || !(l.codAct || l.np)) return;
+    l.personas.filter(n => !sinTrabajo(n)).forEach(n => { (mapa[n] = mapa[n] || []).push({ ini: l.horaIni, fin: l.horaFin, ref: l.id }); });
+  });
+  Object.entries(jornada.novedades || {}).forEach(([n, x]) => {
+    const iv = intervaloNov(x);
+    if (iv) (mapa[n] = mapa[n] || []).push({ ...iv, ref: "NOV" });
+  });
+  return mapa;
+}
+function renderResumenDia() {
+  const fecha = document.getElementById("fecha").value;
+  const mapa = porPersona(); const nombres = Object.keys(mapa);
+  if (!nombres.length && !(jornada.sup && jornada.sup.activo && jornada.sup.ini && jornada.sup.fin && !supYaGuardada())) return "";
+  const s = jornada.sup;
+  const filaSup = (s.activo && s.ini && s.fin && !(finAntesDeInicio(s.ini, s.fin) && !s.nocturno)) ? (() => {
+    const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }], ordYa(maestroActual.nombre, fecha));
+    const total = seg.reduce((a, x) => a + x.horas, 0), extra = seg.filter(x => x.tipoHora.includes("Extra")).reduce((a, x) => a + x.horas, 0);
+    const yaS = horasYa(maestroActual.nombre, fecha);
+    return `<tr><td>${esc(nombreCorto(maestroActual.nombre))} <span class="nota-h">(supervisión)</span></td><td>${Math.round(total * 100) / 100} h${yaS ? ` <span class="nota-h">+ ${r2(yaS)} ya</span>` : ""}</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
+  })() : "";
+  const filas = filaSup + nombres.map(n => {
+    if (traslapes(mapa[n])) return `<tr class="error"><td>${esc(nombreCorto(n))}</td><td colspan="2">Horarios cruzados: revisa sus actividades</td></tr>`;
+    const cr = cruceVivo(n);
+    if (cr) return `<tr class="error"><td>${esc(nombreCorto(n))}</td><td colspan="2">${esc(cr.charAt(0).toUpperCase() + cr.slice(1))}</td></tr>`;
+    const seg = clasificarDia(fecha, mapa[n], ordYa(n, fecha));
+    const total = seg.reduce((s, x) => s + x.horas, 0);
+    const extra = seg.filter(x => x.tipoHora.includes("Extra")).reduce((s, x) => s + x.horas, 0);
+    const ya = horasYa(n, fecha);
+    return `<tr><td>${esc(nombreCorto(n))}</td><td>${Math.round(total * 100) / 100} h${ya ? ` <span class="nota-h">+ ${r2(ya)} ya</span>` : ""}</td><td>${extra > 0 ? `<span class="extra">${Math.round(extra * 100) / 100} h extra</span>` : "—"}</td></tr>`;
+  }).join("");
+  return `
+  <div class="card">
+    <h2>Resumen del día por persona</h2>
+    <table class="resumen"><tr><th>Persona</th><th>Total</th><th>Extra</th></tr>${filas}</table>
+    ${renderJustificaciones()}
+    <p class="nota">Las horas extra se calculan con toda la jornada de la persona (Ley 2101), sumando lo que ya estaba registrado ese día ("ya").</p>
+  </div>`;
+}
+
+
+// ---------- v3: control de horas (AM/PM) ----------
+function finAntesDeInicio(ini, fin) { const a = aHoras(ini), b = aHoras(fin); return a !== null && b !== null && b <= a; }
+function duracionH(ini, fin) { const a = aHoras(ini), b0 = aHoras(fin); if (a === null || b0 === null) return 0; let b = b0; if (b <= a) b += 24; return b - a; }
+function horaTarde(hhmm) { const [h, m] = hhmm.split(":").map(Number); return h < 12 ? `${String(h + 12).padStart(2, "0")}:${String(m).padStart(2, "0")}` : hhmm; }
+
+// ---------- v3: jornada del maestro como SUPERVISIÓN ----------
+// El maestro marca "Hoy solo supervisé" y registra entrada y salida. Sus horas se clasifican
+// (ordinarias / extra / nocturnas) y su costo se reparte entre las actividades de la cuadrilla
+// en proporción a las horas-persona de cada actividad.
+function rangoCuadrilla() {
+  const ivs = jornada.lineas.filter(l => l.horaIni && l.horaFin && (l.codAct || l.np) && l.personas.length && !(finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno));
+  if (!ivs.length) return null;
+  let a = 99, b = -1;
+  ivs.forEach(l => { const x = aHoras(l.horaIni); let y = aHoras(l.horaFin); if (y <= x) y += 24; a = Math.min(a, x); b = Math.max(b, y); });
+  const fmt = h => { const hh = Math.floor(h % 24), mm = Math.round((h - Math.floor(h)) * 60); return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`; };
+  return { a, b, ini: fmt(a), fin: fmt(b) };
+}
+function setSup(campo, valor) {
+  jornada.sup[campo] = valor;
+  if (campo === "ini" || campo === "fin") jornada.sup.auto = false;
+  if (campo === "activo") lsSet(claveLS("supActivo"), valor);
+  if (campo !== "motivo") renderJornada();
+}
+// v3c: la supervisión del maestro se guarda UNA sola vez por fecha (aunque guarde varias veces en el día)
+function fechaActual() { const el = document.getElementById("fecha"); return el ? el.value : ""; }
+function supYaGuardada(fecha) { return (lsGet(claveLS("supGuardada"), {}) || {})[fecha || fechaActual()] || null; }
+function marcarSupGuardada(fecha, info) {
+  const m = lsGet(claveLS("supGuardada"), {}) || {}; m[fecha] = info;
+  const llaves = Object.keys(m).sort().slice(-40); const n = {}; llaves.forEach(k => n[k] = m[k]);
+  lsSet(claveLS("supGuardada"), n);
+}
+function supEnCuadrilla() { return jornada.cuadrilla.some(p => p.nombre === maestroActual.nombre); }
+function excesoSupervision() {
+  const s = jornada.sup, r = rangoCuadrilla();
+  if (!r || !s.ini || !s.fin) return null;
+  const a = aHoras(s.ini); let b = aHoras(s.fin); if (b <= a) b += 24;
+  const antes = Math.max(0, r.a - a), despues = Math.max(0, b - r.b);
+  return (antes > 0.5 || despues > 0.5) ? { antes, despues, r } : null;
+}
+function renderSupervision() {
+  if (!maestroActual) return "";
+  const s = jornada.sup, r = rangoCuadrilla();
+  if (s.activo && s.auto && r) { s.ini = r.ini; s.fin = r.fin; }
+  let cuerpo = "";
+  const yaSup = s.activo ? supYaGuardada() : null;
+  if (yaSup) {
+    cuerpo = `<div class="sup-total">✔ Tu supervisión de este día ya quedó guardada: <b>${yaSup.ini} a ${yaSup.fin}</b> (${yaSup.horas} h). No se vuelve a sumar aunque guardes más actividades hoy.</div>
+      <p class="nota">Si te equivocaste en tus horas, avísale al residente para corregirlo.</p>`;
+  } else if (s.activo) {
+    const fecha = document.getElementById("fecha").value;
+    const malAMPM = finAntesDeInicio(s.ini, s.fin) && !s.nocturno;
+    let total = "";
+    if (s.ini && s.fin && !malAMPM) {
+      const seg = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }], ordYa(maestroActual.nombre, fecha));
+      const t = seg.reduce((x, y) => x + y.horas, 0);
+      const ord = seg.filter(x => !x.tipoHora.includes("Extra")).reduce((x, y) => x + y.horas, 0);
+      const ext = t - ord, noc = seg.filter(x => x.tipoHora.includes("Nocturn")).reduce((x, y) => x + y.horas, 0);
+      const dom = seg.some(x => x.tipoHora.includes("Dominical"));
+      total = `<div class="sup-total">Tu jornada: <b>${Math.round(t * 100) / 100} h</b> · ${Math.round(ord * 100) / 100} ordinarias${ext > 0.01 ? ` · <span class="extra">${Math.round(ext * 100) / 100} extra</span>` : ""}${noc > 0.01 ? ` · ${Math.round(noc * 100) / 100} nocturnas` : ""}${dom ? " · dominical/festivo" : ""}</div>`;
+    }
+    const ex = excesoSupervision();
+    const sel = frentesSupervision();
+    cuerpo = `
+      <label>Frentes que supervisaste hoy</label>
+      <div class="chips">${chipsFrentes(sel, "toggleFrenteSup", [...new Set([...jornada.frentesDia, ...jornada.lineas.map(l => l.codFrente), ...frentesDelMaestro().map(f => f.cod)])])}</div>
+      <div class="sup-horas">
+        <input type="time" value="${s.ini}" onchange="setSup('ini', this.value)" aria-label="Tu hora de entrada">
+        <span>a</span>
+        <input type="time" value="${s.fin}" onchange="setSup('fin', this.value)" aria-label="Tu hora de salida">
+      </div>
+      ${r && !s.auto && (s.ini !== r.ini || s.fin !== r.fin) ? `<button class="btn btn-suave" onclick="jornada.sup.auto=true; renderJornada()">Usar el horario de la cuadrilla (${r.ini} a ${r.fin})</button>` : ""}
+      ${finAntesDeInicio(s.ini, s.fin) ? `<div class="alerta-hora">${s.nocturno ? "Turno de noche: terminas al día siguiente." : `Tu salida (<b>${s.fin}</b>) quedó antes que tu entrada. Si saliste en la tarde, cámbiala a <b>${horaTarde(s.fin)}</b> (PM).`}
+        <label><input type="checkbox" ${s.nocturno ? "checked" : ""} onchange="setSup('nocturno', this.checked)"> 🌙 Fue turno de noche</label></div>` : ""}
+      ${total}
+      ${ex ? `<div class="sup-aviso">Tu horario va ${ex.antes > 0.5 ? `${Math.round(ex.antes * 10) / 10} h antes` : ""}${ex.antes > 0.5 && ex.despues > 0.5 ? " y " : ""}${ex.despues > 0.5 ? `${Math.round(ex.despues * 10) / 10} h después` : ""} del de tu cuadrilla (${ex.r.ini} a ${ex.r.fin}). <b>¿Qué hiciste en ese tiempo?</b>
+        <input type="text" maxlength="120" placeholder="Ej. Recibo de material, reunión con interventoría" value="${esc(s.motivo)}" oninput="setSup('motivo', this.value)"></div>` : ""}
+      ${supEnCuadrilla() ? `<div class="sup-error">También estás en la cuadrilla. Si hoy solo supervisaste, quítate de la cuadrilla. Si trabajaste con ellos, desmarca "Hoy solo supervisé".</div>` : ""}
+      <p class="nota">${sel.length ? `Tu tiempo se reparte entre ${sel.length === 1 ? "el frente " + nombreFrenteCorto(sel[0]) : "los frentes " + sel.map(nombreFrenteCorto).join(", ")}, según las horas de tu cuadrilla en cada uno${sel.some(c => !jornada.lineas.some(l => l.codFrente === c && (l.codAct || l.np))) ? " (y en partes iguales donde no registraste cuadrilla)" : ""}.` : "Marca al menos un frente."}</p>`;
+  }
+  return `
+  <div class="card card-sup">
+    <h2>5. Tu jornada: ${esc(nombreCorto(maestroActual.nombre))}</h2>
+    <label class="sup-toggle"><input type="checkbox" ${s.activo ? "checked" : ""} onchange="setSup('activo', this.checked)"> Hoy hice supervisión en mis frentes de trabajo</label>
+    ${s.activo ? "" : `<p class="nota">Si hiciste trabajo con la cuadrilla, agrégate en el paso 3 y márcate en cada actividad.</p>`}
+    ${cuerpo}
+  </div>`;
+}
+function problemasSupervision() {
+  const s = jornada.sup, p = [];
+  if (!maestroActual || !s.activo || supYaGuardada()) return p;
+  if (supEnCuadrilla()) p.push("Estás en la cuadrilla y en supervisión: quítate de la cuadrilla o desmarca 'Hoy solo supervisé'");
+  if (!s.ini || !s.fin) p.push("Tu jornada: falta tu hora de entrada o de salida");
+  else if (finAntesDeInicio(s.ini, s.fin) && !s.nocturno) p.push(`Tu salida (${s.fin}) es antes que tu entrada. Si saliste en la tarde, escribe ${horaTarde(s.fin)}`);
+  else if (duracionH(s.ini, s.fin) > 14) p.push("Tu jornada dura más de 14 horas, revisa las horas");
+  if (!frentesSupervision().length) p.push("Tu jornada: marca al menos un frente que supervisaste");
+  if (excesoSupervision() && (s.motivo || "").trim().length < 4) p.push("Escribe qué hiciste fuera del horario de tu cuadrilla");
+  return p;
+}
+function filasSupervision(fecha, creado) {
+  const s = jornada.sup;
+  if (!maestroActual || !s.activo || supYaGuardada(fecha) || problemasSupervision().length) return [];
+  const sel = frentesSupervision();
+  // Destinos: actividades de la cuadrilla en los frentes supervisados (peso = horas-persona)
+  // + "supervisión general" en los frentes supervisados donde no hubo cuadrilla registrada
+  const lineas = jornada.lineas.filter(l => sel.includes(l.codFrente) && l.horaIni && l.horaFin && (l.codAct || l.np) && l.personas.length);
+  const destinos = lineas.map(l => ({ l, w: l.personas.length * duracionH(l.horaIni, l.horaFin) }));
+  const pesoFrente = {}; destinos.forEach(d => { pesoFrente[d.l.codFrente] = (pesoFrente[d.l.codFrente] || 0) + d.w; });
+  const pf = Object.values(pesoFrente);
+  const promedio = pf.length ? pf.reduce((a, b) => a + b, 0) / pf.length : 1;
+  sel.filter(c => !pesoFrente[c]).forEach(c => destinos.push({ general: c, w: promedio }));
+  const W = destinos.reduce((a, d) => a + d.w, 0); if (!W) return [];
+  const segs = clasificarDia(fecha, [{ ini: s.ini, fin: s.fin, ref: "SUP" }], ordYa(maestroActual.nombre, fecha));
+  const filas = [];
+  segs.forEach((seg, i) => {
+    let resto = Math.round(seg.horas * 100) / 100;
+    destinos.forEach((d, j) => {
+      const h = j === destinos.length - 1 ? Math.round(resto * 100) / 100 : Math.round(seg.horas * d.w / W * 100) / 100;
+      resto -= h; if (h <= 0) return;
+      const codF = d.general || d.l.codFrente;
+      const frente = CATALOGO.frentes.find(f => f.cod === codF);
+      const a = (d.general || d.l.np) ? null : CATALOGO.actividades.find(x => x.cod === d.l.codAct);
+      filas.push({
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_s${i}${j}`,
+        fecha, nombre: maestroActual.nombre, cargo: maestroActual.cargo, residente: maestroActual.residente,
+        codfrente: codF, frenteNombre: frente ? frente.nombre : "",
+        codcap: a ? a.cod.split(".").slice(0, 2).join(".") : "", codsubcap: a ? a.codSubcap : "",
+        codact: d.general ? `SUP-${codF}` : (d.l.np ? `NP-${codF}-${d.l.np.cat}` : d.l.codAct),
+        actDesc: "[SUPERVISIÓN] " + (d.general ? `Supervisión general frente ${frente ? frente.nombre : codF}` :
+          (d.l.np ? `[NO PRESUPUESTADA] ${d.l.np.desc}` : (a ? a.desc : ""))),
+        actUnidad: d.general ? "h" : (d.l.np ? CATEGORIAS[d.l.np.cat].unidad : (a ? a.unidad : "")),
+        horas: h, tipoHora: seg.tipoHora, cantidad: null,
+        observaciones: `SUPERVISIÓN ${s.ini}-${s.fin} · frentes ${sel.join(", ")} · ${Math.round(d.w / W * 100)}%${s.motivo ? " · Fuera del horario de la cuadrilla: " + s.motivo : ""}${obsJust(maestroActual.nombre)}`,
+        creado, registradoPor: maestroActual.nombre, loteId: "SUP_" + (d.general ? `${codF}_${creado}` : d.l.loteId),
+      });
+    });
+  });
+  return filas;
+}
+
+// ---------- v3b: varios frentes por jornada ----------
+function nombreFrenteCorto(cod) { const f = CATALOGO.frentes.find(x => x.cod === cod); return f ? f.nombre.split(" - ")[0] : cod; }
+function opcionesFrentes(base) {
+  return [...new Set([...frentesDelMaestro().map(f => f.cod), ...base])];
+}
+function chipsFrentes(seleccion, fn, universo) {
+  const lista = universo || opcionesFrentes(seleccion);
+  return lista.map(cod => {
+    const f = CATALOGO.frentes.find(x => x.cod === cod); if (!f) return "";
+    const partes = f.nombre.split(" - "); const corto = partes[0], resto = partes.slice(1).join(" - ");
+    return `<button class="chip frente ${seleccion.includes(cod) ? "on" : "off"}" onclick="${fn}('${cod}')">Frente ${esc(corto)}<small>${esc(resto.slice(0, 28))}</small></button>`;
+  }).join("");
+}
+function toggleFrenteDia(cod) {
+  const a = jornada.frentesDia;
+  jornada.frentesDia = a.includes(cod) ? (a.length > 1 ? a.filter(x => x !== cod) : a) : [...a, cod];
+  jornada.frenteDia = jornada.frentesDia[0];
+  lsSet(claveLS("frentes"), jornada.frentesDia);
+  renderJornada();
+}
+function frentesSupervision() {
+  const s = jornada.sup;
+  if (s.frentesAuto) {
+    s.frentes = [...new Set([...jornada.frentesDia, ...jornada.lineas.filter(l => l.codAct || l.np).map(l => l.codFrente)])];
+  }
+  return s.frentes;
+}
+function toggleFrenteSup(cod) {
+  const s = jornada.sup; const a = frentesSupervision();
+  s.frentes = a.includes(cod) ? a.filter(x => x !== cod) : [...a, cod];
+  s.frentesAuto = false;
+  renderJornada();
+}
+
+// ---------- Fecha: Hoy / Ayer y aviso de horario futuro ----------
+function fechaLocal(desfaseDias) {
+  const d = new Date(); d.setDate(d.getDate() + desfaseDias);
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 10);
+}
+function ponerFecha(desfase) { document.getElementById("fecha").value = fechaLocal(desfase); alCambiarFecha(); }
+function alCambiarFecha() {
+  actualizarFechaTxt();
+  if (maestroActual && (SHEET.estado !== "ok" || fechaActual() < SHEET.desde)) cargarSheet(true);
+  if (modo === "personal") renderJornada(); else if (modo === "semana") renderSemana(); else if (modo !== "buscador") renderBloques();
+}
+function actualizarFechaTxt() {
+  const v = document.getElementById("fecha").value;
+  const el = document.getElementById("fechaTxt"); if (!el) return;
+  const dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  if (!v) { el.textContent = ""; return; }
+  const d = new Date(v + "T12:00:00");
+  el.textContent = `Registrando: ${dias[d.getDay()]} ${d.getDate()} de ${meses[d.getMonth()]}`;
+  document.getElementById("btnHoy").classList.toggle("activo", v === fechaLocal(0));
+  document.getElementById("btnAyer").classList.toggle("activo", v === fechaLocal(-1));
+}
+function avisoHorarioFuturo() {
+  if (document.getElementById("fecha").value !== fechaLocal(0)) return "";
+  const ahora = new Date(); const hhmm = String(ahora.getHours()).padStart(2, "0") + ":" + String(ahora.getMinutes()).padStart(2, "0");
+  const futura = jornada.lineas.find(l => l.horaFin && l.horaFin > hhmm && (!l.horaIni || l.horaFin > l.horaIni));
+  if (!futura) return "";
+  return `<div class="aviso-fecha">Estás registrando con fecha de <b>HOY</b>, pero hay actividades hasta las <b>${futura.horaFin}</b>, que todavía no ha llegado. ¿Es el trabajo de ayer?
+    <button type="button" onclick="ponerFecha(-1)">Sí, cambiar a ayer</button></div>`;
+}
+
+// ---------- Evitar duplicados sin preguntar ----------
+function claveFila(f) { return [f.fecha, f.nombre, f.codact, f.tipoHora, f.horas, String(f.observaciones || "").slice(0, 11)].join("|"); }
+function claveMed(m) { return ["M", m.fecha, m.frenteCod, m.categoriaLetra, m.cantidad].join("|"); }
+
+// ---------- Validación y guardado ----------
+function problemasJornada() {
+  const p = [];
+  if (cierreBloqueaFecha()) p.push("Primero envía el cierre de cantidades de la semana pasada (tarjeta roja de arriba)");
+  if (!jornada.lineas.length && !(jornada.sup && jornada.sup.activo && !supYaGuardada()) && !Object.keys(jornada.novedades || {}).length) p.push("No hay actividades");
+  jornada.lineas.forEach((l, i) => {
+    if (!l.horaIni || !l.horaFin) p.push(`Actividad ${i + 1}: falta la hora de inicio o de fin`);
+    if (!(l.codAct || l.np)) p.push(`Actividad ${i + 1}: falta elegir la actividad`);
+    if (!l.personas.length) p.push(`Actividad ${i + 1}: no tiene personas`);
+    if (finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno) p.push(`Actividad ${i + 1}: la hora de fin (${l.horaFin}) es antes que la de inicio. Si terminaron en la tarde, escribe ${horaTarde(l.horaFin)}`);
+    if (duracionH(l.horaIni, l.horaFin) > 14) p.push(`Actividad ${i + 1}: dura más de 14 horas, revisa las horas`);
+  });
+  problemasSupervision().forEach(x => p.push(x));
+  problemasNovedades().forEach(x => p.push(x));
+  problemasCruce().forEach(x => p.push(x));
+  excedidos().forEach(e => { if ((jornada.just[e.n] || "").trim().length < 4) p.push(`${nombreCorto(e.n)} pasa de ${HORAS_DIA_ALERTA} h en el día: escribe el motivo en el resumen del día`); });
+  const mapa = porPersona();
+  Object.entries(mapa).forEach(([n, ivs]) => { if (traslapes(ivs)) p.push(`${nombreCorto(n)} tiene horarios cruzados`); });
+  return p;
+}
+function construirFilasJornada() {
+  const fecha = document.getElementById("fecha").value;
+  const filas = []; const mapa = porPersona();
+  const creado = new Date().toISOString();
+  Object.entries(mapa).forEach(([nombre, ivs]) => {
+    const persona = jornada.cuadrilla.find(p => p.nombre === nombre) || { cargo: "Sin confirmar" };
+    clasificarDia(fecha, ivs, ordYa(nombre, fecha)).forEach((seg, i) => {
+      if (seg.ref === "NOV") {
+        // v5: novedad pagada -> código de gastos generales del frente (el tablero la manda a la A, no al APU)
+        const x = jornada.novedades[nombre]; const codF = jornada.frenteDia;
+        const fr = CATALOGO.frentes.find(f => f.cod === codF);
+        const iv = intervaloNov(x);
+        filas.push({
+          id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_v${i}`,
+          fecha, nombre, cargo: persona.cargo, residente: maestroActual.residente,
+          codfrente: codF, frenteNombre: fr ? fr.nombre : "", codcap: "", codsubcap: "",
+          codact: `${codF}.NOV-${x.tipo}.GG`, actDesc: `[NOVEDAD PAGADA] ${textoNov(x)}`, actUnidad: "h",
+          horas: seg.horas, tipoHora: seg.tipoHora, cantidad: null,
+          observaciones: `NOVEDAD PAGADA: ${textoNov(x)} · ${iv.ini}-${iv.fin} · ${TIPOS_NOV[x.tipo].a}${TIPOS_NOV[x.tipo].soporte ? ` · soporte ${x.soporte ? "entregado" : "pendiente"}` : ""}${obsJust(nombre)}`,
+          creado, registradoPor: maestroActual.nombre, loteId: `NOV_${x.tipo}_${creado}`,
+        });
+        return;
+      }
+      const l = jornada.lineas.find(x => x.id === seg.ref);
+      const frente = CATALOGO.frentes.find(f => f.cod === l.codFrente);
+      const a = l.np ? null : CATALOGO.actividades.find(x => x.cod === l.codAct);
+      filas.push({
+        id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_${i}`,
+        fecha, nombre, cargo: persona.cargo, residente: maestroActual.residente,
+        codfrente: l.codFrente, frenteNombre: frente ? frente.nombre : "",
+        codcap: a ? a.cod.split(".").slice(0, 2).join(".") : "", codsubcap: a ? a.codSubcap : "",
+        codact: l.np ? `NP-${l.codFrente}-${l.np.cat}` : l.codAct,
+        actDesc: l.np ? `[NO PRESUPUESTADA] ${l.np.desc}` : (a ? a.desc : ""),
+        actUnidad: l.np ? CATEGORIAS[l.np.cat].unidad : (a ? a.unidad : ""),
+        horas: seg.horas, tipoHora: seg.tipoHora, cantidad: null,
+        observaciones: `${l.horaIni}-${l.horaFin}${persona.cargo === "Sin confirmar" ? " · Persona registrada manualmente, confirmar cargo y cédula" : ""}${obsJust(nombre)}`,
+        creado, registradoPor: maestroActual.nombre, loteId: l.loteId,
+      });
+    });
+  });
+  filasSupervision(fecha, creado).forEach(f => filas.push(f));
+  filasNovedades(fecha, creado).forEach(f => filas.push(f));
+  return filas;
+}
+function construirMediciones() {
+  const fecha = document.getElementById("fecha").value;
+  return categoriasMediblesHoy().map(({ frente, cat }) => {
+    const v = jornada.cantidades[`${frente}|${cat}`] || {};
+    const cant = parseFloat(String(v.cantidad || "").replace(",", "."));
+    if (!(cant > 0)) return null;
+    const f = CATALOGO.frentes.find(x => x.cod === frente);
+    const nps = jornada.lineas.filter(l => l.np && l.np.cat === cat && l.codFrente === frente).map(l => l.np.desc);
+    return {
+      fecha, oficial: v.oficial || `(registró ${maestroActual.nombre})`, frenteCod: frente, frenteNombre: f ? f.nombre : "",
+      categoria: CATEGORIAS[cat].nombre, categoriaLetra: cat, unidad: CATEGORIAS[cat].unidad, cantidad: cant,
+      observaciones: `Registrado por ${maestroActual.nombre}${nps.length ? " · incluye no presupuestada: " + nps.join("; ") : ""}`,
+    };
+  }).filter(Boolean);
+}
+
+async function guardarJornada() {
+  const btn = document.getElementById("btnGuardar");
+  const terminar = () => { guardando = false; btn.textContent = "Enviar el día"; actualizarBotonGuardar(); };
+  let prob = problemasJornada();
+  if (prob.length) { mostrarToast(prob[0]); return; }
+  guardando = true; btn.disabled = true; btn.textContent = "Revisando el Sheet…";
+  await cargarSheet(true);
+  const conSheet = SHEET.estado === "ok" && Date.now() - SHEET.t < 60 * 1000;
+  prob = problemasJornada(); // con las horas del Sheet ya actualizadas
+  if (prob.length) { renderJornada(); mostrarToast(prob[0]); terminar(); return; }
+  // Lo que ya se envió desde este celular (misma persona, fecha, actividad y horario) se omite solo
+  const enviados = new Set(lsGet(claveLS("enviados"), []));
+  const todasFilas = construirFilasJornada(), todasMeds = construirMediciones();
+  const filas = todasFilas.filter(f => !enviados.has(claveFila(f)));
+  const meds = todasMeds.filter(m => !enviados.has(claveMed(m)));
+  const omitidas = (todasFilas.length - filas.length) + (todasMeds.length - meds.length);
+  if (!filas.length && !meds.length) {
+    mostrarToast("Esto ya estaba guardado desde este celular. No se repitió.");
+    terminar(); iniciarJornada(); return;
+  }
+  if (!conSheet) {
+    if (!confirm("Sin señal: no se pudo revisar si estas personas ya están registradas ese día.\n\nEl día queda guardado en el celular y se envía solo cuando vuelva la señal. ¿Continuar?")) { terminar(); return; }
+  } else {
+    const c = conflictos(filas);
+    const duros = c.filter(x => x.duro), blandos = c.filter(x => !x.duro);
+    if (duros.length) {
+      alert("No se guardó. Estas personas ya tienen ese horario registrado ese día:\n\n• " + duros.map(x => x.txt).join("\n• ")
+        + "\n\nQuítalas de la actividad o corrige la hora. Si el registro anterior está mal, avísale al residente.");
+      renderJornada(); terminar(); return;
+    }
+    if (blandos.length && !confirm("Ojo:\n\n• " + blandos.map(x => x.txt).join("\n• ") + "\n\n¿Es trabajo adicional del mismo día? Si es así, guarda. Si es lo mismo, cancela.")) { terminar(); return; }
+  }
+  btn.textContent = "Enviando…";
+  try {
+    // v5: si no hay señal, queda en la cola del celular y se envía solo después
+    const cuerpos = [];
+    if (filas.length) cuerpos.push({ registros: filas, hoja: "Registros" });
+    meds.forEach(m => cuerpos.push(m));
+    const enLinea = await enviarOEncolar(cuerpos);
+    lsSet(claveLS("cuadrilla"), jornada.cuadrilla);
+    guardarUltima();
+    const filasSup = filas.filter(f => String(f.actDesc || "").startsWith("[SUPERVISIÓN]"));
+    if (filasSup.length) marcarSupGuardada(filasSup[0].fecha, { ini: jornada.sup.ini, fin: jornada.sup.fin,
+      horas: Math.round(filasSup.reduce((a, f) => a + Number(f.horas || 0), 0) * 100) / 100 });
+    lsSet(claveLS("enviados"), [...filas.map(claveFila), ...meds.map(claveMed), ...enviados].slice(0, 4000));
+    sumarAlSheetLocal(filas);
+    mostrarToast((enLinea ? `✔ Enviado: ${filas.length} registro(s)` : `Sin señal: ${filas.length} registro(s) guardados en el celular. Salen solos cuando vuelva la señal`)
+      + (meds.length ? ` y ${meds.length} medición(es)` : "") + (omitidas ? ` · ${omitidas} ya estaban guardados y no se repitieron` : ""));
+    guardando = false;
+    iniciarJornada();
+  } catch (e) {
+    mostrarToast("No se pudo guardar. Revisa tu conexión e intenta de nuevo.");
+  }
+  terminar();
+}
+
+// =====================================================================
+// ============ BUSCADOR DE CÓDIGOS (solo consulta, no guarda) =========
+// =====================================================================
+let bus = { frente: "", cap: "", sub: "", act: "", texto: "" };
+function renderBuscador() {
+  const z = document.getElementById("zonaBuscador");
+  const caps = CATALOGO.capitulos.filter(c => c.codFrente === bus.frente);
+  const subs = CATALOGO.subcapitulos.filter(x => x.codCapitulo === bus.cap);
+  const acts = CATALOGO.actividades.filter(a => a.codSubcap === bus.sub);
+  const op = (lista, sel, txt) => lista.map(x => `<option value="${x.cod}" ${sel === x.cod ? "selected" : ""}>${esc(txt(x))}</option>`).join("");
+  const frentes = CATALOGO.frentes.map(f => `<option value="${f.cod}" ${bus.frente === f.cod ? "selected" : ""}>${f.cod} — ${esc(f.nombre)}</option>`).join("");
+  z.innerHTML = `
+    <div class="aviso">Solo consulta: aquí no se guarda nada. Úsalo para encontrar el código de frente y de actividad al pedir materiales o equipos.</div>
+    <div class="card">
+      <h2>1. Frente de trabajo</h2>
+      <select onchange="bus={frente:this.value,cap:'',sub:'',act:'',texto:''}; renderBuscador()">
+        <option value="">— Selecciona el frente —</option>${frentes}
+      </select>
+    </div>
+    ${bus.frente ? `
+    <div class="card">
+      <h2>2. Busca por palabras</h2>
+      <input type="text" id="busTexto" placeholder="Ej. luminaria led, pintura muro, andamio" value="${esc(bus.texto)}"
+             oninput="bus.texto=this.value; buscarEnCatalogo()" autocomplete="off">
+      <div class="lista-act" id="busResultados"></div>
+      <h2 style="margin-top:16px">o navega por capítulos</h2>
+      <label>Capítulo</label>
+      <select onchange="bus.cap=this.value; bus.sub=''; bus.act=''; renderBuscador()">
+        <option value="">— Capítulo —</option>${op(caps, bus.cap, c => c.nombre.split("(")[0].trim())}
+      </select>
+      ${bus.cap ? `<label>Subcapítulo</label>
+      <select onchange="bus.sub=this.value; bus.act=''; renderBuscador()">
+        <option value="">— Subcapítulo —</option>${op(subs, bus.sub, x => x.cod + " — " + x.nombre.split("(")[0].trim().slice(0, 70))}
+      </select>` : ""}
+      ${bus.sub ? `<label>Actividad</label>
+      <select onchange="bus.act=this.value; renderBuscador()">
+        <option value="">— Actividad —</option>${op(acts, bus.act, a => a.cod + " — " + a.desc.split("(")[0].trim().slice(0, 70))}
+      </select>` : ""}
+    </div>` : ""}
+    ${renderResultadoBuscador()}
+  `;
+  if (bus.texto) buscarEnCatalogo();
+}
+function buscarEnCatalogo() {
+  const cont = document.getElementById("busResultados"); if (!cont) return;
+  const palabras = normTxt(bus.texto).split(/\s+/).filter(w => w.length >= 3);
+  if (!palabras.length) { cont.innerHTML = ""; return; }
+  const enc = CATALOGO.actividades.filter(a => actEnFrente(a, bus.frente) &&
+    palabras.every(w => normTxt(a.desc).includes(w) || a.cod.includes(w))).slice(0, 15);
+  cont.innerHTML = enc.length ? enc.map(a => `
+    <div onclick="elegirEnBuscador('${a.cod}')">
+      <b>${esc(a.desc.split("(")[0].trim().slice(0, 90))}</b><span>${a.cod} · ${a.unidad}</span>
+    </div>`).join("") : `<p class="nota">Sin resultados en este frente. Prueba otra palabra o navega por capítulos.</p>`;
+}
+function elegirEnBuscador(cod) {
+  const a = CATALOGO.actividades.find(x => x.cod === cod); if (!a) return;
+  bus.act = cod; bus.sub = a.codSubcap; bus.cap = cod.split(".").slice(0, 2).join("."); bus.texto = "";
+  renderBuscador();
+  const r = document.getElementById("busResultado"); if (r) r.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+function renderResultadoBuscador() {
+  const a = CATALOGO.actividades.find(x => x.cod === bus.act); if (!a) return "";
+  const cap = CATALOGO.capitulos.find(c => c.cod === bus.cap), sub = CATALOGO.subcapitulos.find(x => x.cod === a.codSubcap);
+  return `
+    <div class="bus-resultado" id="busResultado">
+      <div class="bus-codigos">
+        <div><small>CÓDIGO DE FRENTE</small><b>${bus.frente}</b></div>
+        <div><small>CÓDIGO DE ACTIVIDAD</small><b>${a.cod}</b></div>
+      </div>
+      <div class="bus-desc">${esc(a.desc)}</div>
+      <div class="bus-ruta">Unidad: <b>${esc(a.unidad)}</b><br>Capítulo: ${esc(cap ? cap.nombre.split("(")[0].trim() : "")}<br>Subcapítulo: ${esc(sub ? sub.nombre.split("(")[0].trim().slice(0, 90) : "")}</div>
+      <button class="btn btn-secundario btn-copiar" onclick="copiarCodigo('${a.cod}')">Copiar código ${a.cod}</button>
+    </div>`;
+}
+function copiarCodigo(cod) {
+  const ok = () => mostrarToast(`Código ${cod} copiado`);
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(cod).then(ok, () => prompt("Copia el código:", cod));
+  else prompt("Copia el código:", cod);
+}
+
+// =====================================================================
+// ============ v4 (19-oct-2026): control contra el Sheet ==============
+// =====================================================================
+// La app lee el Sheet "Registro Mano de Obra - RAW" (compartido como lector) para:
+//  1. no dejar registrar dos veces a la misma persona en el mismo horario (aunque sea otro maestro u otro celular),
+//  2. mostrar al maestro qué días le faltan de su cuadrilla,
+//  3. sumar las horas ya registradas ese día (horas extra bien calculadas y alerta de más de 10 h),
+//  4. pedir el cierre semanal de cantidades.
+const SHEET_ID = "1Sbt-r9yR_pcyluP_JLX9nA2nwxpW3cU2ATVPMwvNP-I";
+const HORAS_DIA_ALERTA = 10;
+// v5: novedades para la liquidación de nómina.
+//  paga: true  -> se registran las horas (cuentan para ordinarias/extra) con el código <frente>.NOV-<TIPO>.GG,
+//                 que el tablero ya manda a la A (gastos generales / administración), nunca al APU de una actividad.
+//  paga: false -> fila de 0 horas con código NOV-<TIPO> (no se paga, o lo paga la EPS / la nómina aparte).
+//  parcial: se puede marcar por horas (la persona trabaja el resto del día). Si costos define otra cosa, se cambia SOLO aquí.
+const TIPOS_NOV = {
+  NOVINO: { t: "No vino", g: "no", paga: false },
+  PNR:    { t: "Permiso no remunerado", g: "no", paga: false, parcial: true },
+  SUSP:   { t: "Suspensión", g: "no", paga: false },
+  INCAP:  { t: "Incapacidad", g: "eps", paga: false, soporte: true },
+  VAC:    { t: "Vacaciones", g: "eps", paga: false },
+  EXAM:   { t: "Examen médico", g: "si", paga: true, a: "Gastos generales", soporte: true, parcial: true, sub: ["Ingreso", "Periódico", "Retiro"] },
+  CITA:   { t: "Cita médica", g: "si", paga: true, a: "Gastos generales", soporte: true, parcial: true },
+  PREM:   { t: "Permiso remunerado", g: "si", paga: true, a: "Administración", parcial: true },
+  CALAM:  { t: "Calamidad / luto", g: "si", paga: true, a: "Administración", soporte: true },
+  ALT:    { t: "Curso de alturas", g: "si", paga: true, a: "Gastos generales", soporte: true, parcial: true },
+  CAP:    { t: "Capacitación / charla", g: "si", paga: true, a: "Gastos generales", parcial: true, desc: true },
+  TM:     { t: "Tiempo muerto (lluvia, sin frente)", g: "si", paga: true, a: "Administración", parcial: true, desc: true },
+};
+const GRUPOS_NOV = [["no", "No trabajó · no se paga"], ["eps", "No trabajó · lo paga la nómina o la EPS"], ["si", "Se paga · fuera de la actividad"]];
+let SHEET = { estado: "nada", desde: "", filas: [], t: 0, error: "" };
+let promSheet = null;
+let guardando = false;
+let gvizN = 0;
+
+const r2 = x => Math.round((x || 0) * 100) / 100;
+const nn = s => normTxt(s).replace(/\s+/g, " ").trim();
+function aNum(v) { const n = parseFloat(String(v ?? "").replace(",", ".")); return isNaN(n) ? 0 : n; }
+function fechaISO(d) { const x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset()); return x.toISOString().slice(0, 10); }
+function sumarDias(fechaStr, n) { const d = new Date(fechaStr + "T12:00:00"); d.setDate(d.getDate() + n); return fechaISO(d); }
+function diaSemana(fechaStr) { return new Date(fechaStr + "T12:00:00").getDay(); }
+function lunesDe(fechaStr) { return sumarDias(fechaStr, -((diaSemana(fechaStr) + 6) % 7)); }
+function diaCorto(d) { return ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"][diaSemana(d)] + " " + Number(d.slice(8, 10)); }
+function rangoTxt(obs) {
+  const m = String(obs || "").match(/(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})/);
+  return m ? { ini: m[1].padStart(5, "0"), fin: m[2].padStart(5, "0") } : null;
+}
+function cruzan(a, b) {
+  const s = x => { const i = aHoras(x.ini); let j = aHoras(x.fin); if (j <= i) j += 24; return [i, j]; };
+  const [a1, a2] = s(a), [b1, b2] = s(b);
+  return a1 < b2 - 1e-9 && b1 < a2 - 1e-9;
+}
+// v5: no trabaja si la novedad es de todo el día; con una novedad de parte del día sigue disponible para actividades
+const sinTrabajo = n => { const x = jornada.novedades && jornada.novedades[n]; return !!x && !!x.dia; };
+const esCantidad = f => String(f.obs || "").startsWith("CANTIDAD SEMANAL");
+
+// ---------- Lectura del Sheet (Google Visualization, JSONP: funciona sin cambiar el Apps Script) ----------
+function gviz(tq, hoja) {
+  return new Promise((resolve, reject) => {
+    const cb = `__gv${Date.now()}_${gvizN++}`;
+    const s = document.createElement("script");
+    const limpiar = () => { clearTimeout(t); try { delete window[cb]; } catch (e) { window[cb] = undefined; } s.remove(); };
+    const t = setTimeout(() => { limpiar(); reject(new Error("tiempo agotado")); }, 20000);
+    window[cb] = resp => {
+      limpiar();
+      if (!resp || resp.status === "error") reject(new Error((resp && resp.errors && resp.errors[0] && resp.errors[0].detailed_message) || "error del Sheet"));
+      else resolve(resp.table || { rows: [] });
+    };
+    s.onerror = () => { limpiar(); reject(new Error("sin conexión")); };
+    s.src = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json;responseHandler:${cb}`
+      + `&sheet=${encodeURIComponent(hoja)}&headers=1&tq=${encodeURIComponent(tq)}`;
+    document.head.appendChild(s);
+  });
+}
+function celda(c) {
+  if (!c || c.v === null || c.v === undefined) return "";
+  const v = c.v;
+  if (typeof v === "string") {
+    let m = v.match(/^Date\((\d+),(\d+),(\d+)/);
+    if (m) return `${m[1]}-${String(+m[2] + 1).padStart(2, "0")}-${String(+m[3]).padStart(2, "0")}`;
+    m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (m) return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  }
+  return v;
+}
+function filasDeTabla(t, campos) {
+  return (t.rows || []).map(r => {
+    const c = r.c || []; const o = {};
+    campos.forEach((k, i) => { o[k] = celda(c[i]); });
+    return o;
+  });
+}
+function rangoSheet() {
+  const hoy = fechaLocal(0), fecha = fechaActual() || hoy;
+  return [sumarDias(hoy, -14), sumarDias(lunesDe(hoy), -7), sumarDias(fecha, -1)].sort()[0];
+}
+function cargarSheet(forzar) {
+  const desde = rangoSheet();
+  if (!forzar && SHEET.estado === "ok" && SHEET.desde <= desde && Date.now() - SHEET.t < 5 * 60 * 1000) return Promise.resolve(SHEET);
+  if (promSheet) return promSheet;
+  if (SHEET.estado !== "ok") SHEET.estado = "cargando";
+  const campos = ["fecha", "nombre", "horas", "tipoHora", "obs", "por"];
+  promSheet = (async () => {
+    try {
+      let t;
+      try { t = await gviz(`select B,C,M,N,P,R where B >= date '${desde}'`, "Registros"); }
+      catch (e) { t = await gviz(`select B,C,M,N,P,R`, "Registros"); } // por si la columna de fecha no es de tipo fecha
+      const filas = filasDeTabla(t, campos)
+        .map(f => ({ fecha: String(f.fecha).slice(0, 10), nombre: String(f.nombre || ""), horas: aNum(f.horas),
+                     tipoHora: String(f.tipoHora || ""), obs: String(f.obs || ""), por: String(f.por || "") }))
+        .filter(f => f.nombre && /^\d{4}-\d{2}-\d{2}$/.test(f.fecha) && f.fecha >= desde);
+      filas.forEach(f => { f.n = nn(f.nombre); });
+      const locales = SHEET.estado === "ok" ? SHEET.filas.filter(f => f.local && !filas.some(g => g.n === f.n && g.fecha === f.fecha && g.obs === f.obs)) : [];
+      SHEET = { estado: "ok", desde, filas: [...filas, ...locales], t: Date.now(), error: "" };
+    } catch (e) {
+      SHEET = { ...SHEET, estado: SHEET.estado === "ok" ? "ok" : "error", error: String(e.message || e) };
+    }
+    promSheet = null;
+    if (modo === "personal" && maestroActual && !guardando) renderJornada();
+    if (modo === "semana" && maestroActual) renderSemana();
+    return SHEET;
+  })();
+  return promSheet;
+}
+function sumarAlSheetLocal(filas) {
+  if (SHEET.estado !== "ok") return;
+  filas.forEach(f => SHEET.filas.push({ fecha: f.fecha, nombre: f.nombre, n: nn(f.nombre), horas: aNum(f.horas), tipoHora: f.tipoHora || "",
+    obs: String(f.observaciones || ""), por: f.registradoPor || "", local: true }));
+}
+function regsDia(nombre, fecha) {
+  if (SHEET.estado !== "ok") return [];
+  const k = nn(nombre);
+  return SHEET.filas.filter(f => f.n === k && f.fecha === fecha && !esCantidad(f));
+}
+function horasYa(nombre, fecha) { return regsDia(nombre, fecha).reduce((a, f) => a + f.horas, 0); }
+function ordYa(nombre, fecha) { return regsDia(nombre, fecha).filter(f => !/extra/i.test(f.tipoHora)).reduce((a, f) => a + f.horas, 0); }
+function badgeYa(nombre) {
+  const regs = regsDia(nombre, fechaActual());
+  if (!regs.length) return "";
+  const h = regs.reduce((a, f) => a + f.horas, 0);
+  const nov = regs.find(f => f.obs.startsWith("NOVEDAD"));
+  const por = [...new Set(regs.map(f => nombreCorto(f.por || "")))].filter(Boolean).join(", ");
+  return `<small class="ya">${h > 0 ? `ya tiene ${r2(h)} h` : (nov ? esc(nov.obs.replace(/^NOVEDAD( PAGADA)?: /, "").split(" · ")[0]) : "ya registrado")}${por ? " · " + esc(por) : ""}</small>`;
+}
+
+// ---------- 5. "Te falta registrar" ----------
+function diasAPendiente() {
+  // semana pasada completa (lunes a sábado) + esta semana hasta ayer
+  const hoy = fechaLocal(0), lun = lunesDe(hoy);
+  const ini = sumarDias(lun, -7), fin = sumarDias(hoy, -1);
+  const dias = [];
+  for (let d = ini; d <= fin; d = sumarDias(d, 1)) { if (diaSemana(d) !== 0 && !esFestivoColombia(d)) dias.push(d); }
+  return dias;
+}
+function miCuadrillaHabitual() {
+  const yo = nn(maestroActual.nombre), desde = sumarDias(fechaLocal(0), -14);
+  const ocultos = new Set(lsGet(claveLS("ocultosPend"), []));
+  const enCat = new Map(CATALOGO.personal.map(p => [nn(p.nombre), p.nombre]));
+  const m = new Map();
+  SHEET.filas.filter(f => nn(f.por) === yo && f.fecha >= desde && !esCantidad(f)).forEach(f => m.set(f.n, f.nombre));
+  lsGet(claveLS("cuadrilla"), []).forEach(p => m.set(nn(p.nombre), p.nombre));
+  m.set(yo, maestroActual.nombre);
+  return [...m.entries()].filter(([k]) => enCat.has(k) && !ocultos.has(k)).map(([k]) => ({ k, nombre: enCat.get(k) }));
+}
+function pendientes() {
+  if (SHEET.estado !== "ok" || !maestroActual) return [];
+  const dias = diasAPendiente(); if (!dias.length) return [];
+  const conReg = new Set(SHEET.filas.filter(f => !esCantidad(f)).map(f => f.n + "|" + f.fecha));
+  return miCuadrillaHabitual()
+    .map(p => ({ ...p, faltan: dias.filter(d => !conReg.has(p.k + "|" + d)) }))
+    .filter(p => p.faltan.length)
+    .sort((a, b) => b.faltan.length - a.faltan.length);
+}
+function renderPendientes() {
+  if (!maestroActual) return "";
+  if (SHEET.estado === "cargando" || SHEET.estado === "nada") return `<div class="card card-pend"><p class="nota">Revisando los registros de la semana…</p></div>`;
+  if (SHEET.estado === "error") return `<div class="card card-pend"><p class="nota">Sin conexión con el Sheet: no se pudo revisar qué falta registrar ni si hay repetidos.
+    <button class="campo-libre" onclick="cargarSheet(true)">Reintentar</button></p></div>`;
+  const dias = diasAPendiente(); const p = pendientes();
+  if (!dias.length) return "";
+  const rango = `${diaCorto(dias[0])} a ${diaCorto(dias[dias.length - 1])}`;
+  if (!p.length) return `<div class="card card-pend ok">✔ Tu cuadrilla está al día (${rango}).</div>`;
+  return `<div class="card card-pend">
+    <h2>Te falta registrar <span class="contador">${p.reduce((a, x) => a + x.faltan.length, 0)}</span></h2>
+    <p class="nota">Días de ${rango} sin ningún registro. Toca el día para registrarlo. Si la persona no trabajó, desmárcala en el paso 1 y escoge el motivo (no vino, incapacidad, permiso…).</p>
+    ${p.map(x => `<div class="pend-fila">
+      <div class="pend-nombre">${esc(nombreCorto(x.nombre))}${nn(x.nombre) === nn(maestroActual.nombre) ? " (tú)" : ""}</div>
+      <div class="chips">${x.faltan.map(d => `<button class="chip pend ${d === fechaActual() ? "on" : ""}" onclick="irAFecha('${d}')">${diaCorto(d)}${diaSemana(d) === 6 ? " (si trabajó)" : ""}</button>`).join("")}
+        <button class="chip ocultar" title="Ya no está en mi cuadrilla" onclick='ocultarPend(${JSON.stringify(x.k)})'>No es de mi cuadrilla</button></div>
+    </div>`).join("")}
+  </div>`;
+}
+function irAFecha(d) {
+  document.getElementById("fecha").value = d; alCambiarFecha();
+  const c = document.getElementById("cardQuien"); if (c) c.scrollIntoView({ behavior: "smooth" });
+}
+function ocultarPend(k) {
+  if (!confirm("¿Esta persona ya no está en tu cuadrilla? Dejará de aparecerte en pendientes.")) return;
+  lsSet(claveLS("ocultosPend"), [...new Set([...lsGet(claveLS("ocultosPend"), []), k])]);
+  renderJornada();
+}
+
+// ---------- 3. Novedades para la liquidación de nómina (v5) ----------
+// Una novedad: { tipo, dia: true (todo el día) | false (parte del día), ini, fin, sub, desc, soporte }
+function textoNov(x) {
+  const T = TIPOS_NOV[x.tipo]; if (!T) return x.tipo;
+  return `${T.t}${x.sub ? " " + x.sub.toLowerCase() : ""}${x.desc && x.desc.trim() ? ": " + x.desc.trim() : ""}${!x.dia && x.ini && x.fin ? ` (${horaBonita(x.ini)} a ${horaBonita(x.fin)})` : ""}`;
+}
+// Intervalo de horas pagadas de una novedad (null si no se paga o está incompleta)
+function intervaloNov(x) {
+  const T = x && TIPOS_NOV[x.tipo];
+  if (!T || !T.paga) return null;
+  const ini = x.dia ? "07:00" : x.ini, fin = x.dia ? finCuota() : x.fin;
+  if (!ini || !fin || finAntesDeInicio(ini, fin)) return null;
+  return { ini, fin };
+}
+function finCuota() {
+  const h = cuotaOrdinariaDia(fechaActual()) || 8;
+  const t = 7 + h; return `${String(Math.floor(t)).padStart(2, "0")}:${t % 1 ? "30" : "00"}`;
+}
+function editarNovedad(nombre) { jornada.novEditando = jornada.novEditando === nombre ? null : nombre; renderJornada(); }
+function setNovTipo(tipo) {
+  const n = jornada.novEditando; if (!n) return;
+  const prev = jornada.novedades[n] || {};
+  const T = TIPOS_NOV[tipo];
+  const dia = T.parcial ? (prev.tipo === tipo ? prev.dia : true) : true;
+  jornada.novedades[n] = { tipo, dia, ini: prev.ini || "07:00", fin: prev.fin || finCuota(), desc: prev.tipo === tipo ? prev.desc || "" : "",
+    sub: prev.tipo === tipo ? prev.sub || "" : "", soporte: prev.tipo === tipo ? !!prev.soporte : false };
+  if (dia) jornada.lineas.forEach(l => { l.personas = l.personas.filter(x => x !== n); });
+  renderJornada();
+}
+function setNov(campo, valor) {
+  const n = jornada.novEditando; if (!n || !jornada.novedades[n]) return;
+  const x = jornada.novedades[n];
+  x[campo] = valor;
+  if (campo === "dia" && valor) jornada.lineas.forEach(l => { l.personas = l.personas.filter(y => y !== n); });
+  if (campo !== "desc") renderJornada();
+}
+function quitarNovedad() { delete jornada.novedades[jornada.novEditando]; jornada.novEditando = null; renderJornada(); }
+function resumenNov(x) {
+  const T = TIPOS_NOV[x.tipo];
+  if (!T.paga) return { ok: false, txt: x.dia ? "Queda con 0 horas: no se paga ese día." : "Esas horas no se pagan. El resto del día sigue disponible para sus actividades." };
+  const iv = intervaloNov(x);
+  if (!iv) return { ok: false, txt: "Falta la hora de inicio o de fin." };
+  const h = r2(duracionH(iv.ini, iv.fin));
+  return { ok: true, txt: `Se pagan ${String(h).replace(".", ",")} h como ${T.t.toLowerCase()}, a ${T.a.toLowerCase()}.${x.dia ? "" : ` Fuera de ese horario sigue disponible para sus actividades.`}` };
+}
+function renderNovedadEditor() {
+  const n = jornada.novEditando; if (!n) return "";
+  const nov = jornada.novedades[n], T = nov && TIPOS_NOV[nov.tipo];
+  const res = nov ? resumenNov(nov) : null;
+  return `<div class="nov-editor">
+    <b>Novedad de ${esc(nombreCorto(n))}</b>
+    ${GRUPOS_NOV.map(([g, titulo]) => `<div class="grupo-nov">${titulo}</div>
+      <div class="chips">${Object.entries(TIPOS_NOV).filter(([, t]) => t.g === g).map(([k, t]) =>
+        `<button class="chip ${nov && nov.tipo === k ? "hora on" : ""}" onclick="setNovTipo('${k}')">${esc(t.t)}</button>`).join("")}</div>`).join("")}
+    ${T ? `
+      ${T.sub ? `<div class="chips" style="margin-top:8px">${T.sub.map(s => `<button class="chip ${nov.sub === s ? "hora on" : ""}" onclick="setNov('sub', '${s}')">${s}</button>`).join("")}</div>` : ""}
+      ${T.parcial ? `<div class="seg"><button class="${nov.dia ? "on" : ""}" onclick="setNov('dia', true)">Todo el día</button>
+        <button class="${nov.dia ? "" : "on"}" onclick="setNov('dia', false)">Parte del día</button></div>` : ""}
+      ${!nov.dia ? `<label>Desde</label>${chipsHora(nov.ini, HORAS_INI, v => `setNov('ini', ${v})`, "Inicio de la novedad")}
+        <label>Hasta</label>${chipsHora(nov.fin, ["09:00", "10:00", "11:00", ...HORAS_FIN], v => `setNov('fin', ${v})`, "Fin de la novedad")}` : ""}
+      ${T.desc ? `<input type="text" style="margin-top:8px" maxlength="100" placeholder="${nov.tipo === "TM" ? "¿Qué pasó? Ej. Lluvia, frente 5 sin cubierta" : "¿Cuál? Ej. Charla de seguridad"}" value="${esc(nov.desc)}" oninput="setNov('desc', this.value)">` : ""}
+      ${T.soporte ? `<label class="sup-toggle" style="margin-top:10px;font-size:13.5px"><input type="checkbox" ${nov.soporte ? "checked" : ""} onchange="setNov('soporte', this.checked)"> Entregó el soporte (${nov.tipo === "ALT" ? "certificado" : nov.tipo === "INCAP" ? "incapacidad" : "orden o constancia"})</label>` : ""}
+      <div class="nov-res ${res.ok ? "" : "no"}">${esc(res.txt)}</div>` : ""}
+    <div class="fila-botones">
+      <button class="btn btn-suave" onclick="jornada.novEditando=null; renderJornada()">Listo</button>
+      ${nov ? `<button class="campo-libre" onclick="quitarNovedad()">Quitar la novedad</button>` : ""}
+    </div>
+  </div>`;
+}
+function problemasNovedades() {
+  const p = [];
+  Object.entries(jornada.novedades || {}).forEach(([n, x]) => {
+    const T = TIPOS_NOV[x.tipo]; if (!T) return;
+    const quien = `${T.t} de ${nombreCorto(n)}`;
+    if (!x.dia) {
+      if (!x.ini || !x.fin) p.push(`${quien}: falta la hora`);
+      else if (finAntesDeInicio(x.ini, x.fin)) p.push(`${quien}: la hora de fin es antes que la de inicio`);
+      const ivs = jornada.lineas.filter(l => l.personas.includes(n) && l.horaIni && l.horaFin).map(l => ({ ini: l.horaIni, fin: l.horaFin }));
+      if (x.ini && x.fin && ivs.some(iv => cruzan(iv, { ini: x.ini, fin: x.fin }))) p.push(`${quien}: se cruza con una de sus actividades`);
+    }
+    if (T.sub && !x.sub) p.push(`${quien}: escoge ${T.sub.join(", ").toLowerCase()}`);
+    if (T.desc && (x.desc || "").trim().length < 4) p.push(`${quien}: escribe qué fue`);
+  });
+  return p;
+}
+// Novedades que no se pagan: una fila de 0 horas para que se sepa por qué no trabajó y no salga como pendiente
+function filasNovedades(fecha, creado) {
+  const filas = [];
+  const fr = CATALOGO.frentes.find(f => f.cod === jornada.frenteDia);
+  Object.entries(jornada.novedades || {}).forEach(([n, x], i) => {
+    const T = TIPOS_NOV[x.tipo]; if (!T || T.paga) return;
+    const persona = jornada.cuadrilla.find(p => p.nombre === n) || { cargo: "Sin confirmar" };
+    filas.push({
+      id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_n${i}`,
+      fecha, nombre: n, cargo: persona.cargo, residente: maestroActual.residente,
+      codfrente: jornada.frenteDia, frenteNombre: fr ? fr.nombre : "", codcap: "", codsubcap: "",
+      codact: `NOV-${x.tipo}`, actDesc: `[NOVEDAD] ${textoNov(x)}`, actUnidad: "",
+      horas: 0, tipoHora: "Ordinaria Diurna", cantidad: null,
+      observaciones: `NOVEDAD: ${textoNov(x)}${!x.dia && x.ini && x.fin ? ` · ${x.ini}-${x.fin}` : ""}${T.soporte ? ` · soporte ${x.soporte ? "entregado" : "pendiente"}` : ""}`,
+      creado, registradoPor: maestroActual.nombre, loteId: `NOV_${creado}`,
+    });
+  });
+  return filas;
+}
+
+// ---------- 4. Más de 10 h en el día: pedir el motivo ----------
+function totalesDia() {
+  const fecha = fechaActual(); const out = {};
+  Object.entries(porPersona()).forEach(([n, ivs]) => {
+    if (traslapes(ivs)) return;
+    out[n] = { nuevo: ivs.reduce((a, iv) => a + duracionH(iv.ini, iv.fin), 0), ya: horasYa(n, fecha) };
+  });
+  const s = jornada.sup;
+  if (maestroActual && s && s.activo && !supYaGuardada() && s.ini && s.fin && !(finAntesDeInicio(s.ini, s.fin) && !s.nocturno)) {
+    const n = maestroActual.nombre;
+    out[n] = out[n] || { nuevo: 0, ya: horasYa(n, fecha) };
+    out[n].nuevo += duracionH(s.ini, s.fin);
+  }
+  return out;
+}
+function excedidos() {
+  return Object.entries(totalesDia()).filter(([n, t]) => t.nuevo > 0 && t.nuevo + t.ya > HORAS_DIA_ALERTA + 1e-9 && !cruceVivo(n))
+    .map(([n, t]) => ({ n, total: t.nuevo + t.ya, ya: t.ya }));
+}
+function obsJust(n) {
+  const j = (jornada.just[n] || "").trim();
+  return j && excedidos().some(e => e.n === n) ? ` · Más de ${HORAS_DIA_ALERTA} h: ${j}` : "";
+}
+function renderJustificaciones() {
+  const exc = excedidos(); if (!exc.length) return "";
+  return `<div class="sup-aviso"><b>Más de ${HORAS_DIA_ALERTA} horas en el día.</b> El límite legal es de 2 horas extra diarias. Escribe el motivo de cada persona; si no, no se puede guardar.
+    ${exc.map(e => `<label class="just-label">${esc(nombreCorto(e.n))}: ${r2(e.total)} h${e.ya ? ` (incluye ${r2(e.ya)} h que ya estaban registradas)` : ""}</label>
+      <input type="text" maxlength="120" placeholder="Ej. Vaciado de placa que no se podía suspender" value="${esc(jornada.just[e.n] || "")}"
+             oninput='jornada.just[${JSON.stringify(e.n)}] = this.value'>`).join("")}
+  </div>`;
+}
+
+// ---------- 1. Registros dobles: comparar contra el Sheet antes de guardar ----------
+function conflictos(filas) {
+  const fecha = fechaActual(); const out = []; const vistos = new Set();
+  const nuevos = {};
+  filas.forEach(f => { const r = rangoTxt(f.observaciones); if (!r || !(aNum(f.horas) > 0)) return; (nuevos[f.nombre] = nuevos[f.nombre] || []).push(r); });
+  Object.entries(nuevos).forEach(([n, ivs]) => {
+    regsDia(n, fecha).filter(f => f.horas > 0 && !f.local).forEach(f => {
+      const r = rangoTxt(f.obs);
+      if (!r) {
+        const k = n + "|sin";
+        if (!vistos.has(k)) { vistos.add(k); out.push({ duro: false, txt: `${nombreCorto(n)} ya tiene ${r2(horasYa(n, fecha))} h registradas ese día (por ${nombreCorto(f.por) || "otro registro"})` }); }
+        return;
+      }
+      if (ivs.some(iv => cruzan(iv, r))) {
+        const k = `${n}|${r.ini}|${r.fin}`;
+        if (!vistos.has(k)) { vistos.add(k); out.push({ duro: true, txt: `${nombreCorto(n)}: ya está registrado de ${r.ini} a ${r.fin} (por ${nombreCorto(f.por) || "otro registro"})` }); }
+      }
+    });
+  });
+  return out;
+}
+
+// Mismo control, en vivo mientras el maestro llena el día (antes de pedir el motivo de más de 10 h)
+function cruceVivo(n) {
+  const fecha = fechaActual(); const ivs = [...(porPersona()[n] || [])];
+  const s = jornada.sup;
+  if (maestroActual && n === maestroActual.nombre && s && s.activo && !supYaGuardada() && s.ini && s.fin) ivs.push({ ini: s.ini, fin: s.fin });
+  for (const f of regsDia(n, fecha)) {
+    if (!(f.horas > 0) || f.local) continue;
+    const r = rangoTxt(f.obs);
+    if (r && ivs.some(iv => iv.ini && iv.fin && cruzan(iv, r))) return `ya está registrado de ${r.ini} a ${r.fin} (por ${nombreCorto(f.por) || "otro registro"})`;
+  }
+  return "";
+}
+function problemasCruce() {
+  const nombres = new Set(Object.keys(porPersona()));
+  if (maestroActual) nombres.add(maestroActual.nombre);
+  return [...nombres].map(n => { const c = cruceVivo(n); return c ? `${nombreCorto(n)} ${c} ese día. Quítalo de la actividad o corrige la hora.` : ""; }).filter(Boolean);
+}
+
+// ---------- 7. Buscar en otros frentes y sugerir antes de "no presupuestada" ----------
+const PALABRAS_VACIAS = new Set(["para", "con", "del", "los", "las", "una", "unos", "unas", "que", "por", "como", "este", "esta", "entre",
+  "sobre", "desde", "hasta", "zona", "sector", "frente", "area", "todo", "toda", "hacia"]);
+function frenteDeCod(cod) { return String(cod).split(".")[0]; }
+function sugerenciasNP(desc, codFrente) {
+  const pal = [...new Set(normTxt(desc).split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !PALABRAS_VACIAS.has(w)))];
+  if (!pal.length) return [];
+  const minimo = Math.min(2, pal.length);
+  return CATALOGO.actividades
+    .map(a => { const d = normTxt(a.desc.split("(")[0]); return { a, s: pal.filter(w => d.includes(w)).length, mismo: actEnFrente(a, codFrente) ? 1 : 0 }; })
+    .filter(x => x.s >= minimo)
+    .sort((x, y) => (y.s - x.s) || (y.mismo - x.mismo))
+    .slice(0, 6).map(x => x.a.cod);
+}
+function elegirActividadOtroFrente(id, cod) {
+  const f = frenteDeCod(cod);
+  if (!confirm(`Esta actividad es del frente ${nombreFrenteCorto(f)}. La actividad y sus horas quedarán cargadas a ese frente. ¿Trabajaron allá?`)) return;
+  const l = jornada.lineas.find(x => x.id === id); l.codFrente = f;
+  if (!jornada.frentesDia.includes(f)) jornada.frentesDia = [...jornada.frentesDia, f];
+  elegirActividad(id, cod);
+}
+function confirmarNP(id) {
+  const l = jornada.lineas.find(x => x.id === id);
+  if (!l.npPend) return;
+  l.np = l.npPend; l.codAct = ""; l.npSug = null; l.npPend = null; lineaEnPicker = null;
+  renderJornada();
+}
+function renderSugerenciasNP(l) {
+  if (!l.npSug || !l.npSug.length) return "";
+  return `<div class="sug-np"><b>Antes de marcarla como no presupuestada: ¿es alguna de estas actividades del presupuesto?</b>
+    ${l.npSug.map(cod => {
+      const a = CATALOGO.actividades.find(x => x.cod === cod); if (!a) return "";
+      const otro = !actEnFrente(a, l.codFrente);
+      return `<div class="sug-item" onclick="${otro ? `elegirActividadOtroFrente(${l.id}, '${cod}')` : `elegirActividad(${l.id}, '${cod}')`}">
+        <b>${esc(a.desc.split("(")[0].trim().slice(0, 80))}</b><span>${cod} · ${esc(a.unidad)}${otro ? " · frente " + esc(nombreFrenteCorto(frenteDeCod(cod))) : ""}</span></div>`;
+    }).join("")}
+    <button class="btn btn-suave" onclick="confirmarNP(${l.id})">Ninguna: es no presupuestada</button>
+  </div>`;
+}
+
+// ---------- Cierre semanal de cantidades (obligatorio desde el martes) ----------
+function semanaCierre() {
+  const hoy = fechaLocal(0), lun = lunesDe(hoy), wd = diaSemana(hoy);
+  if (wd === 6 || wd === 0) return { lun, sab: sumarDias(lun, 5), actual: true };
+  return { lun: sumarDias(lun, -7), sab: sumarDias(lun, -2), actual: false };
+}
+function estadoCierre() {
+  if (SHEET.estado !== "ok" || !maestroActual) return null;
+  const { lun, sab, actual } = semanaCierre(); const yo = nn(maestroActual.nombre);
+  const hecho = !!(lsGet(claveLS("cierres"), {}) || {})[lun] ||
+    SHEET.filas.some(f => f.n === yo && esCantidad(f) && f.fecha >= lun && f.fecha <= sab);
+  const hubo = SHEET.filas.some(f => nn(f.por) === yo && f.fecha >= lun && f.fecha <= sab && f.horas > 0 && !esCantidad(f)
+    && !(f.n === yo && f.obs.startsWith("SUPERVISIÓN")));
+  const wd = diaSemana(fechaLocal(0));
+  const requerido = !hecho && hubo;
+  return { lun, sab, actual, hecho, requerido, bloquea: requerido && !actual && wd >= 2 && wd <= 5 };
+}
+function cierreBloqueaFecha() {
+  const e = estadoCierre();
+  return !!(e && e.bloquea && fechaActual() >= lunesDe(fechaLocal(0)));
+}
+function renderCierreSemanal() {
+  const e = estadoCierre();
+  if (!e || (!e.requerido && !jornada.cierre)) return "";
+  const titulo = `${diaCorto(e.lun)} a ${diaCorto(e.sab)}`;
+  const msg = e.bloquea ? `<b>Obligatorio:</b> para registrar esta semana, primero envía lo que tu cuadrilla ejecutó la semana pasada.`
+    : e.actual ? `Envía las cantidades que tu cuadrilla ejecutó esta semana en cada actividad.`
+    : `Tienes hasta hoy lunes. Desde el martes la app no deja registrar la semana nueva sin este cierre.`;
+  return `<div class="card card-cierre ${e.bloquea ? "bloquea" : ""}">
+    <h2>Cierre de cantidades · ${titulo}</h2>
+    <p class="nota">${msg}</p>
+    ${jornada.cierre ? renderCierreLista() : `<button class="btn btn-secundario" onclick="abrirCierre()">Hacer el cierre de la semana</button>`}
+  </div>`;
+}
+async function abrirCierre() {
+  const e = estadoCierre(); if (!e) return;
+  jornada.cierre = { estado: "cargando", items: [], lun: e.lun, sab: e.sab };
+  renderJornada();
+  try {
+    const yo = maestroActual.nombre.replace(/'/g, "");
+    const t = await gviz(`select F,J,K,L,M,P,C where R = '${yo}' and B >= date '${e.lun}' and B <= date '${e.sab}'`, "Registros");
+    const filas = filasDeTabla(t, ["fr", "cod", "desc", "und", "horas", "obs", "nombre"]);
+    const mapa = new Map();
+    filas.forEach(f => {
+      const obs = String(f.obs || ""), cod = String(f.cod || "");
+      if (!cod || obs.startsWith("SUPERVISIÓN") || obs.startsWith("NOVEDAD") || obs.startsWith("CANTIDAD") || /^(NOV|SUP)-/.test(cod)) return;
+      const und = String(f.und || "").trim();
+      if (!und || /^(glb|global|h)$/i.test(und)) return; // lo que no se mide (aseo, apoyo, etc.)
+      const np = cod.startsWith("NP-");
+      const desc = String(f.desc || "").replace("[NO PRESUPUESTADA] ", "").trim();
+      const k = np ? `${cod}|${desc}` : cod;
+      const it = mapa.get(k) || { k, cod, np, desc: np ? desc : desc.split("(")[0].trim(), und, fr: String(f.fr || ""), hh: 0, cant: "" };
+      it.hh += aNum(f.horas); mapa.set(k, it);
+    });
+    jornada.cierre.items = [...mapa.values()].sort((a, b) => b.hh - a.hh);
+    jornada.cierre.estado = "ok";
+  } catch (err) {
+    jornada.cierre.estado = "error";
+  }
+  renderJornada();
+}
+function renderCierreLista() {
+  const c = jornada.cierre;
+  if (c.estado === "cargando") return `<p class="nota">Buscando las actividades de tu cuadrilla en esa semana…</p>`;
+  if (c.estado === "error") return `<p class="nota">No se pudo leer el Sheet. <button class="campo-libre" onclick="abrirCierre()">Reintentar</button></p>`;
+  if (!c.items.length) return `<p class="nota">No hay actividades medibles de tu cuadrilla esa semana.</p>
+    <button class="btn btn-secundario" onclick="enviarCierre()">Confirmar: no hubo cantidades que medir</button>`;
+  return `${c.items.map((it, i) => `
+    <div class="cierre-fila">
+      <div class="cant-nombre">${esc(it.desc.slice(0, 90))}${it.np ? ` <span class="tag-np">no presupuestada</span>` : ""}</div>
+      <div class="act-sub">${esc(it.cod)} · ${r2(it.hh)} horas-hombre en la semana</div>
+      <div class="cant-inputs">
+        <input type="text" inputmode="decimal" placeholder="0" value="${esc(it.cant)}" oninput="jornada.cierre.items[${i}].cant = this.value">
+        <span class="unidad">${esc(it.und)}</span>
+      </div>
+    </div>`).join("")}
+    <p class="nota">Cantidad <b>terminada en la semana</b> en cada actividad, en área o volumen neto. Si no se terminó nada, escribe 0.</p>
+    <button class="btn btn-primario" onclick="enviarCierre()">Enviar el cierre de la semana</button>`;
+}
+async function enviarCierre() {
+  const c = jornada.cierre; if (!c || c.estado !== "ok") return;
+  const faltan = c.items.filter(it => String(it.cant).trim() === "" || isNaN(parseFloat(String(it.cant).replace(",", "."))));
+  if (faltan.length) { mostrarToast(`Falta la cantidad de ${faltan.length} actividad(es). Si no se terminó nada, escribe 0.`); return; }
+  const creado = new Date().toISOString();
+  const items = c.items.length ? c.items : [{ cod: "SIN-CANTIDADES", np: false, desc: "Sin cantidades medibles en la semana", und: "", fr: jornada.frenteDia, hh: 0, cant: "0" }];
+  const filas = items.map((it, i) => {
+    const codF = it.np ? (String(it.cod).match(/^NP-(\d\d)/) || [])[1] || it.fr : frenteDeCod(it.cod);
+    const fr = CATALOGO.frentes.find(f => f.cod === codF);
+    const a = it.np ? null : CATALOGO.actividades.find(x => x.cod === it.cod);
+    return {
+      id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}_c${i}`,
+      fecha: c.sab, nombre: maestroActual.nombre, cargo: maestroActual.cargo, residente: maestroActual.residente,
+      codfrente: codF, frenteNombre: fr ? fr.nombre : "",
+      codcap: a ? a.cod.split(".").slice(0, 2).join(".") : "", codsubcap: a ? a.codSubcap : "",
+      codact: it.cod, actDesc: `[CANTIDAD SEMANAL] ${it.np ? "[NO PRESUPUESTADA] " : ""}${it.desc}`, actUnidad: it.und,
+      horas: 0, tipoHora: "Ordinaria Diurna", cantidad: parseFloat(String(it.cant).replace(",", ".")),
+      observaciones: `CANTIDAD SEMANAL ${c.lun} a ${c.sab} · ${r2(it.hh)} horas-hombre`,
+      creado, registradoPor: maestroActual.nombre, loteId: `CANT_${c.lun}`,
+    };
+  });
+  try {
+    await enviarOEncolar([{ registros: filas, hoja: "Registros" }]);
+    const m = lsGet(claveLS("cierres"), {}) || {}; m[c.lun] = creado; lsSet(claveLS("cierres"), m);
+    sumarAlSheetLocal(filas);
+    jornada.cierre = null;
+    mostrarToast(`✔ Cierre de la semana enviado (${filas.length} actividad(es))`);
+    renderJornada();
+  } catch (e) {
+    mostrarToast("No se pudo enviar el cierre. Revisa tu conexión e intenta de nuevo.");
+  }
+}
+
+// =====================================================================
+// ============ v5 (27-oct-2026): inicio, pasos, horas con botones, =====
+// ============ buscador con palabras de obra, sin señal, mi semana =====
+// =====================================================================
+
+// ---------- Horas con botones (sin el reloj del celular, para evitar el error de AM/PM) ----------
+const HORAS_INI = ["06:00", "07:00", "08:00", "12:00", "13:00"];
+const HORAS_FIN = ["12:00", "13:00", "15:00", "16:00", "17:00", "18:00"];
+function horaBonita(h) {
+  if (!h) return "";
+  const [H, M] = h.split(":").map(Number);
+  const hh = H % 12 === 0 ? 12 : H % 12;
+  return `${hh}${M ? ":" + String(M).padStart(2, "0") : ":00"} ${H === 12 && !M ? "m" : H < 12 ? "am" : "pm"}`;
+}
+// jsFor(v) devuelve el código del onclick con el valor v (un texto entre comillas o this.value)
+function chipsHora(valor, opciones, jsFor, aria) {
+  const ops = [...new Set(opciones.filter(Boolean))].sort();
+  const otra = valor && !ops.includes(valor);
+  return `<div class="chips">${ops.map(h => `<button type="button" class="chip hora ${h === valor ? "on" : ""}" onclick="${jsFor(`'${h}'`)}">${horaBonita(h)}</button>`).join("")}
+    <label class="chip otra ${otra ? "hora on" : ""}">Otra <input type="time" value="${otra ? valor : ""}" onchange="${jsFor("this.value")}" aria-label="${aria}"></label></div>`;
+}
+
+// ---------- Buscador: palabras que usan en obra -> palabras del presupuesto ----------
+// Para ampliar: agregar la palabra (sin tildes, en minúscula) y las palabras o frases del presupuesto que le corresponden.
+const SINONIMOS = {
+  pega: ["construccion de muro", "mamposteria"], pegue: ["construccion de muro", "mamposteria"], levante: ["construccion de muro", "mamposteria"],
+  mamposteria: ["mamposteria", "construccion de muro"],
+  resane: ["revoque", "estuco", "panete"], panete: ["revoque", "panete"], friso: ["revoque"], pañete: ["revoque"],
+  escombro: ["escombro"], botada: ["escombro"], trasiego: ["trasiego", "escombro", "movimiento"], acarreo: ["acarreo", "trasiego", "escombro"],
+  tumbar: ["demolicion"], picar: ["demolicion"], picada: ["demolicion"],
+  cieloraso: ["cielo"], superboard: ["superboard", "drywall", "fibrocemento"], drywall: ["drywall", "superboard", "yeso"],
+  enchape: ["enchape", "ceramica", "porcelanato"], baldosa: ["baldosa", "piso", "porcelanato", "grano"],
+  vaceo: ["concreto", "vaciado"], vaciado: ["concreto", "vaciado"], fundida: ["concreto"], fundir: ["concreto"],
+  dovela: ["dovela", "grouting"], pintar: ["pintura", "vinilo"], vinilo: ["pintura", "vinilo"],
+  desmontar: ["desmonte", "retiro"], retirar: ["retiro", "desmonte"], quitar: ["retiro", "desmonte"],
+  lampara: ["luminaria", "lampara"], luminaria: ["luminaria", "iluminacion"], iluminacion: ["luminaria", "iluminacion"],
+  baranda: ["baranda", "pasamanos"], pasamanos: ["pasamanos", "baranda"], limpieza: ["aseo", "limpieza"],
+};
+function coincideBusqueda(a, palabras) {
+  const d = normTxt(a.desc) + " " + a.cod;
+  return palabras.every(w => {
+    const base = w.replace(/s$/, "");
+    if (d.includes(w) || (base.length >= 3 && d.includes(base))) return true;
+    return (SINONIMOS[w] || SINONIMOS[base] || []).some(s => d.includes(normTxt(s)));
+  });
+}
+function ordenarResultados(lista, palabras) {
+  const rec = lsGet(claveLS("recientes"), []);
+  // primero lo que la cuadrilla ya usó, luego los frentes del maestro y los de hoy, luego más palabras exactas
+  const propios = new Set([...frentesDelMaestro().map(f => f.cod), ...(jornada.frentesDia || [])]);
+  const puntos = a => {
+    const d = normTxt(a.desc); const i = rec.indexOf(a.cod);
+    return (i >= 0 ? 60 - i : 0) + (propios.has(frenteDeCod(a.cod)) ? 20 : 0) + palabras.filter(w => d.includes(w)).length * 5;
+  };
+  return lista.map((a, i) => ({ a, p: puntos(a), i })).sort((x, y) => y.p - x.p || x.i - y.i).map(x => x.a);
+}
+
+// ---------- Sin señal: cola de envíos guardada en el celular ----------
+const CLAVE_COLA = "jmc_cola_envios";
+function cola() { return lsGet(CLAVE_COLA, []) || []; }
+async function postear(cuerpo) {
+  await fetch(URL_APPS_SCRIPT, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(cuerpo) });
+}
+// Devuelve true si todo salió; false si quedó (todo o parte) en la cola del celular
+async function enviarOEncolar(cuerpos) {
+  const resto = [...cuerpos];
+  if (navigator.onLine !== false) {
+    try { while (resto.length) { await postear(resto[0]); resto.shift(); } } catch (e) { /* sin señal */ }
+  }
+  if (!resto.length) return true;
+  lsSet(CLAVE_COLA, [...cola(), ...resto.map(b => ({ b, t: new Date().toISOString() }))]);
+  return false;
+}
+let vaciando = false;
+async function vaciarCola() {
+  const c = cola();
+  if (!c.length || vaciando || navigator.onLine === false) return;
+  vaciando = true; let n = 0;
+  try { for (const x of c) { await postear(x.b); n++; lsSet(CLAVE_COLA, c.slice(n)); } } catch (e) { /* sigue sin señal */ }
+  vaciando = false;
+  if (n) { mostrarToast(`✔ Se enviaron ${n} envío(s) que estaban guardados en el celular`); if (maestroActual) cargarSheet(true); }
+  if (modo === "personal" && maestroActual && !guardando) renderJornada();
+}
+window.addEventListener("online", vaciarCola);
+setInterval(vaciarCola, 60 * 1000);
+setTimeout(vaciarCola, 3000);
+
+// ---------- "Igual que ayer": repetir el último día enviado desde este celular ----------
+function guardarUltima() {
+  lsSet(claveLS("ultima"), {
+    fecha: fechaActual(), frentesDia: jornada.frentesDia, cuadrilla: jornada.cuadrilla,
+    lineas: jornada.lineas.filter(l => l.codAct || l.np).map(l => ({ horaIni: l.horaIni, horaFin: l.horaFin, codFrente: l.codFrente,
+      codAct: l.codAct, np: l.np, personas: l.personas, nocturno: !!l.nocturno })),
+    sup: jornada.sup && jornada.sup.activo ? { ini: jornada.sup.ini, fin: jornada.sup.fin, frentes: frentesSupervision() } : null,
+  });
+}
+function igualQueAntes() {
+  const u = lsGet(claveLS("ultima"), null); if (!u) return;
+  if (u.fecha === fechaActual() && !confirm("Ese día ya lo enviaste desde este celular. ¿Copiarlo otra vez?")) return;
+  iniciarJornada();
+  jornada.cuadrilla = (u.cuadrilla || []).filter(p => p && p.nombre);
+  if (u.frentesDia && u.frentesDia.length) { jornada.frentesDia = u.frentesDia; jornada.frenteDia = u.frentesDia[0]; }
+  jornada.lineas = (u.lineas || []).map(l => {
+    contLinea++;
+    return { ...l, id: contLinea, todos: false, personas: (l.personas || []).filter(n => jornada.cuadrilla.some(p => p.nombre === n)),
+      loteId: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}` };
+  });
+  if (u.sup && jornada.sup.activo) Object.assign(jornada.sup, { ini: u.sup.ini, fin: u.sup.fin, auto: false, frentes: u.sup.frentes || [], frentesAuto: !(u.sup.frentes || []).length });
+  jornada.desdeAnterior = u.fecha;
+  irPaso(1);
+}
+
+// ---------- Inicio: qué falta registrar ----------
+function cuadrillaSinMi() { return SHEET.estado === "ok" ? miCuadrillaHabitual().filter(p => p.k !== nn(maestroActual.nombre)) : []; }
+function renderInicio() {
+  const fecha = fechaActual(), hoy = fechaLocal(0);
+  const u = lsGet(claveLS("ultima"), null);
+  const c = cola();
+  let estado;
+  if (SHEET.estado === "ok") {
+    const crew = cuadrillaSinMi();
+    const reg = crew.filter(p => regsDia(p.nombre, fecha).length).length;
+    const pct = crew.length ? Math.round(reg / crew.length * 100) : 0;
+    const msg = !crew.length ? "Aún no hay cuadrilla habitual registrada" : reg === crew.length ? "Toda tu cuadrilla está registrada"
+      : reg ? `Faltan ${crew.length - reg} de tu cuadrilla` : "Nadie de tu cuadrilla registrado todavía";
+    estado = `<div class="hoy-top"><div class="anillo" style="--p:${pct}"><span>${reg}/${crew.length}</span></div>
+      <div><b>${fecha === hoy ? "Hoy, " : ""}${esc(fechaLarga(fecha))}</b><small>${msg}</small></div></div>`;
+  } else {
+    estado = `<div class="hoy-top"><div><b>${fecha === hoy ? "Hoy, " : ""}${esc(fechaLarga(fecha))}</b><small>${SHEET.estado === "error"
+      ? "Sin conexión: no se pudo revisar lo registrado" : "Revisando lo registrado…"}</small></div></div>`;
+  }
+  let resumenU = "";
+  if (u && u.lineas && u.lineas.length && u.fecha !== fecha) {
+    const per = new Set(u.lineas.flatMap(l => l.personas)).size;
+    const a = textoActividad(u.lineas[0]);
+    const ini = u.lineas.map(l => l.horaIni).sort()[0], fin = u.lineas.map(l => l.horaFin).sort().slice(-1)[0];
+    resumenU = `${per} persona(s) · ${a ? esc(a.titulo.slice(0, 32)) : "actividad"}${u.lineas.length > 1 ? ` y ${u.lineas.length - 1} más` : ""} · ${horaBonita(ini)} a ${horaBonita(fin)}`;
+  }
+  return `
+    ${c.length ? `<div class="banner-cola"><b>Sin señal: ${c.length} envío(s) guardados en el celular.</b> Salen solos cuando vuelva la señal.
+       <button class="campo-libre" onclick="vaciarCola()">Enviar ahora</button></div>` : ""}
+    ${renderCierreSemanal()}
+    <div class="card">
+      ${estado}
+      ${resumenU ? `<button class="btn-grande" onclick="igualQueAntes()">Igual que el ${esc(fechaLarga(u.fecha))}<small>${resumenU}</small></button>` : ""}
+      <button class="btn btn-secundario" onclick="irPaso(1)">Registrar ${fecha === hoy ? "hoy" : "este día"} paso a paso</button>
+    </div>
+    ${renderPendientes()}
+    ${tiraSemana()}`;
+}
+function tiraSemana() {
+  if (SHEET.estado !== "ok") return "";
+  const crew = cuadrillaSinMi(); if (!crew.length) return "";
+  const fecha = fechaActual(), lun = lunesDe(fecha), hoy = fechaLocal(0);
+  const dias = [0, 1, 2, 3, 4, 5, 6].map(i => sumarDias(lun, i));
+  return `<div class="card">
+    <h2 style="display:flex;justify-content:space-between;align-items:center">Semana del ${diaCorto(lun)}
+      <button class="campo-libre" onclick="cambiarModo('semana')">Ver mi semana ›</button></h2>
+    <div class="tira">${dias.map(d => {
+      const reg = crew.filter(p => regsDia(p.nombre, d).length).length;
+      const fut = d > hoy;
+      const cls = fut ? "" : reg === crew.length ? "completo" : reg ? "parcial" : "";
+      return `<button class="${cls} ${d === fecha ? "sel" : ""}" ${fut ? "disabled" : ""} onclick="irAFecha('${d}')">
+        <span>${["L", "M", "M", "J", "V", "S", "D"][(diaSemana(d) + 6) % 7]}</span><b>${fut ? "" : reg ? `${reg}/${crew.length}` : "–"}</b></button>`;
+    }).join("")}</div>
+  </div>`;
+}
+
+// ---------- Paso 4: cada persona con la línea de su día ----------
+function tramosDia(n, ivs, fecha) {
+  const dom = diaSemana(fecha) === 0 || esFestivoColombia(fecha);
+  let rest = Math.max(0, cuotaOrdinariaDia(fecha) - ordYa(n, fecha));
+  const out = [];
+  ivs.map(iv => { const a = aHoras(iv.ini); let b = aHoras(iv.fin); if (b <= a) b += 24; return { a, b, nov: iv.ref === "NOV" }; })
+    .sort((x, y) => x.a - y.a)
+    .forEach(iv => {
+      if (dom) { out.push({ a: iv.a, b: iv.b, t: iv.nov ? "nov" : "dom" }); return; }
+      const o = Math.min(rest, iv.b - iv.a);
+      if (o > 0) out.push({ a: iv.a, b: iv.a + o, t: iv.nov ? "nov" : "ord" });
+      if (iv.b - iv.a - o > 1e-9) out.push({ a: iv.a + o, b: iv.b, t: "ext" });
+      rest -= o;
+    });
+  regsDia(n, fecha).filter(f => f.horas > 0 && !f.local).forEach(f => {
+    const r = rangoTxt(f.obs); if (!r) return;
+    const a = aHoras(r.ini); let b = aHoras(r.fin); if (b <= a) b += 24;
+    out.push({ a, b, t: "ya" });
+  });
+  return out;
+}
+function renderRevisar() {
+  const fecha = fechaActual();
+  const filas = Object.entries(porPersona()).map(([n, ivs]) => ({ n, ivs }));
+  const s = jornada.sup;
+  if (maestroActual && s && s.activo && !supYaGuardada() && s.ini && s.fin && !(finAntesDeInicio(s.ini, s.fin) && !s.nocturno))
+    filas.push({ n: maestroActual.nombre, ivs: [{ ini: s.ini, fin: s.fin, ref: "SUP" }], sup: true });
+  const sinTrab = Object.entries(jornada.novedades || {}).filter(([, x]) => x.dia && !TIPOS_NOV[x.tipo].paga);
+  if (!filas.length && !sinTrab.length) return `<div class="card"><div class="vacio">Todavía no hay nada para enviar</div></div>`;
+  const todos = filas.flatMap(f => tramosDia(f.n, f.ivs, fecha));
+  const lo = Math.floor(Math.min(7, ...todos.map(t => t.a))), hi = Math.ceil(Math.max(17, ...todos.map(t => t.b)));
+  const pos = h => (h - lo) / (hi - lo) * 100;
+  let totH = 0, totE = 0;
+  const html = filas.map(f => {
+    if (traslapes(f.ivs)) return `<div class="rev-fila"><div class="cab"><b>${esc(nombreCorto(f.n))}</b><span style="color:#B4453A;font-weight:700">Horarios cruzados</span></div></div>`;
+    const seg = clasificarDia(fecha, f.ivs, ordYa(f.n, fecha));
+    const t = seg.reduce((a, x) => a + x.horas, 0), e = seg.filter(x => x.tipoHora.includes("Extra")).reduce((a, x) => a + x.horas, 0);
+    const ya = horasYa(f.n, fecha);
+    if (!f.sup) { totH += t; totE += e; }
+    const cr = cruceVivo(f.n);
+    const nov = jornada.novedades[f.n];
+    return `<div class="rev-fila">
+      <div class="cab"><b>${esc(nombreCorto(f.n))}${f.sup ? " (supervisión)" : ""}</b><span><b>${r2(t + ya)} h</b>${e > 0.001 ? ` <span class="extra">· ${r2(e)} extra</span>` : ""}</span></div>
+      <div class="tl">${tramosDia(f.n, f.ivs, fecha).map(x => `<span class="${x.t}" style="left:${pos(x.a).toFixed(2)}%;width:${(pos(x.b) - pos(x.a)).toFixed(2)}%"></span>`).join("")}</div>
+      ${cr ? `<small style="color:#B4453A;font-weight:600">${esc(cr)}</small>` : ""}
+      ${nov ? `<small class="tag-nov" style="font-size:12px">${esc(textoNov(nov))}</small>` : ""}
+    </div>`;
+  }).join("");
+  const personas = new Set(filas.filter(f => !f.sup).map(f => f.n)).size;
+  const marcas = [...new Set([lo, 12, hi])].filter(v => v >= lo && v <= hi);
+  return `<div class="card">
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px;text-align:center">
+      <div><b style="font-size:21px;color:var(--verde-oscuro)">${personas}</b><br><small class="nota-h">personas</small></div>
+      <div><b style="font-size:21px;color:var(--verde-oscuro)">${r2(totH)}</b><br><small class="nota-h">horas</small></div>
+      <div><b style="font-size:21px;color:#7A5E00">${r2(totE)}</b><br><small class="nota-h">horas extra</small></div>
+    </div>
+    <div class="tl-escala">${marcas.map(m => `<span style="left:${Math.min(94, Math.max(6, pos(m))).toFixed(1)}%">${horaBonita(String(m % 24).padStart(2, "0") + ":00")}</span>`).join("")}</div>
+    ${html}
+    ${sinTrab.map(([n, x]) => `<div class="rev-fila"><div class="cab"><b style="color:#6B756F">${esc(nombreCorto(n))}</b><span class="tag-nov">${esc(textoNov(x))} · 0 h</span></div></div>`).join("")}
+    <div class="leyenda"><span><i style="background:var(--verde)"></i>Ordinarias</span><span><i style="background:#E0A526"></i>Extra</span>
+      <span><i style="background:#8A5A9E"></i>Novedad pagada</span><span><i style="background:#3D6E8C"></i>Dominical</span>
+      <span><i style="background:#C9D3CC"></i>Ya registrado por otro</span></div>
+    ${renderJustificaciones()}
+  </div>`;
+}
+
+// ---------- Mi semana: horas de la cuadrilla, extra semanal y novedades para nómina ----------
+let semanaSel = null;
+function abrevNov(txt) {
+  const t = txt.replace(/^NOVEDAD( PAGADA)?: /, "").split(" · ")[0];
+  const m = { "No vino": "NV", "Incapacidad": "Inc", "Vacaciones": "Vac", "Suspensión": "Sus", "Permiso no remunerado": "PNR", "Permiso": "Per" };
+  return m[t] || t.slice(0, 3);
+}
+function renderSemana() {
+  const z = document.getElementById("zonaSemana");
+  if (!maestroActual) { z.innerHTML = `<div class="vacio">Selecciona tu nombre para ver tu semana</div>`; return; }
+  if (SHEET.estado !== "ok") {
+    z.innerHTML = `<div class="card"><p class="nota">${SHEET.estado === "error"
+      ? `Sin conexión con el Sheet. <button class="campo-libre" onclick="cargarSheet(true)">Reintentar</button>` : "Leyendo los registros de la semana…"}</p></div>`;
+    if (SHEET.estado === "nada") cargarSheet();
+    return;
+  }
+  const hoy = fechaLocal(0), actual = lunesDe(hoy), anterior = sumarDias(actual, -7);
+  const lun = semanaSel === anterior ? anterior : actual;
+  const dias = [0, 1, 2, 3, 4, 5, 6].map(i => sumarDias(lun, i));
+  const yo = nn(maestroActual.nombre);
+  const enSem = SHEET.filas.filter(f => f.fecha >= lun && f.fecha <= dias[6] && !esCantidad(f));
+  const enCat = new Map(CATALOGO.personal.map(p => [nn(p.nombre), p.nombre]));
+  const m = new Map(cuadrillaSinMi().map(p => [p.k, p.nombre]));
+  enSem.filter(f => nn(f.por) === yo && f.n !== yo).forEach(f => { if (!m.has(f.n)) m.set(f.n, enCat.get(f.n) || f.nombre); });
+  const personas = [...m.entries()].map(([k, nombre]) => {
+    const regs = enSem.filter(f => f.n === k);
+    const porDia = dias.map(d => {
+      const r = regs.filter(f => f.fecha === d); const h = r.reduce((a, f) => a + f.horas, 0);
+      const nov = r.find(f => f.obs.startsWith("NOVEDAD:"));
+      return { d, h, nov: h > 0 ? "" : nov ? abrevNov(nov.obs) : "" };
+    });
+    const ext = regs.filter(f => /extra/i.test(f.tipoHora)).reduce((a, f) => a + f.horas, 0);
+    return { k, nombre, porDia, tot: porDia.reduce((a, x) => a + x.h, 0), ext };
+  }).sort((a, b) => b.ext - a.ext || a.nombre.localeCompare(b.nombre));
+  const pasados = personas.filter(p => p.ext > 12 + 1e-9);
+  // novedades de la semana (para la liquidación de nómina)
+  const agrup = new Map();
+  enSem.filter(f => f.obs.startsWith("NOVEDAD") && (m.has(f.n) || nn(f.por) === yo)).forEach(f => {
+    const txt = f.obs.replace(/^NOVEDAD( PAGADA)?: /, "").split(" · ")[0];
+    const k = `${f.fecha}|${f.n}|${txt}`;
+    const x = agrup.get(k) || { fecha: f.fecha, nombre: m.get(f.n) || f.nombre, txt, horas: 0, paga: f.obs.startsWith("NOVEDAD PAGADA"),
+      pend: f.obs.includes("soporte pendiente"), a: (f.obs.match(/· (Gastos generales|Administración)/) || [])[1] || "" };
+    x.horas += f.horas; agrup.set(k, x);
+  });
+  const novs = [...agrup.values()].sort((a, b) => a.fecha.localeCompare(b.fecha));
+  const hPag = novs.filter(x => x.paga).reduce((a, x) => a + x.horas, 0);
+  const diasNo = novs.filter(x => !x.paga && /^(No vino|Suspensión|Permiso no remunerado)/.test(x.txt)).length;
+  const pend = novs.filter(x => x.pend).length;
+  z.innerHTML = `
+    <div class="card" style="display:flex;align-items:center;gap:8px">
+      <button class="btn-nov" ${lun === anterior ? "disabled" : ""} onclick="semanaSel='${anterior}'; renderSemana()">‹ Anterior</button>
+      <b style="flex:1;text-align:center;color:var(--verde-oscuro)">${diaCorto(lun)} a ${diaCorto(dias[6])}</b>
+      <button class="btn-nov" ${lun === actual ? "disabled" : ""} onclick="semanaSel=null; renderSemana()">Esta ›</button>
+    </div>
+    ${renderCierreSemanal()}
+    <div class="card">
+      <h2>Horas de tu cuadrilla</h2>
+      ${personas.length ? `<div class="sem-grid">
+        <span class="h" style="text-align:left">Persona</span>${["L", "M", "M", "J", "V", "S", "D"].map(x => `<span class="h">${x}</span>`).join("")}<span class="h">Tot</span><span class="h">Extra</span>
+        ${personas.map(p => `<span class="n" title="${esc(p.nombre)}">${esc(nombreCorto(p.nombre))}</span>${p.porDia.map((x, i) =>
+          `<span class="c ${x.h > 0 ? (x.h > HORAS_DIA_ALERTA ? "alto" : (i === 6 || esFestivoColombia(x.d)) ? "dom" : "t") : x.nov ? "nv" : ""}">${x.h > 0 ? r2(x.h) : esc(x.nov)}</span>`).join("")}
+          <span class="tot">${r2(p.tot)}</span><span class="ex ${p.ext > 12 + 1e-9 ? "mal" : ""}">${r2(p.ext)}</span>`).join("")}
+      </div>
+      <div class="leyenda"><span><i style="background:#FFE3B0"></i>Más de ${HORAS_DIA_ALERTA} h</span><span><i style="background:#DCE6F2"></i>Dominical o festivo</span>
+        <span><i style="background:#EFE7F3"></i>Novedad (NV no vino, Inc, Vac…)</span><span><i style="background:#B3261E"></i>Más de 12 h extra</span></div>`
+      : `<p class="nota">Sin registros de tu cuadrilla en esta semana.</p>`}
+    </div>
+    ${pasados.length ? `<div class="problemas"><b>${pasados.map(p => esc(nombreCorto(p.nombre))).join(", ")} ${pasados.length > 1 ? "pasan" : "pasa"} de 12 h extra en la semana</b> (límite legal). Revisa con el residente antes de programar más horas extra.</div>` : ""}
+    <div class="card">
+      <h2>Novedades de la semana <span class="contador">${novs.length}</span></h2>
+      ${novs.length ? `<p class="nota" style="margin:0 0 6px">${r2(hPag)} h pagadas sin actividad · ${diasNo} día(s) sin pago${pend ? ` · <b style="color:#7A5E00">${pend} soporte(s) pendiente(s)</b>` : ""}</p>
+        ${novs.map(x => `<div class="nov-sem"><b>${diaCorto(x.fecha)} · ${esc(nombreCorto(x.nombre))}</b> · ${esc(x.txt)}<br>
+          ${x.paga ? `<span class="pill paga">Paga ${r2(x.horas)} h</span>${x.a ? `<span class="pill gris">${esc(x.a)}</span>` : ""}`
+            : /^(Incapacidad|Vacaciones)/.test(x.txt) ? `<span class="pill gris">EPS / nómina</span>` : `<span class="pill nopaga">No se paga</span>`}
+          ${x.pend ? `<span class="pill pend">Falta el soporte</span>` : ""}</div>`).join("")}`
+      : `<p class="nota">No se marcaron novedades esta semana.</p>`}
+    </div>`;
 }
 
 cargarCatalogo();
