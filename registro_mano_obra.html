@@ -790,6 +790,8 @@ function calcularSegmentosHora(fechaStr, horaInicioStr, horaFinStr) {
   if (fin - inicio > 24) return null; // dato improbable / error de digitación
 
   const esDominicalFestivo = (diaSemana === 0) || esFestivoColombia(fechaStr);
+  const sig = sumarDias(fechaStr, 1);
+  const esDominicalSig = new Date(sig + "T00:00:00").getDay() === 0 || esFestivoColombia(sig);
 
   // Cuota de horas ORDINARIAS del día (a partir de la hora en que inició el turno):
   //   Lunes a Jueves: 8h ordinarias (ej. 7am-3pm), luego extra
@@ -809,6 +811,7 @@ function calcularSegmentosHora(fechaStr, horaInicioStr, horaFinStr) {
   // Puntos de quiebre: inicio/fin del turno, fin de la cuota ordinaria, y
   // cada transición 19:00/06:00 (nocturno) que caiga dentro del turno.
   const puntos = new Set([inicio, fin, finOrdinaria]);
+  if (24 > inicio && 24 < fin) puntos.add(24);
   for (let k = -1; k * 24 <= fin + 24; k++) {
     const t19 = k * 24 + 19, t6 = k * 24 + 6;
     if (t19 > inicio && t19 < fin) puntos.add(t19);
@@ -824,7 +827,7 @@ function calcularSegmentosHora(fechaStr, horaInicioStr, horaFinStr) {
     const medio = (ini + finTramo) / 2;
     const esOrdinaria = ini < finOrdinaria - 1e-9;
     const esNocturna = esHoraNocturna(medio);
-    const tipo = nombreTipoHora(esOrdinaria, esNocturna, esDominicalFestivo);
+    const tipo = nombreTipoHora(esOrdinaria, esNocturna, medio >= 24 ? esDominicalSig : esDominicalFestivo);
     totales[tipo] = (totales[tipo] || 0) + dur;
   }
   return Object.entries(totales)
@@ -1398,9 +1401,9 @@ function renderLinea(l) {
     <label>Hasta</label>
     ${chipsHora(l.horaFin, HORAS_FIN, v => `setLinea(${l.id}, 'horaFin', ${v})`, "Hora de fin")}
     ${finAntesDeInicio(l.horaIni, l.horaFin) ? `
-      <div class="alerta-hora">${l.nocturno ? "Turno de noche: termina al día siguiente." :
+      <div class="alerta-hora">${l.nocturno ? "Termina después de medianoche, al día siguiente." :
         `La hora de fin (<b>${l.horaFin}</b>) quedó antes que la de inicio. Si terminaron en la tarde, cámbiala a <b>${horaTarde(l.horaFin)}</b> (PM).`}
-        <label><input type="checkbox" ${l.nocturno ? "checked" : ""} onchange="setLinea(${l.id}, 'nocturno', this.checked); renderJornada()"> 🌙 Fue turno de noche</label>
+        <label><input type="checkbox" ${l.nocturno ? "checked" : ""} onchange="setLinea(${l.id}, 'nocturno', this.checked); renderJornada()"> 🌙 Terminó después de medianoche (al día siguiente)</label>
       </div>` : ""}
     ${act ? `
       <div class="act-elegida" onclick="abrirPicker(${l.id})">
@@ -1548,7 +1551,8 @@ function cuotaOrdinariaDia(fechaStr) {
 }
 // intervalos: [{ini, fin, ref}] -> [{ref, tipoHora, horas}]
 function clasificarDia(fechaStr, intervalos, ordYaUsadas) {
-  const dom = new Date(fechaStr + "T00:00:00").getDay() === 0 || esFestivoColombia(fechaStr);
+  const domDe = f => new Date(f + "T00:00:00").getDay() === 0 || esFestivoColombia(f);
+  const dom = domDe(fechaStr), domSig = domDe(sumarDias(fechaStr, 1));
   let restante = Math.max(0, cuotaOrdinariaDia(fechaStr) - (ordYaUsadas || 0));
   const salida = [];
   const orden = intervalos.map(iv => {
@@ -1559,12 +1563,14 @@ function clasificarDia(fechaStr, intervalos, ordYaUsadas) {
     const puntos = new Set([iv.a, iv.b]);
     if (restante > 0 && iv.a + restante < iv.b) puntos.add(iv.a + restante);
     for (let k = -1; k <= 2; k++) { [k * 24 + 19, k * 24 + 6].forEach(t => { if (t > iv.a && t < iv.b) puntos.add(t); }); }
+    if (24 > iv.a && 24 < iv.b) puntos.add(24); // medianoche: lo que sigue es del día siguiente (dominical/festivo)
     const cortes = [...puntos].sort((x, y) => x - y);
     const tot = {};
     for (let i = 0; i < cortes.length - 1; i++) {
       const dur = cortes[i + 1] - cortes[i]; if (dur <= 1e-9) continue;
       const esOrd = restante > 1e-9;
-      const tipo = nombreTipoHora(esOrd, esHoraNocturna((cortes[i] + cortes[i + 1]) / 2), dom);
+      const medio = (cortes[i] + cortes[i + 1]) / 2;
+      const tipo = nombreTipoHora(esOrd, esHoraNocturna(medio), medio >= 24 ? domSig : dom);
       tot[tipo] = (tot[tipo] || 0) + dur;
       if (esOrd) restante = Math.max(0, restante - dur);
     }
@@ -1691,8 +1697,8 @@ function renderSupervision() {
         <input type="time" value="${s.fin}" onchange="setSup('fin', this.value)" aria-label="Tu hora de salida">
       </div>
       ${r && !s.auto && (s.ini !== r.ini || s.fin !== r.fin) ? `<button class="btn btn-suave" onclick="jornada.sup.auto=true; renderJornada()">Usar el horario de la cuadrilla (${r.ini} a ${r.fin})</button>` : ""}
-      ${finAntesDeInicio(s.ini, s.fin) ? `<div class="alerta-hora">${s.nocturno ? "Turno de noche: terminas al día siguiente." : `Tu salida (<b>${s.fin}</b>) quedó antes que tu entrada. Si saliste en la tarde, cámbiala a <b>${horaTarde(s.fin)}</b> (PM).`}
-        <label><input type="checkbox" ${s.nocturno ? "checked" : ""} onchange="setSup('nocturno', this.checked)"> 🌙 Fue turno de noche</label></div>` : ""}
+      ${finAntesDeInicio(s.ini, s.fin) ? `<div class="alerta-hora">${s.nocturno ? "Terminas después de medianoche, al día siguiente." : `Tu salida (<b>${s.fin}</b>) quedó antes que tu entrada. Si saliste en la tarde, cámbiala a <b>${horaTarde(s.fin)}</b> (PM).`}
+        <label><input type="checkbox" ${s.nocturno ? "checked" : ""} onchange="setSup('nocturno', this.checked)"> 🌙 Terminó después de medianoche (al día siguiente)</label></div>` : ""}
       ${total}
       ${ex ? `<div class="sup-aviso">Tu horario va ${ex.antes > 0.5 ? `${Math.round(ex.antes * 10) / 10} h antes` : ""}${ex.antes > 0.5 && ex.despues > 0.5 ? " y " : ""}${ex.despues > 0.5 ? `${Math.round(ex.despues * 10) / 10} h después` : ""} del de tu cuadrilla (${ex.r.ini} a ${ex.r.fin}). <b>¿Qué hiciste en ese tiempo?</b>
         <input type="text" maxlength="120" placeholder="Ej. Recibo de material, reunión con interventoría" value="${esc(s.motivo)}" oninput="setSup('motivo', this.value)"></div>` : ""}
@@ -1713,7 +1719,7 @@ function problemasSupervision() {
   if (supEnCuadrilla()) p.push("Estás en la cuadrilla y en supervisión: quítate de la cuadrilla o desmarca 'Hoy solo supervisé'");
   if (!s.ini || !s.fin) p.push("Tu jornada: falta tu hora de entrada o de salida");
   else if (finAntesDeInicio(s.ini, s.fin) && !s.nocturno) p.push(`Tu salida (${s.fin}) es antes que tu entrada. Si saliste en la tarde, escribe ${horaTarde(s.fin)}`);
-  else if (duracionH(s.ini, s.fin) > 14) p.push("Tu jornada dura más de 14 horas, revisa las horas");
+  else if (duracionH(s.ini, s.fin) > HORAS_TOPE) p.push(`Tu jornada da más de ${HORAS_TOPE} horas: revisa la hora de entrada y de salida`);
   if (!frentesSupervision().length) p.push("Tu jornada: marca al menos un frente que supervisaste");
   if (excesoSupervision() && (s.motivo || "").trim().length < 4) p.push("Escribe qué hiciste fuera del horario de tu cuadrilla");
   return p;
@@ -1839,7 +1845,7 @@ function problemasJornada() {
     if (!(l.codAct || l.np)) p.push(`Actividad ${i + 1}: falta elegir la actividad`);
     if (!l.personas.length) p.push(`Actividad ${i + 1}: no tiene personas`);
     if (finAntesDeInicio(l.horaIni, l.horaFin) && !l.nocturno) p.push(`Actividad ${i + 1}: la hora de fin (${l.horaFin}) es antes que la de inicio. Si terminaron en la tarde, escribe ${horaTarde(l.horaFin)}`);
-    if (duracionH(l.horaIni, l.horaFin) > 14) p.push(`Actividad ${i + 1}: dura más de 14 horas, revisa las horas`);
+    if (duracionH(l.horaIni, l.horaFin) > HORAS_TOPE) p.push(`Actividad ${i + 1}: da más de ${HORAS_TOPE} horas, revisa la hora de inicio y de fin`);
   });
   problemasSupervision().forEach(x => p.push(x));
   problemasNovedades().forEach(x => p.push(x));
@@ -2055,6 +2061,8 @@ function copiarCodigo(cod) {
 //  4. pedir el cierre semanal de cantidades.
 const SHEET_ID = "1Sbt-r9yR_pcyluP_JLX9nA2nwxpW3cU2ATVPMwvNP-I";
 const HORAS_DIA_ALERTA = 10;
+// Más de 10 h: se guarda con el motivo. Más de 22 h seguidas se toma como error de digitación.
+const HORAS_TOPE = 22;
 // v5: novedades para la liquidación de nómina.
 //  paga: true  -> se registran las horas (cuentan para ordinarias/extra) con el código <frente>.NOV-<TIPO>.GG,
 //                 que el tablero ya manda a la A (gastos generales / administración), nunca al APU de una actividad.
@@ -2377,8 +2385,8 @@ function obsJust(n) {
 }
 function renderJustificaciones() {
   const exc = excedidos(); if (!exc.length) return "";
-  return `<div class="sup-aviso"><b>Más de ${HORAS_DIA_ALERTA} horas en el día.</b> El límite legal es de 2 horas extra diarias. Escribe el motivo de cada persona; si no, no se puede guardar.
-    ${exc.map(e => `<label class="just-label">${esc(nombreCorto(e.n))}: ${r2(e.total)} h${e.ya ? ` (incluye ${r2(e.ya)} h que ya estaban registradas)` : ""}</label>
+  return `<div class="sup-aviso"><b>Más de ${HORAS_DIA_ALERTA} horas en el día.</b> Pasa el límite legal de 2 horas extra diarias. Si las horas son reales, escribe el motivo de cada persona y se puede guardar.
+    ${exc.map(e => `<label class="just-label">${esc(nombreCorto(e.n))}: ${r2(e.total)} h${e.ya ? ` (incluye ${r2(e.ya)} h que ya estaban registradas)` : ""}${e.total > 14 ? ` · <span style="font-weight:400">revisa que la hora de salida esté bien</span>` : ""}</label>
       <input type="text" maxlength="120" placeholder="Ej. Vaciado de placa que no se podía suspender" value="${esc(jornada.just[e.n] || "")}"
              oninput='jornada.just[${JSON.stringify(e.n)}] = this.value'>`).join("")}
   </div>`;
